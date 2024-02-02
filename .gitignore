@@ -33,3 +33,4 @@ dist-ssr
 /dataSources.local.xml
 
 .idea/*
+pnpm-lock.yaml
