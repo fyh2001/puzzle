@@ -52,10 +52,9 @@ type UserListResp struct {
 
 // UserRegisterReq 用户注册请求模型
 type UserRegisterReq struct {
-	Id       string `json:"id"`       // 主键ID
 	Username string `json:"username"` // 用户名
+	Password string `json:"password"` // 密码
 	Nickname string `json:"nickname"` // 昵称
-	Avatar   string `json:"avatar"`   // 头像
 }
 
 // UserLoginReq 用户登录请求模型

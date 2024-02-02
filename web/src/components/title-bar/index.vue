@@ -23,6 +23,8 @@ const props = defineProps({
 
 <template>
   <div>
-    <n-el :style="{ fontSize: textSize, color: textColor }">{{ title }}</n-el>
+    <n-el :style="{ fontSize: textSize, color: textColor }">{{
+      props.title
+    }}</n-el>
   </div>
 </template>

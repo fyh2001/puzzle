@@ -19,7 +19,7 @@ func Register(c *gin.Context) {
 
 	err = userService.UserRegister(registerReq)
 	if err != nil {
-		c.JSON(400, HttpResult.Fail("注册失败"))
+		c.JSON(400, HttpResult.Fail(err.Error()))
 		return
 	}
 

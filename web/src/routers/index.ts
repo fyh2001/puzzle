@@ -7,6 +7,8 @@ import {
 
 import Index from "@/views/index/index.vue";
 import Home from "@/views/home/index.vue";
+import Register from "@/views/register/index.vue";
+
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
@@ -20,6 +22,11 @@ const routes: RouteRecordRaw[] = [
         meta: { index: 0 },
       },
     ],
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: Register,
   },
 ];
 

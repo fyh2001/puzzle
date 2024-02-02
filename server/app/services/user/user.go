@@ -11,13 +11,31 @@ import (
 
 // UserRegister 用户注册
 func UserRegister(u models.UserRegisterReq) error {
-	user := models.User{
-		Username: u.Username,
-		Nickname: u.Nickname,
-		Avatar:   u.Avatar,
+
+	// 判断用户名是否存在
+	var tempUser models.User
+	err := database.GetMySQL().Table("user").Where("username = ?", u.Username).First(&tempUser).Error
+	if err == nil {
+		return errors.New("用户名已存在")
 	}
 
-	err := database.GetMySQL().Create(&user).Error
+	// 判断昵称是否存在
+	err = database.GetMySQL().Table("user").Where("nickname = ?", u.Nickname).First(&tempUser).Error
+	if err == nil {
+		return errors.New("昵称已存在")
+	}
+
+	snowflake := utils.Snowflake{}
+
+	user := models.User{
+		Id:       snowflake.NextVal(),
+		Username: u.Username,
+		Password: utils.MD5(u.Password),
+		Nickname: u.Nickname,
+		Status:   0,
+	}
+
+	err = database.GetMySQL().Create(&user).Error
 	if err != nil {
 		return err
 	}
@@ -37,7 +55,7 @@ func UserLogin(u models.UserLoginReq) (models.UserLoginResp, error) {
 		return loginResp, errors.New("用户不存在")
 	}
 
-	if userInfo.Password != u.Password {
+	if userInfo.Password != utils.MD5(u.Password) {
 		return loginResp, errors.New("密码错误")
 	}
 
