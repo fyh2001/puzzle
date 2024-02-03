@@ -43,4 +43,3 @@ const themeColor = computed(() => {
   }
 });
 </script>
-@/store/theme/theme

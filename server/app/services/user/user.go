@@ -59,11 +59,11 @@ func UserLogin(u models.UserLoginReq) (models.UserLoginResp, error) {
 		return loginResp, errors.New("密码错误")
 	}
 
-	if userInfo.Status != 1 {
+	if userInfo.Status == 1 {
 		return loginResp, errors.New("用户已冻结")
 	}
 
-	if userInfo.Status != 2 {
+	if userInfo.Status == 2 {
 		return loginResp, errors.New("用户已注销")
 	}
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import GlobalProvider from "@/components/global-provider/index.vue";
-import { useThemeStore } from "@/store/theme/index";
+import GlobalProvider from "@/components/global-provider.vue";
+import { useThemeStore } from "@/store/theme";
 
 import { onMounted } from "vue";
 
@@ -23,4 +23,3 @@ onMounted(() => {});
 </template>
 
 <style></style>
-@/store/theme/theme

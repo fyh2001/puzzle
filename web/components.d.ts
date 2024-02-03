@@ -8,11 +8,14 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Components: typeof import('./src/components/index.vue')['default']
-    GlobalProvider: typeof import('./src/components/global-provider/index.vue')['default']
+    Dropdown: typeof import('./src/components/dropdown.vue')['default']
+    GlobalProvider: typeof import('./src/components/global-provider.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    NAvatar: typeof import('naive-ui')['NAvatar']
     NButton: typeof import('naive-ui')['NButton']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
     NDialogProvider: typeof import('naive-ui')['NDialogProvider']
+    NDropdown: typeof import('naive-ui')['NDropdown']
     NEl: typeof import('naive-ui')['NEl']
     NForm: typeof import('naive-ui')['NForm']
     NFormItem: typeof import('naive-ui')['NFormItem']
@@ -22,7 +25,8 @@ declare module 'vue' {
     NMessageProvider: typeof import('naive-ui')['NMessageProvider']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Tabbar: typeof import('./src/components/tabbar/index.vue')['default']
-    TitleBar: typeof import('./src/components/title-bar/index.vue')['default']
+    Tabbar: typeof import('./src/components/tabbar.vue')['default']
+    TitleBar: typeof import('./src/components/title-bar.vue')['default']
+    TopBar: typeof import('./src/components/top-bar.vue')['default']
   }
 }

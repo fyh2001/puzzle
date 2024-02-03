@@ -7,7 +7,10 @@ import {
 
 import Index from "@/views/index/index.vue";
 import Home from "@/views/home/index.vue";
+import Record from "@/views/record/index.vue";
+import User from "@/views/user/index.vue";
 import Register from "@/views/register/index.vue";
+import Login from "@/views/login/index.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -21,12 +24,29 @@ const routes: RouteRecordRaw[] = [
         component: Home,
         meta: { index: 0 },
       },
+      {
+        path: "/record",
+        name: "Record",
+        component: Record,
+        meta: { index: 1 },
+      },
+      {
+        path: "/user",
+        name: "User",
+        component: User,
+        meta: { index: 2 },
+      },
     ],
   },
   {
     path: "/register",
     name: "Register",
     component: Register,
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
   },
 ];
 

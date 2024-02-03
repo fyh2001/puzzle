@@ -46,6 +46,11 @@ export interface UserloginReq {
   password: string;
 }
 
+export interface UserloginResp {
+  token: string;
+  user: UserResp;
+}
+
 export interface UserRegisterReq {
   username: string;
   password: string;

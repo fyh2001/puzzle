@@ -12,14 +12,9 @@ export const useThemeStore = defineStore("theme", {
 
   getters: {
     // 深色模式/浅色模式
-    getDarkMode() {
-      return this.darkMode;
-    },
-
+    getDarkMode: (state) => state.darkMode,
     // 主题色
-    getThemeColor() {
-      return this.themeColor;
-    },
+    getThemeColor: (state) => state.themeColor,
   },
 
   actions: {
@@ -34,7 +29,7 @@ export const useThemeStore = defineStore("theme", {
     },
 
     // 切换主题色
-    changeThemeColor(color) {
+    changeThemeColor(color: string) {
       this.themeColor = color;
     },
   },

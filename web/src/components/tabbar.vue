@@ -1,7 +1,17 @@
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import type { TabbarItem, TabItemOffset } from "@/components/tabbar/types";
+
+export interface TabbarItem {
+  label: string;
+  icon: any;
+  path: string;
+}
+
+export interface TabItemOffset {
+  left: number;
+  width: number;
+}
 
 const route = useRoute();
 const router = useRouter();

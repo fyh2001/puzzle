@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { ScrambleModel } from "@/store/scramble/types";
+import type { ScrambleModel } from "@/types/scramble";
 
 export const useScrambleStore = defineStore("scramble", {
   persist: true,

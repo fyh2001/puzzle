@@ -13,13 +13,13 @@ func Register(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&registerReq)
 	if err != nil {
-		c.JSON(400, HttpResult.Fail("参数错误"))
+		c.JSON(200, HttpResult.Fail("参数错误"))
 		return
 	}
 
 	err = userService.UserRegister(registerReq)
 	if err != nil {
-		c.JSON(400, HttpResult.Fail(err.Error()))
+		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
 	}
 
@@ -32,14 +32,14 @@ func Login(c *gin.Context) {
 	// 参数校验
 	err := c.ShouldBindJSON(&loginReq)
 	if err != nil {
-		c.JSON(400, HttpResult.Fail("参数错误"))
+		c.JSON(200, HttpResult.Fail("参数错误"))
 		return
 	}
 
 	// 登录
 	userInfo, err := userService.UserLogin(loginReq)
 	if err != nil {
-		c.JSON(400, HttpResult.Fail(err.Error()))
+		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
 	}
 
@@ -52,14 +52,14 @@ func ListUser(c *gin.Context) {
 	// 参数校验
 	err := c.ShouldBind(&userReq)
 	if err != nil {
-		c.JSON(400, HttpResult.Fail("参数错误"))
+		c.JSON(200, HttpResult.Fail("参数错误"))
 		return
 	}
 
 	// 查询用户列表
 	userList, err := userService.List(userReq)
 	if err != nil {
-		c.JSON(400, HttpResult.Fail(err.Error()))
+		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
 	}
 

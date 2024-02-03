@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import TitleBar from "@/components/title-bar/index.vue";
+import TitleBar from "@/components/title-bar.vue";
 import {
   getCellClass,
   getScramble,
@@ -12,7 +12,7 @@ import { useScrambleStore } from "@/store/scramble";
 import { useGameStore } from "@/store/game";
 import { useMessage } from "naive-ui";
 
-const message = useMessage();
+const Message = useMessage();
 
 const gameStore = useGameStore();
 const scrambleStore = useScrambleStore();
@@ -201,4 +201,3 @@ const handleDataClear = () => {
     </div>
   </div>
 </template>
-@/store/scramble/scramble@/store/game/game

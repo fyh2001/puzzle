@@ -4,7 +4,7 @@ import {
   InsertChartOutlinedRound,
   PersonOutlineRound,
 } from "@vicons/material";
-import Tabbar from "@/components/tabbar/index.vue";
+import Tabbar from "@/components/tabbar.vue";
 import type { TabbarItem } from "@/components/tabbar/types";
 
 const tabsContent: TabbarItem[] = [
