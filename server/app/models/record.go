@@ -9,8 +9,8 @@ import (
 type Record struct {
 	Id        int64     `json:"id" gorm:"primaryKey"`             // 主键ID
 	UserId    int64     `json:"user_id"`                          // 用户ID
-	Event     string    `json:"event"`                            // p15 | p24 | p35 | p48 | p63 | p80
-	Type      int       `json:"type"`                             // 类型 0:个人 1:排行榜 2:对战
+	Dimension int       `json:"dimension"`                        // 阶数 3 | 4 | 5 | 6 | 7 | 8
+	Type      int       `json:"type"`                             // 类型 0:练习 1:排行榜 2:对战
 	Duration  int       `json:"duration"`                         // 耗时
 	Step      int       `json:"step"`                             // 步数
 	Status    int       `json:"status"`                           // 状态 0:启用 1:冻结 2:删除
@@ -25,20 +25,20 @@ type Record struct {
 type RecordReq struct {
 	Id            int64            `json:"id"`             // 主键ID
 	UserId        int64            `json:"user_id"`        // 用户ID
-	Event         string           `json:"event"`          // p15 | p24 | p35 | p48 | p63 | p80
+	Dimension     int              `json:"dimension"`      // 阶数 3 | 4 | 5 | 6 | 7 | 8
 	Type          int              `json:"type"`           // 类型 0:个人 1:排行榜 2:对战
+	Status        int              `json:"status"`         // 状态 0:启用 1:冻结 2:删除
 	DurationRange []int            `json:"duration_range"` // 耗时范围
 	StepRange     []int            `json:"step_range"`     // 步数范围
-	Status        int              `json:"status"`         // 状态 0:启用 1:冻结 2:删除
-	Pagination    utils.Pagination `gorm:"embedded"`       // 分页
 	DateRange     []time.Time      `json:"date_range"`     // 日期范围
+	Pagination    utils.Pagination `gorm:"embedded"`       // 分页
 }
 
 // RecordResp 记录响应模型
 type RecordResp struct {
 	Id        int64     `json:"id"`         // 主键ID
 	UserId    int64     `json:"user_id"`    // 用户ID
-	Event     string    `json:"event"`      // p15 | p24 | p35 | p48 | p63 | p80
+	Dimension int       `json:"dimension"`  // 阶数 3 | 4 | 5 | 6 | 7 | 8
 	Type      int       `json:"type"`       // 类型 0:个人 1:排行榜 2:对战
 	Duration  int       `json:"duration"`   // 耗时
 	Step      int       `json:"step"`       // 步数
@@ -52,6 +52,6 @@ type RecordResp struct {
 
 // RecordListResp 记录列表响应模型
 type RecordListResp struct {
-	Records []RecordResp `json:"records"`
 	Total   int64        `json:"total"`
+	Records []RecordResp `json:"records"`
 }

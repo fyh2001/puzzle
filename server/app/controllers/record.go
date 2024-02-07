@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"fmt"
 	HttpResult "puzzle/app/common/result"
 	"puzzle/app/models"
 	recordService "puzzle/app/services/record"
+	"puzzle/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,9 +18,28 @@ func InsertRecord(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("record: %v\n", record)
+
+	encryptionParams := utils.EncryptionParams{
+		Dimension: record.Dimension,
+		RandomIdx: record.Idx,
+		StepCount: record.Step,
+		Scramble:  record.Scramble,
+		Solution:  record.Solution,
+	}
+
+	if !encryptionParams.VerifyScramble() {
+		c.JSON(200, HttpResult.Fail("参数错误!"))
+		return
+	}
+
+	// 获取用户ID
+	userId, _ := c.Get("userId")
+	record.UserId = userId.(int64)
+
 	err = recordService.Insert(record)
 	if err != nil {
-		HttpResult.Fail(err.Error())
+		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
 	}
 

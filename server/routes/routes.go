@@ -3,6 +3,7 @@ package routes
 import (
 	"puzzle/app/controllers"
 	"puzzle/app/middlewares/cors"
+	"puzzle/app/middlewares/jwt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,7 +28,7 @@ func InitRouter() *gin.Engine {
 		}
 
 		// 记录
-		record := root.Group("/record")
+		record := root.Group("/record").Use(jwt.JWT())
 		{
 			record.POST("/insert", controllers.InsertRecord) // 新增记录
 			record.POST("/list", controllers.ListRecord)     // 记录列表

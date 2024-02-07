@@ -9,15 +9,12 @@ import {
   Looks5Outlined,
   Looks6Outlined,
   DashboardCustomizeRound,
-  ColorLensRound,
-  GridOnRound,
-  AutoAwesomeMotionRound,
 } from "@vicons/material";
 import { ref, computed, watch } from "vue";
 import TitleBar from "@/components/title-bar.vue";
 import Dropdown from "@/components/dropdown.vue";
 import {
-  shuffle,
+  getScramble,
   createHashMap,
   handleClick,
   transformArray,
@@ -58,7 +55,7 @@ const dropdownOptions = [
         },
         props: {
           onClick: () => {
-            gameStore.setGameMode(0);
+            gameMode.value = "practice";
           },
         },
       },
@@ -75,7 +72,7 @@ const dropdownOptions = [
         },
         props: {
           onClick: () => {
-            gameStore.setGameMode(1);
+            gameMode.value = "ranked";
           },
         },
       },
@@ -122,6 +119,7 @@ const dropdownOptions = [
         props: {
           onClick: () => {
             gameStore.setDimension(3);
+            gameDimension.value = 3;
           },
         },
       },
@@ -138,6 +136,7 @@ const dropdownOptions = [
         props: {
           onClick: () => {
             gameStore.setDimension(4);
+            gameDimension.value = 4;
           },
         },
       },
@@ -154,6 +153,7 @@ const dropdownOptions = [
         props: {
           onClick: () => {
             gameStore.setDimension(5);
+            gameDimension.value = 5;
           },
         },
       },
@@ -170,59 +170,36 @@ const dropdownOptions = [
         props: {
           onClick: () => {
             gameStore.setDimension(6);
-          },
-        },
-      },
-    ],
-  },
-  {
-    label: "颜色模式",
-    key: "colorPattern",
-    icon: () => {
-      return (
-        <n-el class="flex items-center" style="color: var(--primary-color)">
-          <n-icon size="18" component={ColorLensRound} />
-        </n-el>
-      );
-    },
-    children: [
-      {
-        label: "层先",
-        key: "layerFirst",
-        disabled: false,
-        icon: () => {
-          return (
-            <n-el class="flex items-center" style="color: var(--primary-color)">
-              <n-icon size="18" component={GridOnRound} />
-            </n-el>
-          );
-        },
-        props: {
-          onClick: () => {
-            gameStore.setColorPattern(0);
-          },
-        },
-      },
-      {
-        label: "降阶",
-        key: "decreaseDimension",
-        disabled: false,
-        icon: () => {
-          return (
-            <n-el class="flex items-center" style="color: var(--primary-color)">
-              <n-icon size="18" component={AutoAwesomeMotionRound} />
-            </n-el>
-          );
-        },
-        props: {
-          onClick: () => {
-            gameStore.setColorPattern(1);
+            gameDimension.value = 6;
           },
         },
       },
     ],
   },
 ];
+
+// 当前游戏模式
+const gameMode = ref("practice");
+// 当前游戏维度
+const gameDimension = ref(gameStore.dimension);
+
+// 当前游戏模式
+const currentGameModeValue = computed(() => {
+  return {
+    practice: 0,
+    ranked: 1,
+    battle: 2,
+  }[gameMode.value];
+});
+// 当前游戏模式标签
+const currentGameModeLabel = computed(
+  () =>
+    ({
+      practice: "练习",
+      ranked: "排位",
+      battle: "对战",
+    }[gameMode.value])
+);
 
 const gameMap = ref([
   [1, 2, 3, 4],
@@ -232,6 +209,22 @@ const gameMap = ref([
 ]);
 
 const gameHashMap = ref(createHashMap(gameMap.value));
+
+// 监听游戏维度变化
+watch(
+  () => gameDimension.value,
+  (newVal) => {
+    const newGameMap = Array.from({ length: newVal * newVal }, (_, index) => {
+      return index + 1;
+    });
+
+    newGameMap[newGameMap.length - 1] = 0;
+
+    gameMap.value = transformArray(newGameMap, newVal);
+    gameHashMap.value = createHashMap(gameMap.value);
+  },
+  { immediate: true }
+);
 
 // 是否开始
 const isStart = ref(false);
@@ -264,6 +257,32 @@ let scrambleMap: number[] = [];
 // 解法
 let solution: string[] = [];
 
+function shuffle(array: number[], seed: number) {
+  let currentIndex = array.length,
+    temporaryValue,
+    randomIndex;
+
+  // 设置随机数种子
+  const seededRandom = (min: number, max: number) => {
+    let x = Math.sin(seed++) * 10000;
+    return Math.floor((x - Math.floor(x)) * (max - min + 1)) + min;
+  };
+
+  // 当还有未洗牌的元素时
+  while (currentIndex !== 0) {
+    // 随机选取一个未洗牌的元素
+    randomIndex = seededRandom(0, currentIndex - 1);
+    currentIndex--;
+
+    // 交换它与当前元素
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 // 打乱
 const handleScramble = () => {
   // if (scrambleStore.getScramble.scrambleStr !== "") {
@@ -274,22 +293,12 @@ const handleScramble = () => {
   handleDataClear();
 
   // 打乱
-  idx = Date.now(); // 设置打乱随机数
-  const scramble = shuffle(gameStore.getDimension, idx); // 打乱顺序
-
-  // 设置打乱顺序
-  scrambleMap = scramble;
-  // 持久化打乱信息
-  scrambleStore.setScramble({
-    scrambleMap: scramble,
-    scrambleStr: scramble.join(","),
-    scrambleIdx: idx,
-  });
+  const scramble = shuffle(gameMap.value.flat(), 100);
 
   // 将打乱顺序应用到游戏地图
   for (let i = 0; i < scramble.length; i++) {
-    const row = Math.floor(i / gameStore.getDimension);
-    const column = i % gameStore.getDimension;
+    const row = Math.floor(i / gameDimension.value);
+    const column = i % gameDimension.value;
     gameMap.value[row][column] = scramble[i];
     gameHashMap.value.set(scramble[i], { row, column });
   }
@@ -365,8 +374,8 @@ const handleDataClear = () => {
 // 上传记录
 const handleRecordUpload = async () => {
   console.log({
-    dimension: gameStore.getDimension,
-    type: gameStore.getGameMode,
+    dimension: gameDimension.value,
+    type: currentGameModeValue.value,
     duration: endTime.value - startTime.value,
     step: gameStep.value,
     scramble: scrambleMap.join(","),
@@ -379,8 +388,8 @@ const handleRecordUpload = async () => {
   const {
     data: { code, data: resp },
   } = await recordRequest.insert({
-    dimension: gameStore.getDimension,
-    type: gameStore.getGameMode,
+    dimension: gameDimension.value,
+    type: currentGameModeValue.value,
     duration: endTime.value - startTime.value,
     step: gameStep.value,
     scramble: scrambleMap.join(","),
@@ -394,30 +403,13 @@ const handleRecordUpload = async () => {
 
   Message.error(resp);
 };
-
-// 监听游戏维度变化
-watch(
-  () => gameStore.getDimension,
-  (newVal) => {
-    const newGameMap = Array.from({ length: newVal * newVal }, (_, index) => {
-      return index + 1;
-    });
-
-    newGameMap[newGameMap.length - 1] = 0;
-
-    gameMap.value = transformArray(newGameMap, newVal);
-    gameHashMap.value = createHashMap(gameMap.value);
-    handleDataClear();
-  },
-  { immediate: true }
-);
 </script>
 
 <template>
   <div class="fixed inset-0 p-4 h-screen">
     <!-- 顶部 -->
     <div class="flex justify-between items-center mb-6">
-      <title-bar :title="gameStore.getGameModeLabel" />
+      <title-bar :title="currentGameModeLabel" />
       <dropdown content="功能" :options="dropdownOptions" :showDivider="true" />
     </div>
 
@@ -425,7 +417,7 @@ watch(
     <div class="grid gap-2 p-1 rounded-md">
       <div
         class="grid gap-2"
-        :style="`grid-template-columns: repeat(${gameStore.getDimension}, 1fr);`"
+        :style="`grid-template-columns: repeat(${gameDimension}, 1fr);`"
         v-for="(row, rowIndex) in gameMap"
         :key="rowIndex"
       >

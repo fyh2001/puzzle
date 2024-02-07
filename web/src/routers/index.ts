@@ -11,6 +11,7 @@ import Record from "@/views/record/index.vue";
 import User from "@/views/user/index.vue";
 import Register from "@/views/register/index.vue";
 import Login from "@/views/login/index.vue";
+import Test from "@/views/test/index.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -47,6 +48,11 @@ const routes: RouteRecordRaw[] = [
     path: "/login",
     name: "Login",
     component: Login,
+  },
+  {
+    path: "/test",
+    name: "Test",
+    component: Test,
   },
 ];
 

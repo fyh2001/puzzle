@@ -1,23 +1,8 @@
-import { generateRandomIdx } from "@/utils/encipherment.js";
-
 // 单元格坐标
 interface CellCoordinate {
   row: number;
   column: number;
 }
-
-// 表格分组
-const redGroup = new Set([1, 2, 3, 4, 5, 9, 13]);
-const blueGroup = new Set([6, 7, 8, 10, 14]);
-const yellowGroup = new Set([11, 12, 15]);
-
-// 获取单元格的类名
-export const getCellClass = (cellValue: number) => {
-  if (redGroup.has(cellValue)) return "bg-red-4 shadow";
-  if (blueGroup.has(cellValue)) return "bg-blue-4 shadow";
-  if (yellowGroup.has(cellValue)) return "bg-yellow-4 shadow";
-  return "";
-};
 
 // 创建游戏地图哈希表
 export const createHashMap = (map: number[][]) => {
@@ -161,78 +146,142 @@ export const handleClick = (
 };
 
 // 判断是否可解
-export const isSolvable = (numsMap: number[]) => {
+export const isSolvable = (n: number, numsMap: number[]) => {
   let sum = 0;
-  for (let i = 0; i < 16; i++) {
-    if (numsMap[i] === 0) {
-      sum += Math.floor(i / 4) + ((i + 1) % 4);
-      continue;
+
+  // 若为偶数阶,需要考虑空格位置
+  if (n % 2 === 0) {
+    for (let i = 0; i < n * n; i++) {
+      if (numsMap[i] === 0) {
+        sum += Math.floor(i / n) + ((i + 1) % n);
+        continue;
+      }
+      for (let j = 0; j < n * n - i; j++) {
+        if (numsMap[j + i] < numsMap[i]) {
+          sum++;
+        }
+      }
     }
-    for (let j = 0; j < 16 - i; j++) {
-      if (numsMap[j + i] < numsMap[i]) {
-        sum++;
+  } else {
+    // 若为奇数阶
+    for (let i = 0; i < n * n; i++) {
+      for (let j = 0; j < n * n - i; j++) {
+        if (
+          numsMap[j + i] < numsMap[i] &&
+          numsMap[j + i] !== 0 &&
+          numsMap[i] !== 0
+        ) {
+          sum++;
+        }
       }
     }
   }
+
   return sum % 2 === 0;
 };
 
-// 根据idx获取n阶排列
-export const setNPerm = (n: number, idx: number, ensureEven: boolean) => {
+//  Fisher-Yates洗牌算法
+export const shuffle = (n: number, idx: number) => {
   const N = n * n;
 
-  const arr = Array.from({ length: N }, (_, index) => index + 1);
-  arr[N - 1] = 0;
+  let currentIndex = N,
+    randomIndex;
 
-  const even = ensureEven ? 1 : 0;
-  let parity = 0;
+  const array = Array.from({ length: n * n }, (_, index) => index + 1);
+  array[n * n - 1] = 0;
 
-  arr[N - 1] = even;
+  // 设置随机数种子
+  const seededRandom = (min: number, max: number) => {
+    let x = Math.sin(idx++) * 10000;
+    return Math.floor((x - Math.floor(x)) * (max - min + 1)) + min;
+  };
 
-  if (ensureEven) {
-    arr[N - 2] = 0;
-  }
+  // 当还有未洗牌的元素时
+  while (currentIndex !== 0) {
+    // 随机选取一个未洗牌的元素
+    randomIndex = seededRandom(0, currentIndex - 1);
+    currentIndex--;
 
-  for (let i = N - 2 - even; i >= 0; i--) {
-    arr[i] = idx % (N - i);
-    parity ^= arr[i];
-    idx = Math.floor(idx / (N - i));
-
-    for (let j = i + 1; j < N; j++) {
-      if (arr[j] >= arr[i]) {
-        arr[j]++;
-      }
-    }
-  }
-
-  if (ensureEven && (parity & 1) !== 0) {
-    const temp = arr[N - 1];
-    arr[N - 1] = arr[N - 2];
-    arr[N - 2] = temp;
+    // 交换它与当前元素
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
   }
 
   // 判断是否可解
-  if (!isSolvable(arr)) {
-    // 如果不可解, 交换最后两个元素, 保证可解.但若其中一个元素为null, 则交换倒数第三个元素
-    if (arr[N - 1] === null) {
-      const temp = arr[N - 2];
-      arr[N - 2] = arr[N - 3];
-      arr[N - 3] = temp;
+  if (!isSolvable(n, array)) {
+    // 如果不可解, 交换最后两个元素, 保证可解.但若其中一个元素为0, 则交换倒数第三个元素
+    if (array[N - 1] === 0) {
+      const temp = array[N - 2];
+      array[N - 2] = array[N - 3];
+      array[N - 3] = temp;
     }
 
-    const temp = arr[N - 1];
-    arr[N - 1] = arr[N - 2];
-    arr[N - 2] = temp;
+    const temp = array[N - 1];
+    array[N - 1] = array[N - 2];
+    array[N - 2] = temp;
   }
 
-  return arr;
+  return array;
 };
 
-// 获取打乱数组
-export const getScramble = (n: number, timestampe: number) => {
-  const randomIdx = generateRandomIdx(timestampe);
-
-  const scramble = setNPerm(n, randomIdx, true);
-
-  return { scramble, randomIdx };
+// 根据阶数将一维数组转换为二维数组
+export const transformArray = (arr: number[], n: number) => {
+  const res = [];
+  for (let i = 0; i < n; i++) {
+    res.push(arr.slice(i * n, (i + 1) * n));
+  }
+  return res;
 };
+
+// 根据idx获取n阶排列(已弃用)
+// export const setNPerm = (n: number, idx: number, ensureEven: boolean) => {
+//   const N = n * n;
+
+//   const arr = Array.from({ length: N }, (_, index) => index + 1);
+//   arr[N - 1] = 0;
+
+//   const even = ensureEven ? 1 : 0;
+//   let parity = 0;
+
+//   arr[N - 1] = even;
+
+//   if (ensureEven) {
+//     arr[N - 2] = 0;
+//   }
+
+//   for (let i = N - 2 - even; i >= 0; i--) {
+//     arr[i] = idx % (N - i);
+//     parity ^= arr[i];
+//     idx = Math.floor(idx / (N - i));
+
+//     for (let j = i + 1; j < N; j++) {
+//       if (arr[j] >= arr[i]) {
+//         arr[j]++;
+//       }
+//     }
+//   }
+
+//   if (ensureEven && (parity & 1) !== 0) {
+//     const temp = arr[N - 1];
+//     arr[N - 1] = arr[N - 2];
+//     arr[N - 2] = temp;
+//   }
+
+//   // 判断是否可解
+//   if (!isSolvable(n, arr)) {
+//     // 如果不可解, 交换最后两个元素, 保证可解.但若其中一个元素为0, 则交换倒数第三个元素
+//     if (arr[N - 1] === 0) {
+//       const temp = arr[N - 2];
+//       arr[N - 2] = arr[N - 3];
+//       arr[N - 3] = temp;
+//     }
+
+//     const temp = arr[N - 1];
+//     arr[N - 1] = arr[N - 2];
+//     arr[N - 2] = temp;
+//   }
+
+//   return arr;
+// };

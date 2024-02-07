@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import type { UserResp } from "@/types/user";
 
 export const useUserStore = defineStore("user", {
+  persist: true,
+
   state: () => ({
     user: <UserResp>{
       id: "",

@@ -5,7 +5,7 @@ import {
   PersonOutlineRound,
 } from "@vicons/material";
 import Tabbar from "@/components/tabbar.vue";
-import type { TabbarItem } from "@/components/tabbar/types";
+import type { TabbarItem } from "@/components/tabbar.vue";
 
 const tabsContent: TabbarItem[] = [
   {
