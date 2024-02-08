@@ -6,7 +6,7 @@ import "gorm.io/gorm"
 type Pagination struct {
 	Page     int `form:"page" json:"page"`
 	PageSize int `form:"pageSize" json:"pageSize"`
-	Type     int `form:"type" json:"type"` // 1: Record 2: BestRecord
+	Offset   int `form:"offset" json:"offset"`
 }
 
 // Paginate 分页封装
@@ -24,10 +24,10 @@ func Paginate(pagination *Pagination) func(db *gorm.DB) *gorm.DB {
 			pageSize = 10
 		}
 
-		offset := (page - 1) * pageSize
+		offset := pagination.Offset
 
-		if pagination.Type == 1 {
-			pageSize += 11
+		if pagination.Offset == 0 {
+			offset = (page - 1) * pageSize
 		}
 
 		return db.Offset(offset).Limit(pageSize)

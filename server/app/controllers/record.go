@@ -54,6 +54,10 @@ func ListRecord(c *gin.Context) {
 		return
 	}
 
+	// 获取用户ID
+	userId, _ := c.Get("userId")
+	recordReq.UserId = userId.(int64)
+
 	recordList, err := recordService.List(recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))

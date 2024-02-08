@@ -101,7 +101,7 @@ func Insert(record models.Record) error {
 // List 记录列表
 func List(recordReq models.RecordReq) (models.RecordListResp, error) {
 	var recordListResp models.RecordListResp
-	db := database.GetMySQL().Table("record").Order("created_at DESC")
+	db := database.GetMySQL().Table("record").Order("created_at "+recordReq.Sorted).Where("type = ?", recordReq.Type)
 
 	if recordReq.Id != 0 {
 		db = db.Where("id = ?", recordReq.Id)
@@ -113,10 +113,6 @@ func List(recordReq models.RecordReq) (models.RecordListResp, error) {
 
 	if recordReq.Dimension != 0 {
 		db = db.Where("dimension = ?", recordReq.Dimension)
-	}
-
-	if recordReq.Type != 0 {
-		db = db.Where("type = ?", recordReq.Type)
 	}
 
 	if len(recordReq.DurationRange) == 2 {

@@ -37,6 +37,7 @@ const dropdownOptions = [
   {
     label: "游戏模式",
     key: "mode",
+    disabled: false,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -65,7 +66,7 @@ const dropdownOptions = [
       {
         label: "排位",
         key: "ranked",
-        disabled: false,
+        disabled: true,
         icon: () => {
           return (
             <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -75,7 +76,7 @@ const dropdownOptions = [
         },
         props: {
           onClick: () => {
-            gameStore.setGameMode(1);
+            // gameStore.setGameMode(1);
           },
         },
       },
