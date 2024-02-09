@@ -7,6 +7,7 @@ import (
 	recordBestAverageSerivce "puzzle/app/services/record-best-average"
 	recordBestSingleSerivce "puzzle/app/services/record-best-single"
 	recordBestStepSerivce "puzzle/app/services/record-best-step"
+	scrambledUserStatusService "puzzle/app/services/scrambled-user-status"
 	"puzzle/database"
 	"puzzle/utils"
 	"strings"
@@ -70,6 +71,17 @@ func Insert(record models.Record) error {
 
 	// 若记录为非练习记录, 则需要更新用户的记录
 	if record.Type != 0 {
+		// 更新用户的完成状态
+		err = scrambledUserStatusService.Update(models.ScrambledUserStatus{
+			UserId:    record.UserId,
+			Dimension: record.Dimension,
+			Status:    1,
+		})
+
+		if err != nil {
+			return err
+		}
+
 		// 更新用户最佳单次记录
 		err = updateRecordBestSingle(record)
 		if err != nil {

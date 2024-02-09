@@ -134,8 +134,8 @@ func setNPerm(idx, n int, ensureEven bool) []int {
 	return arr
 }
 
-// shuffle 打乱
-func shuffle(n, idx int) []int {
+// Shuffle 打乱
+func Shuffle(n, idx int) []int {
 	N := n * n
 	currentIndex := N
 	randomIndex := 0
@@ -352,7 +352,7 @@ func (ep EncryptionParams) VerifyScramble() bool {
 	n := ep.Dimension
 
 	// 生成打乱字符串
-	scramble := shuffle(n, int(ep.RandomIdx))
+	scramble := Shuffle(n, int(ep.RandomIdx))
 	scrambleStr := strings.Trim(strings.Replace(fmt.Sprint(scramble), " ", ",", -1), "[]")
 
 	if scrambleStr != ep.Scramble {
@@ -378,5 +378,11 @@ func (ep EncryptionParams) VerifyScramble() bool {
 	}
 
 	// 判断是否完成
-	return checkCondition(scrambleMap)
+	isFinish := checkCondition(scrambleMap)
+	if !isFinish {
+		fmt.Println("未完成!")
+		return false
+	}
+
+	return true
 }

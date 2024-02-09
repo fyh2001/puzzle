@@ -206,7 +206,7 @@ const handleSelect = (key: string) => {
 <template>
   <div>
     <n-dropdown
-      placement="bottom-start"
+      placement="bottom-end"
       trigger="click"
       size="large"
       :options="options"

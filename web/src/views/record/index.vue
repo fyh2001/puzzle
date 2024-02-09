@@ -1,6 +1,8 @@
 <script lang="tsx" setup>
-import { ref, computed, markRaw } from "vue";
+import { ref, computed, markRaw, onMounted } from "vue";
 import {
+  MovingRound,
+  CableRound,
   WorkspacePremiumRound,
   Looks3Outlined,
   Looks4Outlined,
@@ -26,26 +28,58 @@ const tableOptions = {
   mine: {
     title: "我的记录",
     view: recordPerson,
+    disabled: false,
+    children: {
+      practice: {
+        title: "练习",
+        icon: markRaw(WorkspacePremiumRound),
+        disabled: false,
+        methods: () => {
+          gameStore.setGameMode(0);
+        },
+      },
+      rank: {
+        title: "排名",
+        icon: markRaw(MovingRound),
+        disabled: false,
+        methods: () => {
+          gameStore.setGameMode(1);
+        },
+      },
+      battle: {
+        title: "对战",
+        icon: markRaw(CableRound),
+        disabled: true,
+        methods: () => {
+          gameStore.setGameMode(2);
+        },
+      },
+    },
   },
   all: {
     title: "总排名",
+    disabled: true,
     children: {
       bestSingle: {
         title: "最佳单次",
         icon: markRaw(TimerOutlined),
+        disabled: false,
         view: "bbb",
       },
       bestAverage5: {
         title: "最佳5次平均",
         icon: markRaw(Filter5Round),
+        disabled: false,
       },
       bestAverage12: {
         title: "最佳12次平均",
         icon: markRaw(Filter9PlusRound),
+        disabled: false,
       },
       bestStepCount: {
         title: "最佳步数",
         icon: markRaw(SwipeLeftRound),
+        disabled: false,
       },
     },
   },
@@ -156,6 +190,7 @@ const options = [
   {
     label: "我的记录",
     key: "record",
+    disabled: tableOptions.mine.disabled,
     props: {
       onClick: () => {
         currentTableOptions.value = "mine";
@@ -168,12 +203,29 @@ const options = [
         </n-el>
       );
     },
+    children: Object.entries(tableOptions.mine.children).map(([key, val]) => ({
+      label: val.title,
+      key: key,
+      disabled: val?.disabled || false,
+      props: {
+        onClick: () => {
+          currentTableOptions.value = "mine";
+          currentChildOption.value = key;
+          val.methods();
+        },
+      },
+      icon: () => (
+        <n-el class="flex items-center" style="color: var(--primary-color)">
+          <n-icon size="18" component={val.icon} />
+        </n-el>
+      ),
+    })),
   },
   // 总排名
   {
     label: "总排名",
     key: "rank",
-    disabled: false,
+    disabled: tableOptions.all?.disabled,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -184,6 +236,7 @@ const options = [
     children: Object.entries(tableOptions.all.children).map(([key, val]) => ({
       label: val.title,
       key: key,
+      disabled: val?.disabled || false,
       props: {
         onClick: () => {
           currentTableOptions.value = "all";
@@ -261,7 +314,7 @@ const options = [
 // 当前表格选项
 const currentTableOptions = ref("mine");
 // 当前子表格选项
-const currentChildOption = ref("bestSingle");
+const currentChildOption = ref("");
 
 // 当前表格视图
 const curDataTableView = computed(() => {
@@ -287,6 +340,16 @@ const curDataTableLabel = computed((): string | undefined => {
   resultArr.push(gameStore.dimension + "阶");
 
   return resultArr.join(" - ");
+});
+
+onMounted(() => {
+  const modeToChildOptionMap: Record<number, string> = {
+    0: "practice",
+    1: "rank",
+    2: "battle",
+  };
+
+  currentChildOption.value = modeToChildOptionMap[gameStore.getGameMode];
 });
 </script>
 

@@ -35,12 +35,7 @@ func UserRegister(u models.UserRegisterReq) error {
 		Status:   0,
 	}
 
-	err = database.GetMySQL().Create(&user).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return database.GetMySQL().Create(&user).Error
 }
 
 // UserLogin 用户登录

@@ -37,6 +37,13 @@ func InitRouter() *gin.Engine {
 			record.POST("/list-best-step", controllers.ListRecordBestStep)       // 最佳步数记录列表
 			record.POST("/update", controllers.UpdateRecord)                     // 更新记录
 		}
+
+		// 打乱
+		scramble := root.Group("/scramble").Use(jwt.JWT())
+		{
+			scramble.POST("/get-new-scramble", controllers.GetNewScamble)    // 获取新打乱
+			scramble.POST("/get-user-scramble", controllers.GetUserScramble) // 获取用户打乱
+		}
 	}
 
 	return r

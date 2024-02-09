@@ -64,7 +64,6 @@ export const useRecordStore = defineStore("record", {
         data: { code, data: recordList },
       } = await recordRequest.listRecord({
         ...queryForm,
-        type: 0,
         sorted: "desc",
       });
 

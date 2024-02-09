@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from "vue";
 import { useRecordStore } from "@/store/record";
 import { useGameStore } from "@/store/game";
+import type { Pagination } from "@/types/pagination";
 
 const recordStore = useRecordStore();
 const gameStore = useGameStore();
@@ -53,7 +54,7 @@ const tableColumns = [
 ];
 
 // 分页
-const pagination = {
+const pagination: Pagination = {
   page: 1,
   pageSize: 14,
   offset: 0,
@@ -72,13 +73,15 @@ const getRecords = async () => {
   await recordStore.getPersonRecords({
     pagination,
     dimension: gameStore.getDimension,
+    type: gameStore.getGameMode,
   });
+
   isLoading.value = false;
 };
 
-// 监听阶数变化
+// 监听阶数和模式变化
 watch(
-  () => gameStore.getDimension,
+  () => [gameStore.getDimension, gameStore.getGameMode],
   () => {
     // 重新获取记录
     getRecords();

@@ -27,6 +27,7 @@ import { useScrambleStore } from "@/store/scramble";
 import { useGameStore } from "@/store/game";
 import { useMessage } from "naive-ui";
 import { recordRequest } from "@/api/methods/record";
+import { scrambleRequest } from "api/scramble";
 const Message = useMessage();
 
 const gameStore = useGameStore();
@@ -66,7 +67,7 @@ const dropdownOptions = [
       {
         label: "排位",
         key: "ranked",
-        disabled: true,
+        disabled: false,
         icon: () => {
           return (
             <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -76,7 +77,7 @@ const dropdownOptions = [
         },
         props: {
           onClick: () => {
-            // gameStore.setGameMode(1);
+            gameStore.setGameMode(1);
           },
         },
       },
@@ -261,42 +262,51 @@ let timer: string | number | NodeJS.Timeout | undefined;
 let idx = 0;
 
 // 打乱顺序
-let scrambleMap: number[] = [];
+let scrambleMap: number[] | undefined = [];
 // 解法
 let solution: string[] = [];
 
-// 打乱
-const handleScramble = () => {
-  // if (scrambleStore.getScramble.scrambleStr !== "") {
-  //   return message.error("请先完成本次还原");
-  // }
-
-  // 清除数据
-  handleDataClear();
-
-  // 打乱
-  idx = Date.now(); // 设置打乱随机数
-  const scramble = shuffle(gameStore.getDimension, idx); // 打乱顺序
-
-  // 设置打乱顺序
-  scrambleMap = scramble;
-  // 持久化打乱信息
-  scrambleStore.setScramble({
-    scrambleMap: scramble,
-    scrambleStr: scramble.join(","),
-    scrambleIdx: idx,
-  });
-
-  // 将打乱顺序应用到游戏地图
+// 应用打乱顺序到地图
+const handleScrambleToMap = (scramble: number[], dimension: number) => {
   for (let i = 0; i < scramble.length; i++) {
-    const row = Math.floor(i / gameStore.getDimension);
-    const column = i % gameStore.getDimension;
+    const row = Math.floor(i / dimension);
+    const column = i % dimension;
     gameMap.value[row][column] = scramble[i];
     gameHashMap.value.set(scramble[i], { row, column });
   }
+};
 
-  // 设置打乱状态
-  isScramble.value = true;
+// 设置打乱状态
+const setScrambleStatus = (val: boolean) => {
+  isScramble.value = val;
+};
+
+// 打乱
+const handleScramble = async () => {
+  // 清除数据
+  gameStore.getDimension === 1 && handleDataClear();
+
+  // 练习模式
+  if (gameStore.getGameMode === 0) {
+    idx = Date.now(); // 设置打乱随机数
+    scrambleMap = shuffle(gameStore.getDimension, idx); // 打乱顺序
+  }
+
+  // 排位模式
+  if (gameStore.getGameMode === 1) {
+    let { scrambleArr, scrambleIdx } = await getRankScramble();
+
+    if (scrambleArr!.length === 0) return;
+
+    handleDataClear();
+
+    scrambleMap = scrambleArr;
+    idx = scrambleIdx;
+  }
+
+  handleScrambleToMap(scrambleMap!, gameStore.getDimension);
+
+  setScrambleStatus(true);
 };
 
 // 开始计时
@@ -365,26 +375,14 @@ const handleDataClear = () => {
 
 // 上传记录
 const handleRecordUpload = async () => {
-  console.log({
-    dimension: gameStore.getDimension,
-    type: gameStore.getGameMode,
-    duration: endTime.value - startTime.value,
-    step: gameStep.value,
-    scramble: scrambleMap.join(","),
-    solution: solution.join(","),
-    idx: idx,
-  });
-
-  console.log(solution);
-
   const {
-    data: { code, data: resp },
+    data: { code, data: resp, msg },
   } = await recordRequest.insert({
     dimension: gameStore.getDimension,
     type: gameStore.getGameMode,
     duration: endTime.value - startTime.value,
     step: gameStep.value,
-    scramble: scrambleMap.join(","),
+    scramble: scrambleMap!.join(","),
     solution: solution.join(","),
     idx: idx,
   });
@@ -393,22 +391,77 @@ const handleRecordUpload = async () => {
     return Message.success(resp);
   }
 
-  Message.error(resp);
+  Message.error(msg);
+};
+
+// 初始化练习地图
+const initMap = () => {
+  const newGameMap = Array.from(
+    { length: gameStore.getDimension * gameStore.getDimension },
+    (_, index) => {
+      return index + 1;
+    }
+  );
+
+  newGameMap[newGameMap.length - 1] = 0;
+
+  gameMap.value = transformArray(newGameMap, gameStore.getDimension);
+  gameHashMap.value = createHashMap(gameMap.value);
+  handleDataClear();
+};
+
+// 初始化排位地图
+const initRankMap = async () => {
+  const {
+    data: { code, msg, data: scrambleData },
+  } = await scrambleRequest.getUserScramble({
+    dimension: gameStore.getDimension,
+  });
+
+  if (code === 200) {
+    if (scrambleData.idx === 0) return initMap();
+
+    const scramble = shuffle(scrambleData.dimension, scrambleData.idx); // 打乱顺序
+
+    // 设置打乱顺序
+    scrambleMap = scramble;
+    // 设置idx
+    idx = scrambleData.idx;
+
+    // 将打乱顺序应用到游戏地图
+    handleScrambleToMap(scramble, scrambleData.dimension);
+
+    setScrambleStatus(true);
+  } else {
+    Message.error(msg);
+  }
+};
+
+// 获取排位打乱
+const getRankScramble = async () => {
+  const {
+    data: { code, msg, data: scrambleData },
+  } = await scrambleRequest.getNewScramble({
+    dimension: gameStore.getDimension,
+  });
+
+  if (code === 200) {
+    const scrambleArr = shuffle(scrambleData.dimension, scrambleData.idx);
+    return { scrambleArr, scrambleIdx: scrambleData.idx };
+  } else {
+    Message.error(msg);
+    return { scrambleArr: [], scrambleIdx: 0 };
+  }
 };
 
 // 监听游戏维度变化
 watch(
-  () => gameStore.getDimension,
-  (newVal) => {
-    const newGameMap = Array.from({ length: newVal * newVal }, (_, index) => {
-      return index + 1;
-    });
-
-    newGameMap[newGameMap.length - 1] = 0;
-
-    gameMap.value = transformArray(newGameMap, newVal);
-    gameHashMap.value = createHashMap(gameMap.value);
-    handleDataClear();
+  () => [gameStore.getDimension, gameStore.gameMode],
+  () => {
+    initMap();
+    if (gameStore.gameMode === 1) {
+      initRankMap();
+    }
   },
   { immediate: true }
 );
