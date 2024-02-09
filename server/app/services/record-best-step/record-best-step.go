@@ -46,7 +46,7 @@ func Insert(record models.RecordBestStep) error {
 // List 查询记录
 func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
 	var recordBestStepListResp models.RecordBestStepListResp
-	db := database.GetMySQL().Table("record_best_step").Order("record_step DESC")
+	db := database.GetMySQL().Table("record_best_step").Order("record_step " + recordReq.Sorted)
 
 	if recordReq.UserId != 0 {
 		db = db.Where("user_id = ?", recordReq.UserId)

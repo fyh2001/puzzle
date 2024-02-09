@@ -30,9 +30,12 @@ func InitRouter() *gin.Engine {
 		// 记录
 		record := root.Group("/record").Use(jwt.JWT())
 		{
-			record.POST("/insert", controllers.InsertRecord) // 新增记录
-			record.POST("/list", controllers.ListRecord)     // 记录列表
-			record.POST("/update", controllers.UpdateRecord) // 更新记录
+			record.POST("/insert", controllers.InsertRecord)                     // 新增记录
+			record.POST("/list-record", controllers.ListRecord)                  // 记录列表
+			record.POST("/list-best-single", controllers.ListRecordBestSingle)   // 最佳单次记录列表
+			record.POST("/list-best-average", controllers.ListRecordBestAverage) // 最佳平均记录列表
+			record.POST("/list-best-step", controllers.ListRecordBestStep)       // 最佳步数记录列表
+			record.POST("/update", controllers.UpdateRecord)                     // 更新记录
 		}
 	}
 

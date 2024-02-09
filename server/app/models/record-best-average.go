@@ -24,6 +24,7 @@ type RecordBestAverageReq struct {
 	DurationRange []int            `json:"duration_range"`            // 耗时范围
 	DateRange     []time.Time      `json:"date_range"`                // 日期范围
 	Pagination    utils.Pagination `gorm:"embedded"`                  // 分页
+	Sorted        string           `json:"sorted"`                    // 排序
 }
 
 // RecordBestAverageResp 最佳平均记录响应模型

@@ -1,4 +1,5 @@
 import { Pagination } from "@/types/pagination";
+// 个人记录
 export interface RecordModel {
   id: string;
   userId: string;
@@ -54,5 +55,112 @@ export interface RecordResp {
 
 export interface RecordListResp {
   records: RecordModel[];
+  total: number;
+}
+
+// 最佳单次
+export interface RecordBestSingleModel {
+  userId: string;
+  dimension: number;
+  recordId: string;
+  recordDuration: number;
+  recordStep: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecordBestSingleReq {
+  userId?: number;
+  dimension?: number;
+  recordId?: number;
+  durationRange?: [number, number];
+  stepRange?: [number, number];
+  dateRange?: [string, string];
+  pagination?: Pagination;
+  sorted?: string;
+}
+
+export interface RecordBestSingleResp {
+  userId: string;
+  dimension: number;
+  recordId: string;
+  recordDuration: number;
+  recordStep: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecordBestSingleListResp {
+  records: RecordBestSingleModel[];
+  total: number;
+}
+
+// 最佳平均
+export interface RecordBestAverageModel {
+  userId: string;
+  dimension: number;
+  type: number;
+  recordIds: string;
+  recordAverageDuration: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecordBestAverageReq {
+  userId?: number;
+  dimension?: number;
+  type?: number;
+  durationRange?: [number, number];
+  dateRange?: [string, string];
+  pagination?: Pagination;
+  sorted?: string;
+}
+
+export interface RecordBestAverageResp {
+  userId: string;
+  dimension: number;
+  type: number;
+  recordIds: string;
+  recordAverageDuration: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecordBestAverageListResp {
+  records: RecordBestAverageModel[];
+  total: number;
+}
+
+// 最佳步数
+export interface RecordBestStepModel {
+  userId: string;
+  dimension: number;
+  recordId: string;
+  recordStep: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecordBestStepReq {
+  userId?: number;
+  dimension?: number;
+  recordId?: number;
+  stepRange?: [number, number];
+  dateRange?: [string, string];
+  pagination?: Pagination;
+  sorted?: string;
+}
+
+export interface RecordBestStepResp {
+  userId: string;
+  dimension: number;
+  recordId: string;
+  recordStep: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecordBestStepListResp {
+  records: RecordBestStepModel[];
   total: number;
 }

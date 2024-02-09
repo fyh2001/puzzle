@@ -20,8 +20,8 @@ func UserRegister(u models.UserRegisterReq) error {
 	}
 
 	// 判断昵称是否存在
-	err = database.GetMySQL().Table("user").Where("nickname = ?", u.Nickname).First(&tempUser).Error
-	if err == nil {
+	_ = database.GetMySQL().Table("user").Where("nickname = ?", u.Nickname).First(&tempUser).Error
+	if tempUser.Id != 0 {
 		return errors.New("昵称已存在")
 	}
 

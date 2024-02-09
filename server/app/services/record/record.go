@@ -345,7 +345,7 @@ func updateRecordBestAverage12(record models.Record) error {
 		return errors.New("获取最佳平均记录失败")
 	}
 
-	// 整合最近5条记录id
+	// 整合最近12条记录id
 	var recordIds []int64
 	for _, v := range last12Records.Records {
 		recordIds = append(recordIds, v.Id)

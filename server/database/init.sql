@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- ----------------------------
 -- 新增admin账号
 -- ----------------------------
-BEGIN;
-INSERT INTO `user` (`id`, `username`, `password`, `nickname`, `email`, `phone`, `avatar`, `status`, `created_at`, `updated_at`) VALUES (271060023935762432, 'admin1', 'eb7f6a2e87831026c14971228cb27b37', '黄叶', '', '', '', 0, '2024-02-04 23:11:32', '2024-02-04 23:11:32');
-COMMIT;
+-- BEGIN;
+-- INSERT INTO `user` (`id`, `username`, `password`, `nickname`, `email`, `phone`, `avatar`, `status`, `created_at`, `updated_at`) VALUES (271060023935762432, 'admin1', 'eb7f6a2e87831026c14971228cb27b37', '黄叶', '', '', '', 0, '2024-02-04 23:11:32', '2024-02-04 23:11:32');
+-- COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
 

@@ -51,7 +51,7 @@ func Insert(record models.RecordBestAverage) error {
 // List 记录列表
 func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListResp, error) {
 	var recordListResp models.RecordBestAverageListResp
-	db := database.GetMySQL().Table("record_best_average").Order("record_average_duration DESC")
+	db := database.GetMySQL().Table("record_best_average").Order("record_average_duration " + recordReq.Sorted)
 
 	if recordReq.UserId != 0 {
 		db = db.Where("user_id = ?", recordReq.UserId)

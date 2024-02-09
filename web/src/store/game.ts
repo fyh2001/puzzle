@@ -5,7 +5,7 @@ export const useGameStore = defineStore("game", {
 
   state: () => ({
     dimension: 4, //阶数
-    colorPattern: 1, //颜色模式
+    colorPattern: 1, //颜色模式 0:层先 1:降阶
     gameMode: 0, //游戏模式
   }),
 

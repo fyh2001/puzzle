@@ -23,6 +23,7 @@ type RecordBestStepReq struct {
 	StepRange  []int            `json:"step_range"` // 步数范围
 	DateRange  []time.Time      `json:"date_range"` // 日期范围
 	Pagination utils.Pagination `gorm:"embedded"`   // 分页
+	Sorted     string           `json:"sorted"`     // 排序
 }
 
 // RecordBestStepResp 用户最佳步数记录响应模型

@@ -2,7 +2,16 @@ import { defineStore } from "pinia";
 import { recordRequest } from "api/record";
 import { getAverageOf5, getAverageOf12 } from "@/utils/record";
 import { formatDurationInRecord } from "@/utils/time";
-import type { RecordListResp, RecordReq } from "@/types/record";
+import type {
+  RecordReq,
+  RecordListResp,
+  RecordBestSingleReq,
+  RecordBestSingleListResp,
+  RecordBestAverageReq,
+  RecordBestAverageListResp,
+  RecordBestStepReq,
+  RecordBestStepListResp,
+} from "@/types/record";
 
 export const useRecordStore = defineStore("record", {
   state: () => ({
@@ -10,17 +19,17 @@ export const useRecordStore = defineStore("record", {
     personRecord: <RecordListResp>{ records: [], total: 0 },
     // 排行榜
     rankedRecord: {
-      bestSingle: <RecordListResp>{ records: [], total: 0 }, //最佳单次
-      bestAverage5: <RecordListResp>{ records: [], total: 0 }, //最佳5次
-      bestAverage12: <RecordListResp>{ records: [], total: 0 }, //最佳12次
-      bestStep: <RecordListResp>{ records: [], total: 0 }, //最佳步数
+      bestSingle: <RecordBestSingleListResp>{ records: [], total: 0 }, //最佳单次
+      bestAverage5: <RecordBestAverageListResp>{ records: [], total: 0 }, //最佳5次
+      bestAverage12: <RecordBestAverageListResp>{ records: [], total: 0 }, //最佳12次
+      bestStep: <RecordBestStepListResp>{ records: [], total: 0 }, //最佳步数
     },
     // 周排行榜
     weeklyRankedRecord: {
-      bestSingle: <RecordListResp>{ records: [], total: 0 }, //最佳单次
-      bestAverage5: <RecordListResp>{ records: [], total: 0 }, //最佳5次
-      bestAverage12: <RecordListResp>{ records: [], total: 0 }, //最佳12次
-      bestStep: <RecordListResp>{ records: [], total: 0 }, //最佳步数
+      bestSingle: <RecordBestSingleListResp>{ records: [], total: 0 }, //最佳单次
+      bestAverage5: <RecordBestAverageListResp>{ records: [], total: 0 }, //最佳5次
+      bestAverage12: <RecordBestAverageListResp>{ records: [], total: 0 }, //最佳12次
+      bestStep: <RecordBestStepListResp>{ records: [], total: 0 }, //最佳步数
     },
   }),
 
@@ -53,7 +62,7 @@ export const useRecordStore = defineStore("record", {
     async getPersonRecords(queryForm: RecordReq) {
       const {
         data: { code, data: recordList },
-      } = await recordRequest.list({
+      } = await recordRequest.listRecord({
         ...queryForm,
         type: 0,
         sorted: "desc",
@@ -61,9 +70,56 @@ export const useRecordStore = defineStore("record", {
 
       if (code === 200) {
         this.personRecord = recordList;
-        console.log("个人记录", recordList);
       }
     },
-    // async getBestSingle(queryForm: RecordReq) {},
+    // 获取最佳单次记录
+    async getBestSingleRecords(queryForm: RecordBestSingleReq) {
+      const {
+        data: { code, data: recordList },
+      } = await recordRequest.listBestSingle(queryForm);
+
+      if (code === 200) {
+        this.rankedRecord.bestSingle = recordList;
+      }
+    },
+
+    // 获取最佳平均5次记录
+    async getBestAverage5Records(queryForm: RecordBestAverageReq) {
+      const {
+        data: { code, data: recordList },
+      } = await recordRequest.listBestAverage({
+        ...queryForm,
+        type: 5,
+      });
+
+      if (code === 200) {
+        this.rankedRecord.bestAverage5 = recordList;
+      }
+    },
+
+    // 获取最佳平均12次记录
+    async getBestAverage12Records(queryForm: RecordBestAverageReq) {
+      const {
+        data: { code, data: recordList },
+      } = await recordRequest.listBestAverage({
+        ...queryForm,
+        type: 12,
+      });
+
+      if (code === 200) {
+        this.rankedRecord.bestAverage12 = recordList;
+      }
+    },
+
+    // 获取最佳步数记录
+    async getBestStepRecords(queryForm: RecordBestStepReq) {
+      const {
+        data: { code, data: recordList },
+      } = await recordRequest.listBestStep(queryForm);
+
+      if (code === 200) {
+        this.rankedRecord.bestStep = recordList;
+      }
+    },
   },
 });

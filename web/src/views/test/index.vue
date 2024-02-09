@@ -13,12 +13,7 @@ import {
 import { ref, computed, watch } from "vue";
 import TitleBar from "@/components/title-bar.vue";
 import Dropdown from "@/components/dropdown.vue";
-import {
-  getScramble,
-  createHashMap,
-  handleClick,
-  transformArray,
-} from "@/common/game";
+import { createHashMap, handleClick, transformArray } from "@/common/game";
 import { formatDurationInGame } from "@/utils/time";
 import { useScrambleStore } from "@/store/scramble";
 import { useGameStore } from "@/store/game";

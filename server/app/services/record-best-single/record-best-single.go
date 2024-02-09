@@ -50,7 +50,7 @@ func Insert(record models.RecordBestSingle) error {
 // List 查询记录列表
 func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp, error) {
 	var recordListResp models.RecordBestSingleListResp
-	db := database.GetMySQL().Table("record_best_single").Order("record_duration DESC")
+	db := database.GetMySQL().Table("record_best_single").Order("record_duration " + recordReq.Sorted)
 
 	if recordReq.UserId != 0 {
 		db = db.Where("user_id = ?", recordReq.UserId)
