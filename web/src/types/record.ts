@@ -1,4 +1,5 @@
 import { Pagination } from "@/types/pagination";
+import type { UserResp } from "./user";
 // 个人记录
 export interface RecordModel {
   id: string;
@@ -82,6 +83,7 @@ export interface RecordBestSingleReq {
 
 export interface RecordBestSingleResp {
   userId: string;
+  userInfo: UserResp;
   dimension: number;
   recordId: string;
   recordDuration: number;
@@ -91,7 +93,7 @@ export interface RecordBestSingleResp {
 }
 
 export interface RecordBestSingleListResp {
-  records: RecordBestSingleModel[];
+  records: RecordBestSingleResp[];
   total: number;
 }
 
@@ -107,7 +109,7 @@ export interface RecordBestAverageModel {
 }
 
 export interface RecordBestAverageReq {
-  userId?: number;
+  userId?: string;
   dimension?: number;
   type?: number;
   durationRange?: [number, number];
@@ -118,6 +120,7 @@ export interface RecordBestAverageReq {
 
 export interface RecordBestAverageResp {
   userId: string;
+  userInfo: UserResp;
   dimension: number;
   type: number;
   recordIds: string;
@@ -127,7 +130,7 @@ export interface RecordBestAverageResp {
 }
 
 export interface RecordBestAverageListResp {
-  records: RecordBestAverageModel[];
+  records: RecordBestAverageResp[];
   total: number;
 }
 
@@ -153,6 +156,7 @@ export interface RecordBestStepReq {
 
 export interface RecordBestStepResp {
   userId: string;
+  userInfo: UserResp;
   dimension: number;
   recordId: string;
   recordStep: number;
@@ -161,6 +165,6 @@ export interface RecordBestStepResp {
 }
 
 export interface RecordBestStepListResp {
-  records: RecordBestStepModel[];
+  records: RecordBestStepResp[];
   total: number;
 }

@@ -28,6 +28,7 @@ import { useGameStore } from "@/store/game";
 import { useMessage } from "naive-ui";
 import { recordRequest } from "@/api/methods/record";
 import { scrambleRequest } from "api/scramble";
+
 const Message = useMessage();
 
 const gameStore = useGameStore();
@@ -232,7 +233,6 @@ const gameMap = ref([
   [9, 10, 11, 12],
   [13, 14, 15, 0],
 ]);
-
 const gameHashMap = ref(createHashMap(gameMap.value));
 
 // 是否开始
@@ -241,7 +241,6 @@ const isStart = ref(false);
 const isScramble = ref(false);
 // 是否胜利
 const isWin = ref(false);
-
 // 游戏显示时间
 const gameTime = computed((): string => {
   if (isStart.value) return formatDurationInGame(interval.value);
@@ -260,7 +259,6 @@ const interval = ref(0);
 let timer: string | number | NodeJS.Timeout | undefined;
 // 随机数
 let idx = 0;
-
 // 打乱顺序
 let scrambleMap: number[] | undefined = [];
 // 解法

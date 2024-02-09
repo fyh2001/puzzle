@@ -95,7 +95,7 @@ func ListRecordBestSingle(c *gin.Context) {
 		return
 	}
 
-	recordList, err := recordBestSingleService.List(recordReq)
+	recordList, err := recordBestSingleService.ListWithUserInfo(recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -112,7 +112,7 @@ func ListRecordBestAverage(c *gin.Context) {
 		return
 	}
 
-	recordList, err := recordBestAverageService.List(recordReq)
+	recordList, err := recordBestAverageService.ListWithUserInfo(recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -129,7 +129,7 @@ func ListRecordBestStep(c *gin.Context) {
 		return
 	}
 
-	recordList, err := recordBestStepSerivce.List(recordReq)
+	recordList, err := recordBestStepSerivce.ListWithUserInfo(recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return

@@ -55,6 +55,52 @@ export const useRecordStore = defineStore("record", {
 
         .slice(0, 10);
     },
+    getBestSingleRecordList: (state) => {
+      return state.rankedRecord.bestSingle.records.map((record) => {
+        const duration = formatDurationInRecord(record.recordDuration);
+        const step = record.recordStep;
+        const nickname = record.userInfo?.nickname;
+        return {
+          ...record,
+          duration,
+          step,
+          nickname,
+        };
+      });
+    },
+    getBestAverage5RecordList: (state) => {
+      return state.rankedRecord.bestAverage5.records.map((record) => {
+        const duration = formatDurationInRecord(record.recordAverageDuration);
+        const nickname = record.userInfo?.nickname;
+        return {
+          ...record,
+          duration,
+          nickname,
+        };
+      });
+    },
+    getBestAverage12RecordList: (state) => {
+      return state.rankedRecord.bestAverage5.records.map((record) => {
+        const duration = formatDurationInRecord(record.recordAverageDuration);
+        const nickname = record.userInfo?.nickname;
+        return {
+          ...record,
+          duration,
+          nickname,
+        };
+      });
+    },
+    getBestStepRecordList: (state) => {
+      return state.rankedRecord.bestStep.records.map((record) => {
+        const step = record.recordStep;
+        const nickname = record.userInfo?.nickname;
+        return {
+          ...record,
+          step,
+          nickname,
+        };
+      });
+    },
   },
 
   actions: {
@@ -92,6 +138,7 @@ export const useRecordStore = defineStore("record", {
       });
 
       if (code === 200) {
+        console.log(recordList);
         this.rankedRecord.bestAverage5 = recordList;
       }
     },
@@ -117,6 +164,7 @@ export const useRecordStore = defineStore("record", {
       } = await recordRequest.listBestStep(queryForm);
 
       if (code === 200) {
+        console.log(recordList);
         this.rankedRecord.bestStep = recordList;
       }
     },

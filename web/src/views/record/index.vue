@@ -19,6 +19,10 @@ import {
 import TitleBar from "@/components/title-bar.vue";
 import Dropdown from "@/components/dropdown.vue";
 import recordPerson from "@/views/record/components/record-person.vue";
+import bestSingle from "@/views/record/components/best-single.vue";
+import bestAverage5 from "@/views/record/components/best-average5.vue";
+import bestAverage12 from "@/views/record/components/best-average12.vue";
+import bestStep from "@/views/record/components/best-step.vue";
 import { useGameStore } from "@/store/game";
 
 const gameStore = useGameStore();
@@ -58,28 +62,31 @@ const tableOptions = {
   },
   all: {
     title: "总排名",
-    disabled: true,
+    disabled: false,
     children: {
       bestSingle: {
         title: "最佳单次",
         icon: markRaw(TimerOutlined),
         disabled: false,
-        view: "bbb",
+        view: bestSingle,
       },
       bestAverage5: {
         title: "最佳5次平均",
         icon: markRaw(Filter5Round),
         disabled: false,
+        view: bestAverage5,
       },
       bestAverage12: {
         title: "最佳12次平均",
         icon: markRaw(Filter9PlusRound),
         disabled: false,
+        view: bestAverage12,
       },
-      bestStepCount: {
+      bestStep: {
         title: "最佳步数",
         icon: markRaw(SwipeLeftRound),
         disabled: false,
+        view: bestStep,
       },
     },
   },
@@ -191,11 +198,6 @@ const options = [
     label: "我的记录",
     key: "record",
     disabled: tableOptions.mine.disabled,
-    props: {
-      onClick: () => {
-        currentTableOptions.value = "mine";
-      },
-    },
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">

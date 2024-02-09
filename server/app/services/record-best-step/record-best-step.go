@@ -3,8 +3,10 @@ package recordbeststep
 import (
 	"errors"
 	"puzzle/app/models"
+	userService "puzzle/app/services/user"
 	"puzzle/database"
 	"puzzle/utils"
+	"strconv"
 )
 
 // check 检查参数
@@ -83,6 +85,76 @@ func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, er
 	err = db.Find(&recordBestStepListResp.Records).Error
 	if err != nil {
 		return recordBestStepListResp, errors.New("查询失败")
+	}
+
+	return recordBestStepListResp, nil
+}
+
+// ListWithUserInfo 查询记录并携带用户信息
+func ListWithUserInfo(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
+	var recordBestStepListResp models.RecordBestStepListResp
+	db := database.GetMySQL().Table("record_best_step").Order("record_step " + recordReq.Sorted)
+
+	if recordReq.UserId != 0 {
+		db = db.Where("user_id = ?", recordReq.UserId)
+	}
+
+	if recordReq.Dimension != 0 {
+		db = db.Where("dimension = ?", recordReq.Dimension)
+	}
+
+	if recordReq.RecordId != 0 {
+		db = db.Where("record_id = ?", recordReq.RecordId)
+	}
+
+	if len(recordReq.StepRange) == 2 {
+		db = db.Where("record_step >= ? AND record_step <= ?", recordReq.StepRange[0], recordReq.StepRange[1])
+	}
+
+	if len(recordReq.DateRange) == 2 {
+		db = db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
+	}
+
+	// 查询总数
+	err := db.Count(&recordBestStepListResp.Total).Error
+	if err != nil {
+		return recordBestStepListResp, errors.New("总数查询失败")
+	}
+
+	// 分页
+	if (recordReq.Pagination.Page > 0) && (recordReq.Pagination.PageSize > 0) {
+		db = db.Scopes(utils.Paginate(&recordReq.Pagination))
+	}
+
+	// 查询记录
+	err = db.Find(&recordBestStepListResp.Records).Error
+	if err != nil {
+		return recordBestStepListResp, errors.New("查询失败")
+	}
+
+	// 查询用户信息
+	userIds := make([]int64, 0)
+	for _, record := range recordBestStepListResp.Records {
+		userId, _ := strconv.ParseInt(record.UserId, 10, 64)
+		userIds = append(userIds, userId)
+	}
+
+	userReq := models.UserReq{
+		Ids: userIds,
+	}
+
+	userList, err := userService.List(userReq)
+	if err != nil {
+		return recordBestStepListResp, errors.New("查询用户信息失败")
+	}
+
+	userMap := make(map[string]models.UserResp)
+	for _, user := range userList.Records {
+		userMap[user.Id] = user
+	}
+
+	for i, record := range recordBestStepListResp.Records {
+		recordBestStepListResp.Records[i].UserInfo = userMap[record.UserId]
 	}
 
 	return recordBestStepListResp, nil

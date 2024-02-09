@@ -113,6 +113,10 @@ func List(u models.UserReq) (models.UserListResp, error) {
 		db = db.Where("status = ?", u.Status)
 	}
 
+	if len(u.Ids) > 0 {
+		db = db.Where("id in (?)", u.Ids)
+	}
+
 	// 查询总数
 	err := db.Count(&userResp.Total).Error
 	if err != nil {
