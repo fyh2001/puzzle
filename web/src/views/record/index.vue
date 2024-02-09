@@ -17,12 +17,14 @@ import {
 import TitleBar from "@/components/title-bar.vue";
 import Dropdown from "@/components/dropdown.vue";
 import recordPerson from "@/views/record/components/record-person.vue";
-
 import { useGameStore } from "@/store/game";
 
+const gameStore = useGameStore();
+
+// 自定义表格选项
 const tableOptions = {
   mine: {
-    title: "我的",
+    title: "我的记录",
     view: recordPerson,
   },
   all: {
@@ -69,10 +71,7 @@ const tableOptions = {
     },
   },
 };
-const currentTableOptions = ref("mine");
-const currentChildOption = ref("bestSingle");
 
-const gameStore = useGameStore();
 // 功能下拉框选项
 const options = [
   // 阶数
@@ -259,23 +258,33 @@ const options = [
   },
 ];
 
+// 当前表格选项
+const currentTableOptions = ref("mine");
+// 当前子表格选项
+const currentChildOption = ref("bestSingle");
+
+// 当前表格视图
 const curDataTableView = computed(() => {
   // @ts-ignore
   const rankType = tableOptions[currentTableOptions.value];
   return rankType.children?.[currentChildOption.value]?.view || rankType.view;
 });
 
+// 当前表格标签
 const curDataTableLabel = computed((): string | undefined => {
   const resultArr = [];
 
   // @ts-ignore
+  // 主表格标题
   const rankType = tableOptions[currentTableOptions.value];
   resultArr.push(rankType.title);
 
+  // 子表格标题
   if (rankType.children)
     resultArr.push(rankType.children[currentChildOption.value]?.title);
 
-  resultArr.push(gameStore.dimension);
+  // 阶数
+  resultArr.push(gameStore.dimension + "阶");
 
   return resultArr.join(" - ");
 });
