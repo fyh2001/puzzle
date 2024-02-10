@@ -159,14 +159,15 @@ func Shuffle(n, idx int) []int {
 	}
 
 	if !isSolvable(n, array) {
-		if array[N-1] == 0 {
-			temp := array[N-2]
-			array[N-2] = array[N-3]
+		if array[N-1] != 0 && array[N-2] != 0 {
+			temp := array[N-1]
+			array[N-1] = array[N-2]
+			array[N-2] = temp
+		} else {
+			temp := array[N-4]
+			array[N-4] = array[N-3]
 			array[N-3] = temp
 		}
-		temp := array[N-1]
-		array[N-1] = array[N-2]
-		array[N-2] = temp
 	}
 
 	return array

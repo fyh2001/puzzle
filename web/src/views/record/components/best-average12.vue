@@ -17,11 +17,7 @@ const tableColumns = [
     key: "index",
     width: "65",
     render: (_: Object, index: number) => {
-      return (
-        recordStore.rankedRecord.bestAverage12.total -
-        (pagination.page - 1) * 10 -
-        index
-      );
+      return (pagination.page - 1) * 10 + index + 1;
     },
   },
   {

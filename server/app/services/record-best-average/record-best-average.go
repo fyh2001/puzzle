@@ -168,14 +168,6 @@ func ListWithUserInfo(recordReq models.RecordBestAverageReq) (models.RecordBestA
 func Update(record models.RecordBestAverage) error {
 	db := database.GetMySQL().Table("record_best_average").Where("user_id = ? AND dimension = ? AND type = ?", record.UserId, record.Dimension, record.Type)
 
-	if record.RecordIds != "" {
-		db = db.Where("record_ids = ?", record.RecordIds)
-	}
-
-	if record.RecordAverageDuration != 0 {
-		db = db.Where("record_average_duration = ?", record.RecordAverageDuration)
-	}
-
 	err := db.Updates(&record).Error
 	if err != nil {
 		return err

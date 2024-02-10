@@ -42,7 +42,7 @@ const tableOptions = {
           gameStore.setGameMode(0);
         },
       },
-      rank: {
+      myRank: {
         title: "排名",
         icon: markRaw(MovingRound),
         disabled: false,
@@ -50,7 +50,7 @@ const tableOptions = {
           gameStore.setGameMode(1);
         },
       },
-      battle: {
+      myBattle: {
         title: "对战",
         icon: markRaw(CableRound),
         disabled: true,
@@ -347,8 +347,8 @@ const curDataTableLabel = computed((): string | undefined => {
 onMounted(() => {
   const modeToChildOptionMap: Record<number, string> = {
     0: "practice",
-    1: "rank",
-    2: "battle",
+    1: "myRank",
+    2: "myBattle",
   };
 
   currentChildOption.value = modeToChildOptionMap[gameStore.getGameMode];

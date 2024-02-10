@@ -235,6 +235,13 @@ const gameMap = ref([
 ]);
 const gameHashMap = ref(createHashMap(gameMap.value));
 
+// 是否加载中
+const isLoding = ref(false);
+// 打乱按钮是否禁用
+const btnDisabled = computed(() => {
+  return gameStore.getGameMode === 1 && isScramble.value;
+});
+
 // 是否开始
 const isStart = ref(false);
 // 是否打乱
@@ -282,7 +289,7 @@ const setScrambleStatus = (val: boolean) => {
 // 打乱
 const handleScramble = async () => {
   // 清除数据
-  gameStore.getDimension === 1 && handleDataClear();
+  gameStore.getGameMode === 0 && handleDataClear();
 
   // 练习模式
   if (gameStore.getGameMode === 0) {
@@ -437,12 +444,14 @@ const initRankMap = async () => {
 
 // 获取排位打乱
 const getRankScramble = async () => {
+  isLoding.value = true;
   const {
     data: { code, msg, data: scrambleData },
   } = await scrambleRequest.getNewScramble({
     dimension: gameStore.getDimension,
   });
 
+  isLoding.value = false;
   if (code === 200) {
     const scrambleArr = shuffle(scrambleData.dimension, scrambleData.idx);
     return { scrambleArr, scrambleIdx: scrambleData.idx };
@@ -473,43 +482,46 @@ watch(
       <dropdown content="功能" :options="dropdownOptions" :showDivider="true" />
     </div>
 
-    <!-- Map -->
-    <div class="grid gap-2 p-1 rounded-md">
-      <div
-        class="grid gap-2"
-        :style="`grid-template-columns: repeat(${gameStore.getDimension}, 1fr);`"
-        v-for="(row, rowIndex) in gameMap"
-        :key="rowIndex"
-      >
+    <n-spin :show="isLoding" description="正在获取打乱" size="large">
+      <!-- Map -->
+      <div class="grid gap-2 p-1 rounded-md">
         <div
-          class="aspect-square flex items-center justify-center rounded-md text-center text-5 font-bold"
-          :class="item === 0 ? 'invisible' : gameStore.getCellClass(item)"
-          v-for="(item, colIndex) in row"
-          :key="colIndex"
-          @click="handleTouch(rowIndex, colIndex)"
+          class="grid gap-2"
+          :style="`grid-template-columns: repeat(${gameStore.getDimension}, 1fr);`"
+          v-for="(row, rowIndex) in gameMap"
+          :key="rowIndex"
         >
-          {{ item }}
+          <div
+            class="aspect-square flex items-center justify-center rounded-md text-center text-5 font-bold"
+            :class="item === 0 ? 'invisible' : gameStore.getCellClass(item)"
+            v-for="(item, colIndex) in row"
+            :key="colIndex"
+            @click="handleTouch(rowIndex, colIndex)"
+          >
+            {{ item }}
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 时间与打乱 -->
-    <div class="flex justify-around items-center w-full mt-10">
-      <!-- 时间与步数 -->
-      <div class="w-42 text-center tabular-nums">
-        <div class="text-8 font-bold">{{ gameTime }}</div>
-        <div class="text-4">步数: {{ gameStep }}</div>
+      <!-- 时间与打乱 -->
+      <div class="flex justify-around items-center w-full mt-10">
+        <!-- 时间与步数 -->
+        <div class="w-42 text-center tabular-nums">
+          <div class="text-8 font-bold">{{ gameTime }}</div>
+          <div class="text-4">步数: {{ gameStep }}</div>
+        </div>
+
+        <n-button
+          class="w-30 h-15 text-5 shadow"
+          strong
+          secondary
+          type="primary"
+          :disabled="btnDisabled"
+          @click="handleScramble"
+        >
+          打乱
+        </n-button>
       </div>
-
-      <n-button
-        class="w-30 h-15 text-5 shadow"
-        strong
-        secondary
-        type="primary"
-        @click="handleScramble"
-      >
-        打乱
-      </n-button>
-    </div>
+    </n-spin>
   </div>
 </template>

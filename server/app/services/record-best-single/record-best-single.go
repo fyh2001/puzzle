@@ -176,18 +176,6 @@ func ListWithUserInfo(recordReq models.RecordBestSingleReq) (models.RecordBestSi
 func Update(record models.RecordBestSingle) error {
 	db := database.GetMySQL().Table("record_best_single").Where("user_id = ? AND dimension = ?", record.UserId, record.Dimension)
 
-	if record.RecordId != 0 {
-		db = db.Where("record_id = ?", record.RecordId)
-	}
-
-	if record.RecordDuration != 0 {
-		db = db.Where("record_duration = ?", record.RecordDuration)
-	}
-
-	if record.RecordStep != 0 {
-		db = db.Where("record_step = ?", record.RecordStep)
-	}
-
 	err := db.Updates(&record).Error
 
 	if err != nil {

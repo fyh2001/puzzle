@@ -164,14 +164,6 @@ func ListWithUserInfo(recordReq models.RecordBestStepReq) (models.RecordBestStep
 func Update(record models.RecordBestStep) error {
 	db := database.GetMySQL().Table("record_best_step").Where("user_id = ? AND dimension = ?", record.UserId, record.Dimension)
 
-	if record.RecordId != 0 {
-		db = db.Where("record_id = ?", record.RecordId)
-	}
-
-	if record.RecordStep != 0 {
-		db = db.Where("record_step = ?", record.RecordStep)
-	}
-
 	err := db.Updates(&record).Error
 
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	scrambledUserStatusService "puzzle/app/services/scrambled-user-status"
 	"puzzle/database"
 	"puzzle/utils"
+	"sort"
 	"strings"
 )
 
@@ -236,6 +237,7 @@ func updateRecordBestAverage5(record models.Record) error {
 			Page:     1,
 			PageSize: 5,
 		},
+		Sorted: "desc",
 	})
 
 	if err != nil {
@@ -247,13 +249,24 @@ func updateRecordBestAverage5(record models.Record) error {
 		return nil
 	}
 
-	// 计算平均记录
 	var totalDuration int
+
+	// 将记录的持续时间存储到一个切片中
+	durations := make([]int, 0, len(last5Records.Records))
 	for _, v := range last5Records.Records {
-		totalDuration += int(v.Duration)
+		durations = append(durations, int(v.Duration))
 	}
 
-	averageDuration := totalDuration / 5
+	// 对切片进行排序
+	sort.Ints(durations)
+
+	// 去掉最大和最小值
+	for i := 1; i < len(durations)-1; i++ {
+		totalDuration += durations[i]
+	}
+
+	// 计算平均值
+	averageDuration := totalDuration / (len(durations) - 2)
 
 	// 获取最佳平均记录
 	recordBestAverage, err := recordBestAverageSerivce.List(models.RecordBestAverageReq{
@@ -323,6 +336,7 @@ func updateRecordBestAverage12(record models.Record) error {
 			Page:     1,
 			PageSize: 12,
 		},
+		Sorted: "desc",
 	})
 
 	if err != nil {
@@ -334,13 +348,24 @@ func updateRecordBestAverage12(record models.Record) error {
 		return nil
 	}
 
-	// 计算平均记录
 	var totalDuration int
+
+	// 将记录的持续时间存储到一个切片中
+	durations := make([]int, 0, len(last12Records.Records))
 	for _, v := range last12Records.Records {
-		totalDuration += int(v.Duration)
+		durations = append(durations, int(v.Duration))
 	}
 
-	averageDuration := totalDuration / 12
+	// 对切片进行排序
+	sort.Ints(durations)
+
+	// 去掉最大和最小值
+	for i := 1; i < len(durations)-1; i++ {
+		totalDuration += durations[i]
+	}
+
+	// 计算平均值
+	averageDuration := totalDuration / (len(durations) - 2)
 
 	// 获取最佳平均记录
 	recordBestAverage, err := recordBestAverageSerivce.List(models.RecordBestAverageReq{

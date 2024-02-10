@@ -56,7 +56,7 @@ const tableColumns = [
 // 分页
 const pagination: Pagination = {
   page: 1,
-  pageSize: 14,
+  pageSize: 19,
   offset: 0,
 };
 
@@ -105,7 +105,7 @@ onMounted(() => {
     <n-pagination
       class="mt-5 justify-end"
       :page="pagination.page"
-      :page-size="pagination.pageSize"
+      :page-size="10"
       :item-count="recordStore.personRecord.total"
       :page-slot="3"
       @update:page="handlePageChange"

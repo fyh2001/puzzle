@@ -211,16 +211,12 @@ export const shuffle = (n: number, idx: number) => {
 
   // 判断是否可解
   if (!isSolvable(n, array)) {
-    // 如果不可解, 交换最后两个元素, 保证可解.但若其中一个元素为0, 则交换倒数第三个元素
-    if (array[N - 1] === 0) {
-      const temp = array[N - 2];
-      array[N - 2] = array[N - 3];
-      array[N - 3] = temp;
+    // 如果不可解, 交换最后两个元素, 保证可解.
+    if (array[N - 1] !== 0 && array[N - 2] !== 0) {
+      [array[N - 1], array[N - 2]] = [array[N - 2], array[N - 1]];
+    } else {
+      [array[N - 4], array[N - 3]] = [array[N - 3], array[N - 4]];
     }
-
-    const temp = array[N - 1];
-    array[N - 1] = array[N - 2];
-    array[N - 2] = temp;
   }
 
   return array;

@@ -80,7 +80,7 @@ export const useRecordStore = defineStore("record", {
       });
     },
     getBestAverage12RecordList: (state) => {
-      return state.rankedRecord.bestAverage5.records.map((record) => {
+      return state.rankedRecord.bestAverage12.records.map((record) => {
         const duration = formatDurationInRecord(record.recordAverageDuration);
         const nickname = record.userInfo?.nickname;
         return {
@@ -164,7 +164,6 @@ export const useRecordStore = defineStore("record", {
       } = await recordRequest.listBestStep(queryForm);
 
       if (code === 200) {
-        console.log(recordList);
         this.rankedRecord.bestStep = recordList;
       }
     },
