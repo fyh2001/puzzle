@@ -10,6 +10,7 @@ import {
 } from "@vicons/material";
 import router from "@/routers/index";
 import { useThemeStore } from "@/store/theme";
+import { computed } from "vue";
 
 const themeStore = useThemeStore();
 
@@ -21,7 +22,7 @@ const props = defineProps<{
   showDivider: boolean;
 }>();
 
-const options = [
+const options = computed(() => [
   ...props.options,
   {
     key: "divider",
@@ -85,70 +86,18 @@ const options = [
         </n-el>
       );
     },
-    children: [
-      {
-        label: "翠绿",
-        key: "green",
-        disabled: false,
-        icon: () => {
-          return (
-            <n-icon
-              size="18"
-              class="text-[#18A058]"
-              component={BookmarkRound}
-            />
-          );
-        },
-      },
-      {
-        label: "靛蓝",
-        key: "indigo",
-        disabled: false,
-        icon: () => {
-          return (
-            <n-icon
-              size="18"
-              class="text-indigo-500"
-              component={BookmarkRound}
-            />
-          );
-        },
-      },
-      {
-        label: "玫瑰",
-        key: "rose",
-        disabled: false,
-        icon: () => {
-          return (
-            <n-icon size="18" class="text-rose-500" component={BookmarkRound} />
-          );
-        },
-      },
-      {
-        label: "琥珀",
-        key: "amber",
-        disabled: false,
-        icon: () => {
-          return (
-            <n-icon
-              size="18"
-              class="text-amber-500"
-              component={BookmarkRound}
-            />
-          );
-        },
-      },
-      {
-        label: "天空",
-        key: "sky",
-        disabled: false,
-        icon: () => {
-          return (
-            <n-icon size="18" class="text-sky-500" component={BookmarkRound} />
-          );
-        },
-      },
-    ],
+    children: themeStore.loadedThemes.map((theme) => ({
+      label: theme.label,
+      key: theme.name,
+      disabled: false,
+      icon: () => (
+        <n-icon
+          size="18"
+          class={theme.menuIconClass}
+          component={BookmarkRound}
+        />
+      ),
+    })),
   },
   {
     label: "设置",
@@ -186,17 +135,18 @@ const options = [
       );
     },
   },
-];
+]);
 
 const handleSelect = (key: string) => {
   const func = {
     darkOn: () => themeStore.openDarkMode(),
     darkOff: () => themeStore.closeDarkMode(),
-    green: () => themeStore.changeThemeColor("green"),
-    indigo: () => themeStore.changeThemeColor("indigo"),
-    rose: () => themeStore.changeThemeColor("rose"),
-    amber: () => themeStore.changeThemeColor("amber"),
-    sky: () => themeStore.changeThemeColor("sky"),
+    // 主题切换
+    ...themeStore.loadedThemes.reduce((obj, theme) => {
+      obj[theme.name] = () => themeStore.changeThemeColor(theme.name);
+      return obj;
+    }, {} as Record<string, () => any>),
+
     updateLog: () => router.push("/update-log"),
   }[key];
   func ? func() : emit("select", key);
