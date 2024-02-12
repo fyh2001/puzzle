@@ -6,8 +6,8 @@ import (
 )
 
 func main() {
-	database.InitMySQL() // 初始化MySQL数据库连接
-
+	database.InitMySQL()          // 初始化MySQL数据库连接
+	database.InitRedis()          // 初始化Redis数据库连接
 	router := routes.InitRouter() // 初始化路由
 
 	_ = router.Run(":8081")

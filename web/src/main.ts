@@ -4,6 +4,8 @@ import App from "./App.vue";
 
 const app = createApp(App);
 
+import "@arco-design/web-vue/dist/arco.css";
+
 // Unocss
 import "@unocss/reset/tailwind.css";
 import "uno.css";

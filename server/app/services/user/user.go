@@ -1,12 +1,12 @@
 package user
 
 import (
+	"errors"
 	"puzzle/app/models"
 	"puzzle/database"
 	"puzzle/utils"
+	jwt "puzzle/utils/jwt"
 	"strconv"
-
-	"errors"
 )
 
 // UserRegister 用户注册
@@ -62,7 +62,7 @@ func UserLogin(u models.UserLoginReq) (models.UserLoginResp, error) {
 		return loginResp, errors.New("用户已注销")
 	}
 
-	token, err := utils.GenerateToken(userInfo.Id, userInfo.Username)
+	token, err := jwt.GenerateToken(userInfo.Id, userInfo.Username)
 	if err != nil {
 		return loginResp, errors.New("生成token失败")
 	}

@@ -8,6 +8,8 @@ import transformerDirective from "@unocss/transformer-directives";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
+import { ArcoResolver } from "unplugin-vue-components/resolvers";
+
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "/puzzle",
@@ -37,10 +39,15 @@ export default defineConfig({
           ],
         },
       ],
-      resolvers: [NaiveUiResolver()],
+      resolvers: [NaiveUiResolver(), ArcoResolver()],
     }),
     Components({
-      resolvers: [NaiveUiResolver()],
+      resolvers: [
+        NaiveUiResolver(),
+        ArcoResolver({
+          sideEffect: true,
+        }),
+      ],
     }),
   ],
 });

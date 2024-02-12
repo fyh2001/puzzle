@@ -44,6 +44,18 @@ func InitRouter() *gin.Engine {
 			scramble.POST("/get-new-scramble", controllers.GetNewScamble)    // 获取新打乱
 			scramble.POST("/get-user-scramble", controllers.GetUserScramble) // 获取用户打乱
 		}
+
+		// 管理员
+		admin := root.Group("/admin")
+		{
+			// 鉴权
+			authorization := admin.Group("/authorization")
+			{
+				authorization.POST("/reset-otp", controllers.ResetOtp)          // 重置otp
+				authorization.POST("/authorization", controllers.Authorization) // 验证otp
+				authorization.POST("/get-url", controllers.GetUrl)              // 获取url
+			}
+		}
 	}
 
 	return r
