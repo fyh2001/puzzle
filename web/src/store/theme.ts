@@ -47,7 +47,6 @@ export const useThemeStore = defineStore("theme", {
       Promise.all(Object.values(themeModules).map((val) => val())).then(
         (themes) => {
           this.loadedThemes = themes.map((item: any) => item.default);
-          console.log("store loadedThemes: ", this.loadedThemes);
         }
       );
     },

@@ -3,10 +3,12 @@ package recordbestaverage
 import (
 	"errors"
 	"puzzle/app/models"
+	commonService "puzzle/app/services"
 	userService "puzzle/app/services/user"
 	"puzzle/database"
 	"puzzle/utils"
 	"strconv"
+	"strings"
 )
 
 // check 校验参数
@@ -53,7 +55,28 @@ func Insert(record models.RecordBestAverage) error {
 // List 记录列表
 func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListResp, error) {
 	var recordListResp models.RecordBestAverageListResp
-	db := database.GetMySQL().Table("record_best_average").Order("record_average_duration " + recordReq.Sorted)
+
+	if recordReq.Username != "" || recordReq.Nickname != "" {
+		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
+		if err != nil {
+			return recordListResp, errors.New("查询用户信息失败")
+		}
+
+		if userInfo.Id == "" {
+			return recordListResp, errors.New("用户不存在")
+		}
+
+		recordReq.UserIdStr = userInfo.Id
+	}
+
+	recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
+	recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
+
+	if recordReq.OrderBy == "" {
+		recordReq.OrderBy = "id"
+	}
+
+	db := database.GetMySQL().Table("record_best_average").Order(recordReq.OrderBy + " " + recordReq.Sorted)
 
 	if recordReq.UserId != 0 {
 		db = db.Where("user_id = ?", recordReq.UserId)
@@ -68,10 +91,15 @@ func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListRe
 	}
 
 	if len(recordReq.DurationRange) == 2 {
-		db = db.Where("record_duration >= ? AND record_duration <= ?", recordReq.DurationRange[0], recordReq.DurationRange[1])
+		if recordReq.DurationRange[0] != 0 {
+			db = db.Where("record_duration >= ?", recordReq.DurationRange[0])
+		}
+		if recordReq.DurationRange[1] != 0 {
+			db = db.Where("record_duration <= ?", recordReq.DurationRange[1])
+		}
 	}
 
-	if len(recordReq.DateRange) == 2 {
+	if len(recordReq.DateRange) == 2 && !recordReq.DateRange[0].IsZero() && !recordReq.DateRange[1].IsZero() {
 		db = db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
 	}
 
@@ -86,9 +114,67 @@ func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListRe
 		db = db.Scopes(utils.Paginate(&recordReq.Pagination))
 	}
 
+	// 查询列表
 	err = db.Find(&recordListResp.Records).Error
 	if err != nil {
 		return recordListResp, errors.New("记录查询失败")
+	}
+
+	if recordReq.NeedUserInfo {
+		// 查询用户信息
+		userIds := make([]int64, 0)
+		for _, record := range recordListResp.Records {
+			userId, _ := strconv.ParseInt(record.UserId, 10, 64)
+			userIds = append(userIds, userId)
+		}
+
+		userReq := models.UserReq{
+			Ids: userIds,
+		}
+
+		userList, err := userService.List(userReq)
+		if err != nil {
+			return recordListResp, errors.New("查询用户信息失败")
+		}
+
+		userMap := make(map[string]models.UserResp)
+		for _, user := range userList.Records {
+			userMap[user.Id] = user
+		}
+
+		for i, record := range recordListResp.Records {
+			recordListResp.Records[i].UserInfo = userMap[record.UserId]
+		}
+	}
+
+	if recordReq.NeedRecordDetail {
+		// 查询记录详情
+
+		recordIds := make([]int64, 0)
+		for _, record := range recordListResp.Records {
+			// 逗号分隔的字符串转为数组
+			recordIdArr := strings.Split(record.RecordIds, ",")
+			for _, recordId := range recordIdArr {
+				recordIdInt, _ := strconv.ParseInt(recordId, 10, 64)
+				recordIds = append(recordIds, recordIdInt)
+			}
+		}
+
+		recordList, err := commonService.GetRecordDetail(recordIds)
+		if err != nil {
+			return recordListResp, errors.New("查询记录详情失败")
+		}
+
+		recordMap := make(map[string][]models.RecordResp)
+
+		for _, record := range recordList.Records {
+			recordMap[record.UserId] = append(recordMap[record.UserId], record)
+		}
+
+		for i, record := range recordListResp.Records {
+			recordListResp.Records[i].RecordDetail.Records = recordMap[record.UserId]
+			recordListResp.Records[i].RecordDetail.Total = int64(len(recordMap[record.UserId]))
+		}
 	}
 
 	return recordListResp, nil

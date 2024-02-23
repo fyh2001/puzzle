@@ -61,7 +61,7 @@ const dropdownOptions = [
         },
         props: {
           onClick: () => {
-            gameStore.setGameMode(0);
+            gameStore.setGameMode(1);
           },
         },
       },
@@ -78,7 +78,7 @@ const dropdownOptions = [
         },
         props: {
           onClick: () => {
-            gameStore.setGameMode(1);
+            gameStore.setGameMode(2);
           },
         },
       },
@@ -239,7 +239,7 @@ const gameHashMap = ref(createHashMap(gameMap.value));
 const isLoding = ref(false);
 // 打乱按钮是否禁用
 const btnDisabled = computed(() => {
-  return gameStore.getGameMode === 1 && isScramble.value;
+  return gameStore.getGameMode === 2 && isScramble.value;
 });
 
 // 是否开始
@@ -289,16 +289,16 @@ const setScrambleStatus = (val: boolean) => {
 // 打乱
 const handleScramble = async () => {
   // 清除数据
-  gameStore.getGameMode === 0 && handleDataClear();
+  gameStore.getGameMode === 1 && handleDataClear();
 
   // 练习模式
-  if (gameStore.getGameMode === 0) {
+  if (gameStore.getGameMode === 1) {
     idx = Date.now(); // 设置打乱随机数
     scrambleMap = shuffle(gameStore.getDimension, idx); // 打乱顺序
   }
 
   // 排位模式
-  if (gameStore.getGameMode === 1) {
+  if (gameStore.getGameMode === 2) {
     let { scrambleArr, scrambleIdx } = await getRankScramble();
 
     if (scrambleArr!.length === 0) return;
@@ -331,7 +331,7 @@ const handleTouch = (rowIndex: number, colIndex: number) => {
   }
 
   // 点击处理
-  const { newSolution, newStepCount, map, hashMap } = handleClick(
+  const { newSolution, newStepCount, newMap, hashMap } = handleClick(
     gameMap.value,
     gameHashMap.value,
     rowIndex,
@@ -339,7 +339,7 @@ const handleTouch = (rowIndex: number, colIndex: number) => {
   );
 
   // 更新数据
-  gameMap.value = map;
+  gameMap.value = newMap;
   gameHashMap.value = hashMap;
   gameStep.value += newStepCount;
   newSolution.length && solution.push(newSolution);
@@ -466,7 +466,7 @@ watch(
   () => [gameStore.getDimension, gameStore.gameMode],
   () => {
     initMap();
-    if (gameStore.gameMode === 1) {
+    if (gameStore.gameMode === 2) {
       initRankMap();
     }
   },

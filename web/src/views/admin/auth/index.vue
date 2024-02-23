@@ -7,20 +7,22 @@ import router from "@/routers";
 const Message = useMessage();
 const adminStore = useAdminStore();
 
-const code = ref("");
+const inputValue = ref("");
+const isCodeError = ref(false);
 
 const onFinish = (code: string) => {
-  adminStore
-    .auth({ code })
-    .then(() => {
+  adminStore.auth({ code }).then((res) => {
+    if (res) {
       Message.success("登录成功");
-      setTimeout(() => {
+      return setTimeout(() => {
         router.push({ name: "Admin" });
       }, 1000);
-    })
-    .catch(() => {
-      Message.error("登录失败");
-    });
+    }
+
+    inputValue.value = "";
+    isCodeError.value = true;
+    Message.error("登录失败");
+  });
 };
 </script>
 
@@ -28,8 +30,14 @@ const onFinish = (code: string) => {
   <div class="w-screen h-screen bg-white">
     <a-verification-code
       class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-      v-model="code"
+      v-model="inputValue"
+      :error="isCodeError"
       style="width: 300px"
+      @change="
+        () => {
+          isCodeError && (isCodeError = false);
+        }
+      "
       @finish="onFinish"
     />
   </div>

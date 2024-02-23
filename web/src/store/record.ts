@@ -52,7 +52,6 @@ export const useRecordStore = defineStore("record", {
             duration,
           };
         })
-
         .slice(0, 10);
     },
     getBestSingleRecordList: (state) => {

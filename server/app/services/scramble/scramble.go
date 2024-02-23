@@ -7,6 +7,7 @@ import (
 	scrambledUserStatusService "puzzle/app/services/scrambled-user-status"
 	"puzzle/database"
 	"puzzle/utils"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -34,7 +35,7 @@ func Insert(scramble models.Scramble) error {
 
 	snowflake := utils.Snowflake{}
 	scramble.Id = snowflake.NextVal()
-	scramble.Status = 0
+	scramble.Status = 1
 
 	return database.GetMySQL().Create(&scramble).Error
 }
@@ -111,7 +112,7 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 	}
 
 	// 如果没有找到用户的完成状态，或是用户的完成状态为已完成，则生成新的打乱公式
-	if scrambledUserStatusResp.Total == 0 || scrambledUserStatusResp.Records[0].Status == 1 {
+	if scrambledUserStatusResp.Total == 0 || scrambledUserStatusResp.Records[0].Status == 2 {
 		idx := time.Now().UnixMilli()
 		scramble := utils.Shuffle(getNewScrambleReq.Dimension, int(idx))
 		scrambleStr := strings.Trim(strings.Replace(fmt.Sprint(scramble), " ", ",", -1), "[]")
@@ -123,7 +124,7 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 			Dimension: getNewScrambleReq.Dimension,
 			Idx:       idx,
 			Scramble:  scrambleStr,
-			Status:    0,
+			Status:    1,
 		}
 
 		err = Insert(scrambleModel)
@@ -131,13 +132,14 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 			return models.ScrambleResp{}, err
 		}
 
+		// 查询用户的打乱公式状态
 		if scrambledUserStatusResp.Total == 0 {
 			// 新增用户的打乱公式状态
 			scrambledUserStatus := models.ScrambledUserStatus{
 				UserId:     getNewScrambleReq.UserId,
 				Dimension:  getNewScrambleReq.Dimension,
 				ScrambleId: scrambleModel.Id,
-				Status:     0,
+				Status:     1,
 			}
 
 			err = scrambledUserStatusService.Insert(scrambledUserStatus)
@@ -146,11 +148,12 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 			}
 		} else {
 			// 更新用户的打乱公式状态
+			id, _ := strconv.ParseInt(scrambledUserStatusResp.Records[0].Id, 10, 64)
+
 			scrambledUserStatus := models.ScrambledUserStatus{
-				UserId:     getNewScrambleReq.UserId,
-				Dimension:  getNewScrambleReq.Dimension,
+				Id:         id,
 				ScrambleId: scrambleModel.Id,
-				Status:     0,
+				Status:     1,
 			}
 
 			err = scrambledUserStatusService.Update(scrambledUserStatus)
@@ -194,7 +197,7 @@ func GetUserScramble(getNewScrambleReq models.GetNewScambleReq) (models.Scramble
 	}
 
 	// 如果没有找到用户的完成状态，或是用户的完成状态为已完成，则不生成新的打乱公式
-	if scrambledUserStatusResp.Total == 0 || scrambledUserStatusResp.Records[0].Status == 1 {
+	if scrambledUserStatusResp.Total == 0 || scrambledUserStatusResp.Records[0].Status == 2 {
 		return scrambleResp, nil
 	}
 

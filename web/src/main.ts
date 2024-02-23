@@ -1,10 +1,9 @@
 import { createApp } from "vue";
+import "@arco-design/web-vue/dist/arco.css";
 import "./style.css";
 import App from "./App.vue";
 
 const app = createApp(App);
-
-import "@arco-design/web-vue/dist/arco.css";
 
 // Unocss
 import "@unocss/reset/tailwind.css";

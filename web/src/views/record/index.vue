@@ -1,5 +1,5 @@
 <script lang="tsx" setup>
-import { ref, computed, markRaw, onMounted } from "vue";
+import { ref, computed, markRaw, onMounted, Component } from "vue";
 import {
   MovingRound,
   CableRound,
@@ -113,30 +113,25 @@ const tableOptions = {
   },
 };
 
+const IIcon = (icon: Component) => () =>
+  (
+    <n-el class="flex items-center" style="color: var(--primary-color)">
+      <n-icon size="18" component={icon} />
+    </n-el>
+  );
+
 // 功能下拉框选项
 const options = [
   // 阶数
   {
     label: "阶数选择",
     key: "dimension",
-    icon: () => {
-      return (
-        <n-el class="flex items-center" style="color: var(--primary-color)">
-          <n-icon size="18" component={DashboardCustomizeRound} />
-        </n-el>
-      );
-    },
+    icon: IIcon(DashboardCustomizeRound),
     children: [
       {
         label: "3x3",
         key: "3",
-        icon: () => {
-          return (
-            <n-el class="flex items-center" style="color: var(--primary-color)">
-              <n-icon size="18" component={Looks3Outlined} />
-            </n-el>
-          );
-        },
+        icon: IIcon(Looks3Outlined),
         props: {
           onClick: () => {
             gameStore.setDimension(3);

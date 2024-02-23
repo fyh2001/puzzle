@@ -3,6 +3,7 @@ package recordbeststep
 import (
 	"errors"
 	"puzzle/app/models"
+	commonService "puzzle/app/services"
 	userService "puzzle/app/services/user"
 	"puzzle/database"
 	"puzzle/utils"
@@ -48,7 +49,29 @@ func Insert(record models.RecordBestStep) error {
 // List 查询记录
 func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
 	var recordBestStepListResp models.RecordBestStepListResp
-	db := database.GetMySQL().Table("record_best_step").Order("record_step " + recordReq.Sorted)
+
+	if recordReq.Username != "" || recordReq.Nickname != "" {
+		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
+		if err != nil {
+			return recordBestStepListResp, errors.New("查询用户信息失败")
+		}
+
+		if userInfo.Id == "" {
+			return recordBestStepListResp, errors.New("用户不存在")
+		}
+
+		recordReq.UserIdStr = userInfo.Id
+	}
+
+	recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
+	recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
+	recordReq.RecordId, _ = strconv.ParseInt(recordReq.RecordIdStr, 10, 64)
+
+	if recordReq.OrderBy == "" {
+		recordReq.OrderBy = "id"
+	}
+
+	db := database.GetMySQL().Table("record_best_step").Order(recordReq.OrderBy + " " + recordReq.Sorted)
 
 	if recordReq.UserId != 0 {
 		db = db.Where("user_id = ?", recordReq.UserId)
@@ -85,6 +108,54 @@ func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, er
 	err = db.Find(&recordBestStepListResp.Records).Error
 	if err != nil {
 		return recordBestStepListResp, errors.New("查询失败")
+	}
+
+	if recordReq.NeedUserInfo {
+		// 查询用户信息
+		userIds := make([]int64, 0)
+		for _, record := range recordBestStepListResp.Records {
+			userId, _ := strconv.ParseInt(record.UserId, 10, 64)
+			userIds = append(userIds, userId)
+		}
+
+		userList, err := commonService.GetUserInfo(userIds)
+		if err != nil {
+			return recordBestStepListResp, errors.New("查询用户信息失败")
+		}
+
+		userMap := make(map[string]models.UserResp)
+		for _, user := range userList.Records {
+			userMap[user.Id] = user
+		}
+
+		for i, record := range recordBestStepListResp.Records {
+			recordBestStepListResp.Records[i].UserInfo = userMap[record.UserId]
+		}
+	}
+
+	if recordReq.NeedRecordDetail {
+		// 查询记录详情
+		recordIds := make([]int64, 0)
+		for _, record := range recordBestStepListResp.Records {
+			recordId, _ := strconv.ParseInt(record.RecordId, 10, 64)
+			recordIds = append(recordIds, recordId)
+		}
+
+		recordList, err := commonService.GetRecordDetail(recordIds)
+		if err != nil {
+			return recordBestStepListResp, errors.New("查询记录详情失败")
+		}
+
+		recordMap := make(map[string][]models.RecordResp)
+
+		for _, record := range recordList.Records {
+			recordMap[record.UserId] = append(recordMap[record.UserId], record)
+		}
+
+		for i, record := range recordBestStepListResp.Records {
+			recordBestStepListResp.Records[i].RecordDetail.Records = recordMap[record.UserId]
+			recordBestStepListResp.Records[i].RecordDetail.Total = int64(len(recordMap[record.UserId]))
+		}
 	}
 
 	return recordBestStepListResp, nil

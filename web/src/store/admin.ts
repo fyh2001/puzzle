@@ -1,15 +1,86 @@
 import { defineStore } from "pinia";
-import { authRequest } from "api/admin";
-import type { AuthReq } from "@/types/admin";
+import {
+  authRequest,
+  userManageRequest,
+  recordManageRequest,
+  recordBestSingleRequest,
+} from "api/admin";
+import { formatDurationInRecord } from "@/utils/time";
+import type { AuthReq, AdminData } from "@/types/admin";
+import type { UserReq, UserResp } from "@/types/user";
+import type {
+  RecordResp,
+  RecordReq,
+  RecordBestSingleReq,
+  RecordBestSingleResp,
+} from "@/types/record";
 
 export const useAdminStore = defineStore("admin", {
+  persist: true,
+
   state: () => ({
     authorization: {
       token: "",
       secretUrl: "",
       expiredAt: 0,
     },
+    data: {
+      user: <AdminData<UserResp>>{
+        list: [],
+        total: 0,
+      },
+      personRecord: <AdminData<RecordResp>>{
+        list: [],
+        total: 0,
+      },
+      bestSingleRecord: <AdminData<RecordBestSingleResp>>{
+        list: [],
+        total: 0,
+      },
+    },
   }),
+
+  getters: {
+    getToken: (state) => {
+      if (state.authorization.expiredAt < Date.now()) {
+        return "";
+      }
+
+      return state.authorization.token;
+    },
+    getUserList: (state) => state.data.user.list,
+    getUserTotal: (state) => state.data.user.total,
+    getPersonRecordList: (state) => {
+      return state.data.personRecord.list.map((record) => {
+        const durationFormat = formatDurationInRecord(record.duration);
+
+        return {
+          ...record,
+          durationFormat,
+        };
+      });
+    },
+    getPersonRecordTotal: (state) => state.data.personRecord.total,
+    getBestSingleRecordList: (state) => {
+      return state.data.bestSingleRecord.list.map((record) => {
+        const durationFormat = formatDurationInRecord(record.recordDuration);
+        const recordDetail = record.recordDetail.records.map((record) => {
+          const durationFormat = formatDurationInRecord(record.duration);
+          return {
+            ...record,
+            durationFormat,
+          };
+        });
+
+        return {
+          ...record,
+          durationFormat,
+          recordDetail,
+        };
+      });
+    },
+    getBestSingleRecordTotal: (state) => state.data.bestSingleRecord.total,
+  },
 
   actions: {
     async auth(data: AuthReq): Promise<boolean> {
@@ -19,18 +90,78 @@ export const useAdminStore = defineStore("admin", {
 
       if (code === 200) {
         this.authorization.token = authResp.token;
+        this.authorization.secretUrl = authResp.secretUrl;
         this.authorization.expiredAt = Date.now() + 24 * 60 * 60 * 1000; // 24小时
         return true;
       }
 
       return false;
     },
-  },
 
-  persist: [
-    {
-      paths: ["authorization"],
-      storage: localStorage,
+    resetaAuthorization() {
+      this.authorization.token = "";
+      this.authorization.secretUrl = "";
+      this.authorization.expiredAt = 0;
     },
-  ],
+
+    // 获取用户列表
+    async fetchUserList(queryForm: UserReq) {
+      const {
+        data: { code, data: userListResp, msg },
+      } = await userManageRequest.list(queryForm);
+
+      if (code === 200) {
+        this.data.user.list = userListResp.records;
+        this.data.user.total = userListResp.total;
+      }
+
+      return { code, msg };
+    },
+    // 更新用户列表
+    async updateUserList(data: UserReq) {
+      const {
+        data: { code, msg, data: updateResp },
+      } = await userManageRequest.update(data);
+
+      return { code, msg, data: updateResp };
+    },
+
+    // 获取记录列表
+    async fetchRecordList(queryForm: RecordReq) {
+      const {
+        data: { code, data: recordListResp, msg },
+      } = await recordManageRequest.list(queryForm);
+
+      if (code === 200) {
+        this.data.personRecord.list = recordListResp.records;
+        this.data.personRecord.total = recordListResp.total;
+      }
+
+      return { code, msg };
+    },
+    // 更新记录列表
+    async updateRecordList(data: RecordReq) {
+      const {
+        data: { code, msg, data: updateResp },
+      } = await recordManageRequest.update(data);
+
+      return { code, msg, data: updateResp };
+    },
+
+    // 获取最佳单次记录列表
+    async fetchRecordBestSingleList(queryForm: RecordBestSingleReq) {
+      const {
+        data: { code, data: recordListResp, msg },
+      } = await recordBestSingleRequest.list(queryForm);
+
+      if (code === 200) {
+        this.data.bestSingleRecord.list = recordListResp.records;
+        this.data.bestSingleRecord.total = recordListResp.total;
+      }
+
+      console.log(this.getBestSingleRecordList);
+
+      return { code, msg };
+    },
+  },
 });

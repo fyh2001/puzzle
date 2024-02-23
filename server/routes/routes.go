@@ -55,6 +55,26 @@ func InitRouter() *gin.Engine {
 				authorization.POST("/authorization", controllers.Authorization) // 验证otp
 				authorization.POST("/get-url", controllers.GetUrl)              // 获取url
 			}
+
+			// 用户
+			userManage := admin.Group("/user-manage").Use(jwt.AdminJWT())
+			{
+				userManage.POST("/list", controllers.ListUserData)     // 用户列表
+				userManage.POST("/update", controllers.UpdateUserData) // 更新用户
+			}
+
+			// 记录
+			recordManage := admin.Group("/record-manage").Use(jwt.AdminJWT())
+			{
+				recordManage.POST("/list", controllers.ListRecordData)     // 记录列表
+				recordManage.POST("/update", controllers.UpdateRecordData) // 更新记录
+			}
+
+			// 最佳单次记录
+			recordBestSingleManage := admin.Group("/record-best-single-manage").Use(jwt.AdminJWT())
+			{
+				recordBestSingleManage.POST("/list", controllers.ListRecordBestSingleData) // 最佳单次记录列表
+			}
 		}
 	}
 

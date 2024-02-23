@@ -20,8 +20,10 @@ export interface UserReq {
   nickname?: string;
   email?: string;
   phone?: string;
-  status?: number;
+  status?: number | null;
+  dateRange?: number[] | null;
   pagination?: Pagination;
+  ids?: string[];
 }
 
 export interface UserResp {

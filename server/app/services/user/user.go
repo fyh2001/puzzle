@@ -32,7 +32,7 @@ func UserRegister(u models.UserRegisterReq) error {
 		Username: u.Username,
 		Password: utils.MD5(u.Password),
 		Nickname: u.Nickname,
-		Status:   0,
+		Status:   1,
 	}
 
 	return database.GetMySQL().Create(&user).Error
@@ -54,11 +54,11 @@ func UserLogin(u models.UserLoginReq) (models.UserLoginResp, error) {
 		return loginResp, errors.New("密码错误")
 	}
 
-	if userInfo.Status == 1 {
+	if userInfo.Status == 2 {
 		return loginResp, errors.New("用户已冻结")
 	}
 
-	if userInfo.Status == 2 {
+	if userInfo.Status == 3 {
 		return loginResp, errors.New("用户已注销")
 	}
 
@@ -87,18 +87,27 @@ func UserLogin(u models.UserLoginReq) (models.UserLoginResp, error) {
 // List 获取用户列表
 func List(u models.UserReq) (models.UserListResp, error) {
 	var userResp models.UserListResp
-	db := database.GetMySQL().Table("user")
+
+	if u.OrderBy == "" {
+		u.OrderBy = "id"
+	}
+
+	db := database.GetMySQL().Table("user").Order(u.OrderBy + " " + u.Sorted)
 
 	if u.Id != 0 {
 		db = db.Where("id = ?", u.Id)
 	}
 
 	if u.Username != "" {
-		db = db.Where("username = ?", u.Username)
+		db = db.Where("username Like ?", "%"+u.Username+"%")
 	}
 
 	if u.Nickname != "" {
-		db = db.Where("nickname = ?", u.Nickname)
+		db = db.Where("nickname Like ?", "%"+u.Nickname+"%")
+	}
+
+	if u.AccoladeId != 0 {
+		db = db.Where("accolade_id = ?", u.AccoladeId)
 	}
 
 	if u.Email != "" {
@@ -111,6 +120,10 @@ func List(u models.UserReq) (models.UserListResp, error) {
 
 	if u.Status != 0 {
 		db = db.Where("status = ?", u.Status)
+	}
+
+	if len(u.DateRange) == 2 && !u.DateRange[0].IsZero() && !u.DateRange[1].IsZero() {
+		db = db.Where("created_at >= ? and created_at <= ?", u.DateRange[0], u.DateRange[1])
 	}
 
 	if len(u.Ids) > 0 {
@@ -139,7 +152,10 @@ func List(u models.UserReq) (models.UserListResp, error) {
 
 // UpdateUser 更新用户
 func Update(u models.User) error {
-	err := database.GetMySQL().Model(&u).Updates(&u).Error
+
+	u.Password = utils.MD5(u.Password)
+
+	err := database.GetMySQL().Table("user").Updates(&u).Error
 	if err != nil {
 		return errors.New("更新失败")
 	}

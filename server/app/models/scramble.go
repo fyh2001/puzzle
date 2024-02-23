@@ -10,7 +10,7 @@ type Scramble struct {
 	Dimension int       `json:"dimension"`                       // 阶数 3 | 4 | 5 | 6
 	Idx       int64     `json:"idx"`                             // 随机数索引
 	Scramble  string    `json:"scramble"`                        // 打乱公式
-	Status    int       `json:"status" gorm:"default 0"`         // 状态 0:启用 1:冻结 2:删除
+	Status    int       `json:"status" gorm:"default 1"`         // 状态 1:启用 2:冻结 3:删除
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 }
@@ -20,7 +20,7 @@ type ScrambleReq struct {
 	Dimension  int              `json:"dimension"` // 阶数 3 | 4 | 5 | 6
 	Idx        int64            `json:"idx"`       // 随机数索引
 	Scramble   string           `json:"scramble"`  // 打乱公式
-	Status     int              `json:"status"`    // 状态 0:启用 1:冻结 2:删除
+	Status     int              `json:"status"`    // 状态 1:启用 2:冻结 3:删除
 	DateRange  []time.Time      `json:"dateRange"` // 时间范围
 	Pagination utils.Pagination `gorm:"embedded"`  // 分页
 	Sorted     string           `json:"sorted"`    // 排序
@@ -31,7 +31,7 @@ type ScrambleResp struct {
 	Dimension int       `json:"dimension"`                       // 阶数 3 | 4 | 5 | 6
 	Idx       int64     `json:"idx"`                             // 随机数索引
 	Scramble  string    `json:"scramble"`                        // 打乱公式
-	Status    int       `json:"status" gorm:"default 0"`         // 状态 0:启用 1:冻结 2:删除
+	Status    int       `json:"status" gorm:"default 1"`         // 状态 1:启用 2:冻结 3:删除
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 }

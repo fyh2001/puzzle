@@ -28,7 +28,10 @@ func Insert(scrambledUserStatus models.ScrambledUserStatus) error {
 		return err
 	}
 
-	scrambledUserStatus.Status = 0
+	snowflake := utils.Snowflake{}
+
+	scrambledUserStatus.Id = snowflake.NextVal()
+	scrambledUserStatus.Status = 1
 
 	return database.GetMySQL().Create(&scrambledUserStatus).Error
 }
@@ -80,9 +83,9 @@ func List(scrambledUserStatusReq models.ScrambledUserStatusReq) (models.Scramble
 }
 
 func Update(scrambledUserStatus models.ScrambledUserStatus) error {
-	db := database.GetMySQL().Table("scrambled_user_status").Where("user_id = ? AND dimension = ?", scrambledUserStatus.UserId, scrambledUserStatus.Dimension).Omit("created_at")
+	db := database.GetMySQL().Table("scrambled_user_status")
 
-	err := db.Save(&scrambledUserStatus).Error
+	err := db.Updates(&scrambledUserStatus).Error
 	if err != nil {
 		return errors.New("更新失败")
 	}

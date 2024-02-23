@@ -31,14 +31,14 @@ func Authorization(c *gin.Context) {
 	}
 
 	// 校验验证码
-	token, err := adminAuthorizationService.Authorization(adminAuthorization.Code)
+	adminAuthorizationResp, err := adminAuthorizationService.Authorization(adminAuthorization.Code)
 
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
 	}
 
-	c.JSON(200, result.Success(token))
+	c.JSON(200, result.Success(adminAuthorizationResp))
 }
 
 func GetUrl(c *gin.Context) {

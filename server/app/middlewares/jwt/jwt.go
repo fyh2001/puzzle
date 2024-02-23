@@ -81,7 +81,8 @@ func AdminJWT() gin.HandlerFunc {
 		}
 
 		// 校验redis中的secret
-		otpSecret := database.GetRedis().Get(context.Background(), "admin:otp_secret").Val()
+		otpSecret := database.GetRedis().Get(context.Background(), "admin:opt_secret").Val()
+
 		if otpSecret != c.GetString("secret") {
 			code = 40004 // 无权限访问
 		}
@@ -89,7 +90,7 @@ func AdminJWT() gin.HandlerFunc {
 		if code != 200 {
 			c.JSON(200, gin.H{
 				"code": code,
-				"msg":  "无权限访问",
+				"msg":  "无权限访问Admin",
 				"data": data,
 			})
 			c.Abort()

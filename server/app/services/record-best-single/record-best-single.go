@@ -3,6 +3,7 @@ package recordbestsingle
 import (
 	"errors"
 	"puzzle/app/models"
+	commonService "puzzle/app/services"
 	userService "puzzle/app/services/user"
 	"puzzle/database"
 	"puzzle/utils"
@@ -41,6 +42,8 @@ func Insert(record models.RecordBestSingle) error {
 		return err
 	}
 
+	record.RecordBreakCount = 1
+
 	err = database.GetMySQL().Create(&record).Error
 	if err != nil {
 		return err
@@ -52,7 +55,33 @@ func Insert(record models.RecordBestSingle) error {
 // List 查询记录列表
 func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp, error) {
 	var recordListResp models.RecordBestSingleListResp
-	db := database.GetMySQL().Table("record_best_single").Order("record_duration " + recordReq.Sorted)
+
+	if recordReq.Username != "" || recordReq.Nickname != "" {
+		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
+		if err != nil {
+			return recordListResp, errors.New("查询用户信息失败")
+		}
+
+		if userInfo.Id == "" {
+			return recordListResp, errors.New("用户不存在")
+		}
+
+		recordReq.UserIdStr = userInfo.Id
+	}
+
+	recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
+	recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
+	recordReq.RecordId, _ = strconv.ParseInt(recordReq.RecordIdStr, 10, 64)
+
+	if recordReq.OrderBy == "" {
+		recordReq.OrderBy = "id"
+	}
+
+	db := database.GetMySQL().Table("record_best_single").Order(recordReq.OrderBy + " " + recordReq.Sorted)
+
+	if recordReq.Id != 0 {
+		db = db.Where("id = ?", recordReq.Id)
+	}
 
 	if recordReq.UserId != 0 {
 		db = db.Where("user_id = ?", recordReq.UserId)
@@ -67,14 +96,24 @@ func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp
 	}
 
 	if len(recordReq.DurationRange) == 2 {
-		db = db.Where("record_duration >= ? AND record_duration <= ?", recordReq.DurationRange[0], recordReq.DurationRange[1])
+		if recordReq.DurationRange[0] != 0 {
+			db = db.Where("record_duration >= ?", recordReq.DurationRange[0])
+		}
+		if recordReq.DurationRange[1] != 0 {
+			db = db.Where("record_duration <= ?", recordReq.DurationRange[1])
+		}
 	}
 
 	if len(recordReq.StepRange) == 2 {
-		db = db.Where("record_step >= ? AND record_step <= ?", recordReq.StepRange[0], recordReq.StepRange[1])
+		if recordReq.StepRange[0] != 0 {
+			db = db.Where("record_step >= ?", recordReq.StepRange[0])
+		}
+		if recordReq.StepRange[1] != 0 {
+			db = db.Where("record_step <= ?", recordReq.StepRange[1])
+		}
 	}
 
-	if len(recordReq.DateRange) == 2 {
+	if len(recordReq.DateRange) == 2 && !recordReq.DateRange[0].IsZero() && !recordReq.DateRange[1].IsZero() {
 		db = db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
 	}
 
@@ -93,6 +132,54 @@ func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp
 	err = db.Find(&recordListResp.Records).Error
 	if err != nil {
 		return recordListResp, errors.New("查询失败")
+	}
+
+	if recordReq.NeedUserInfo {
+		// 查询用户信息
+		userIds := make([]int64, 0)
+		for _, record := range recordListResp.Records {
+			userId, _ := strconv.ParseInt(record.UserId, 10, 64)
+			userIds = append(userIds, userId)
+		}
+
+		userList, err := commonService.GetUserInfo(userIds)
+		if err != nil {
+			return recordListResp, errors.New("查询用户信息失败")
+		}
+
+		userMap := make(map[string]models.UserResp)
+		for _, user := range userList.Records {
+			userMap[user.Id] = user
+		}
+
+		for i, record := range recordListResp.Records {
+			recordListResp.Records[i].UserInfo = userMap[record.UserId]
+		}
+	}
+
+	if recordReq.NeedRecordDetail {
+		// 查询记录详情
+		recordIds := make([]int64, 0)
+		for _, record := range recordListResp.Records {
+			recordId, _ := strconv.ParseInt(record.RecordId, 10, 64)
+			recordIds = append(recordIds, recordId)
+		}
+
+		recordList, err := commonService.GetRecordDetail(recordIds)
+		if err != nil {
+			return recordListResp, errors.New("查询记录详情失败")
+		}
+
+		recordMap := make(map[string][]models.RecordResp)
+
+		for _, record := range recordList.Records {
+			recordMap[record.UserId] = append(recordMap[record.UserId], record)
+		}
+
+		for i, record := range recordListResp.Records {
+			recordListResp.Records[i].RecordDetail.Records = recordMap[record.UserId]
+			recordListResp.Records[i].RecordDetail.Total = int64(len(recordMap[record.UserId]))
+		}
 	}
 
 	return recordListResp, nil
@@ -174,7 +261,7 @@ func ListWithUserInfo(recordReq models.RecordBestSingleReq) (models.RecordBestSi
 
 // Update 更新记录
 func Update(record models.RecordBestSingle) error {
-	db := database.GetMySQL().Table("record_best_single").Where("user_id = ? AND dimension = ?", record.UserId, record.Dimension)
+	db := database.GetMySQL().Table("record_best_single")
 
 	err := db.Updates(&record).Error
 

@@ -19,19 +19,22 @@ export const createHashMap = (map: number[][]) => {
 };
 
 // 根据打乱字符串获取游戏地图
-export const getGameMapByScramble = (scramble: string) => {
+export const getGameMapByScramble = (
+  scramble: string,
+  dimension: number
+): number[][] => {
   // 将字符串拆分成数组
   const scrambleArray = scramble.split(",");
 
   // 将一维数组转换为二维数组
-  const rows = 4;
-  const cols = 4;
+  const rows = dimension;
+  const cols = dimension;
   const gameMap = new Array(rows)
-    .fill(null)
+    .fill(0)
     .map((_, i) =>
       scrambleArray
         .slice(i * cols, (i + 1) * cols)
-        .map((value) => (value !== "" ? parseInt(value) : null))
+        .map((value) => (value !== "" ? parseInt(value) : 0))
     );
 
   return gameMap;
@@ -47,6 +50,7 @@ export const handleClick = (
 ) => {
   let newSolution = "";
   let newStepCount = 0;
+  const newMap = map.map((row) => row.slice());
 
   // 获取点击单元格的坐标
   if (!row && !column && value) {
@@ -55,13 +59,13 @@ export const handleClick = (
   }
 
   // 获取点击单元格的值
-  const item = map[row!][column!];
+  const item = newMap[row!][column!];
   // 点击的是空白单元格
   if (item === 0)
     return {
       newSolution,
       newStepCount,
-      map,
+      newMap,
       hashMap,
     };
 
@@ -78,8 +82,8 @@ export const handleClick = (
       // 步数加一
       newStepCount++;
       for (let i = nullColumn; i < column!; i++) {
-        map[row][i] = map[row][i + 1];
-        hashMap.set(map[row][i + 1], {
+        newMap[row][i] = newMap[row][i + 1];
+        hashMap.set(newMap[row][i + 1], {
           row: row,
           column: i,
         });
@@ -92,14 +96,14 @@ export const handleClick = (
       // 步数加一
       newStepCount++;
       for (let i = nullColumn; i > column!; i--) {
-        map[row][i] = map[row][i - 1];
-        hashMap.set(map[row][i - 1], {
+        newMap[row][i] = newMap[row][i - 1];
+        hashMap.set(newMap[row][i - 1], {
           row: row,
           column: i,
         });
       }
     }
-    map[row][column!] = 0;
+    newMap[row][column!] = 0;
     hashMap.set(0, { row: row, column: column! });
   }
 
@@ -112,8 +116,8 @@ export const handleClick = (
       // 步数加一
       newStepCount++;
       for (let i = nullRow; i < row!; i++) {
-        map[i][column] = map[i + 1][column];
-        hashMap.set(map[i + 1][column], {
+        newMap[i][column] = newMap[i + 1][column];
+        hashMap.set(newMap[i + 1][column], {
           row: i,
           column: column,
         });
@@ -126,21 +130,21 @@ export const handleClick = (
       // 步数加一
       newStepCount++;
       for (let i = nullRow; i > row!; i--) {
-        map[i][column] = map[i - 1][column];
-        hashMap.set(map[i - 1][column], {
+        newMap[i][column] = newMap[i - 1][column];
+        hashMap.set(newMap[i - 1][column], {
           row: i,
           column: column,
         });
       }
     }
-    map[row!][column] = 0;
+    newMap[row!][column] = 0;
     hashMap.set(0, { row: row!, column: column });
   }
 
   return {
     newSolution,
     newStepCount,
-    map,
+    newMap,
     hashMap,
   };
 };

@@ -27,21 +27,28 @@ export interface CreateRecordReq {
 }
 
 export interface RecordReq {
-  id?: number;
-  userId?: number;
-  dimension?: number;
-  type?: number;
-  status?: number;
-  durationRange?: [number, number];
-  stepRange?: [number, number];
-  dateRange?: [string, string];
+  id?: string;
+  userId?: string;
+  dimension?: number | null;
+  type?: number | null;
+  duration?: number;
+  step?: number;
+  status?: number | null;
+  scramble?: string;
+  solution?: string;
+  idx?: string;
+  durationRange?: (number | string | null)[];
+  stepRange?: (number | string | null)[];
+  dateRange?: [string, string] | [Date, Date];
   pagination?: Pagination;
   sorted?: string;
+  needUserInfo?: boolean;
 }
 
 export interface RecordResp {
   id: string;
   userId: string;
+  userInfo: UserResp;
   dimension: number;
   type: number;
   duration: number;
@@ -55,7 +62,7 @@ export interface RecordResp {
 }
 
 export interface RecordListResp {
-  records: RecordModel[];
+  records: RecordResp[];
   total: number;
 }
 
@@ -71,25 +78,28 @@ export interface RecordBestSingleModel {
 }
 
 export interface RecordBestSingleReq {
-  userId?: number;
-  dimension?: number;
-  recordId?: number;
-  durationRange?: [number, number];
-  stepRange?: [number, number];
+  userId?: string;
+  dimension?: number | null;
+  recordId?: string;
+  durationRange?: (number | string | null)[];
+  stepRange?: (number | string | null)[];
   dateRange?: [string, string];
   pagination?: Pagination;
   sorted?: string;
+  needUserInfo?: boolean;
+  needRecordDetail?: boolean;
 }
 
 export interface RecordBestSingleResp {
   userId: string;
-  userInfo: UserResp;
   dimension: number;
   recordId: string;
   recordDuration: number;
   recordStep: number;
   createdAt: string;
   updatedAt: string;
+  userInfo: UserResp;
+  recordDetail: RecordListResp;
 }
 
 export interface RecordBestSingleListResp {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useUserStore } from "@/store/user";
-// import { useMessage } from "naive-ui";
-// import router from "@/routers";
+import { useAdminStore } from "@/store/admin";
+import router from "@/routers";
 
 // const baseURL = "http://localhost:8081/api";
 const baseURL = "http://192.168.31.141:8081/api";
@@ -23,18 +23,13 @@ request.interceptors.request.use(
     // const Message = useMessage();
 
     const userStore = useUserStore();
-    const token = userStore.getToken;
+    const adminStore = useAdminStore();
 
-    // 如果没有token
-    // if (
-    //   !token &&
-    //   router.currentRoute.value.path !== "/login" &&
-    //   router.currentRoute.value.path !== "/register"
-    // ) {
-    //   Message.error("请先登录");
-    // }
-
-    config.headers.Authorization = token;
+    if (config.url?.includes("admin")) {
+      config.headers.Authorization = adminStore.getToken;
+    } else {
+      config.headers.Authorization = userStore.getToken;
+    }
 
     return config;
   },
@@ -48,6 +43,12 @@ request.interceptors.request.use(
  */
 request.interceptors.response.use(
   (response) => {
+    if (response.data.msg === "无权限访问Admin") {
+      const adminStore = useAdminStore();
+      adminStore.resetaAuthorization();
+      router.push("/admin/auth");
+    }
+
     return response;
   },
   (error) => {
