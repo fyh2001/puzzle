@@ -39,7 +39,7 @@ const tableOptions = {
         icon: markRaw(WorkspacePremiumRound),
         disabled: false,
         methods: () => {
-          gameStore.setGameMode(0);
+          gameStore.setGameMode(1);
         },
       },
       myRank: {
@@ -47,7 +47,7 @@ const tableOptions = {
         icon: markRaw(MovingRound),
         disabled: false,
         methods: () => {
-          gameStore.setGameMode(1);
+          gameStore.setGameMode(2);
         },
       },
       myBattle: {
@@ -55,7 +55,7 @@ const tableOptions = {
         icon: markRaw(CableRound),
         disabled: true,
         methods: () => {
-          gameStore.setGameMode(2);
+          gameStore.setGameMode(3);
         },
       },
     },
@@ -341,9 +341,9 @@ const curDataTableLabel = computed((): string | undefined => {
 
 onMounted(() => {
   const modeToChildOptionMap: Record<number, string> = {
-    0: "practice",
-    1: "myRank",
-    2: "myBattle",
+    1: "practice",
+    2: "myRank",
+    3: "myBattle",
   };
 
   currentChildOption.value = modeToChildOptionMap[gameStore.getGameMode];

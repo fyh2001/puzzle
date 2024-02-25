@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"puzzle/app/common/result"
 	"puzzle/app/models"
+
 	recordService "puzzle/app/services/record"
 	recordBestSingleSerivce "puzzle/app/services/record-best-single"
 	userService "puzzle/app/services/user"

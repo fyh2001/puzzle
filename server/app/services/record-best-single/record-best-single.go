@@ -1,7 +1,9 @@
 package recordbestsingle
 
 import (
+	"encoding/json"
 	"errors"
+	"puzzle/app/middlewares/rabbitmq"
 	"puzzle/app/models"
 	commonService "puzzle/app/services"
 	userService "puzzle/app/services/user"
@@ -44,10 +46,37 @@ func Insert(record models.RecordBestSingle) error {
 
 	record.RecordBreakCount = 1
 
+	// database.GetMySQL().Transaction(func(tx *gorm.DB) error {
+
+	// 	// 插入记录
+	// 	err = tx.Create(&record).Error
+	// 	if err != nil {
+	// 		tx.Rollback()
+	// 		return errors.New("插入失败")
+	// 	}
+
+	// 	return nil
+	// })
+
 	err = database.GetMySQL().Create(&record).Error
 	if err != nil {
 		return err
 	}
+
+	mq := rabbitmq.NewRabbitMQ("best_single_rank_update_queue", "", "")
+	defer mq.Destory()
+
+	message := rabbitmq.RabbitMQMessage{
+		Dimension: record.Dimension,
+		Message:   "rank update",
+	}
+
+	messageByte, err := json.Marshal(message)
+	if err != nil {
+		return errors.New("消息序列化失败")
+	}
+
+	mq.Publish(messageByte)
 
 	return nil
 }
@@ -264,6 +293,35 @@ func Update(record models.RecordBestSingle) error {
 	db := database.GetMySQL().Table("record_best_single")
 
 	err := db.Updates(&record).Error
+
+	if err != nil {
+		return errors.New("更新失败")
+	}
+
+	mq := rabbitmq.NewRabbitMQ("best_single_rank_update_queue", "", "")
+	defer mq.Destory()
+
+	message := rabbitmq.RabbitMQMessage{
+		Dimension: record.Dimension,
+		Message:   "rank update",
+	}
+
+	messageByte, err := json.Marshal(message)
+	if err != nil {
+		return errors.New("消息序列化失败")
+	}
+
+	mq.Publish(messageByte)
+
+	return nil
+}
+
+// UpdateRank 更新排名
+func UpdateRank(dimension any) error {
+	db := database.GetMySQL().Table("record_best_single")
+
+	err := db.Exec(
+		"CREATE TEMPORARY TABLE temp_rank SELECT id FROM record_best_single WHERE dimension = ? ORDER BY record_duration;SET @rank=0;UPDATE record_best_single AS r JOIN temp_rank AS tr ON r.id = tr.id SET r.rank = (@rank := @rank + 1);DROP TEMPORARY TABLE IF EXISTS temp_rank;", dimension).Error
 
 	if err != nil {
 		return errors.New("更新失败")

@@ -14,6 +14,9 @@ import {
 } from "@vicons/material";
 import { markRaw } from "vue";
 import { useAdminStore } from "@/store/admin";
+import Home from "@/views/home/index.vue";
+import Record from "@/views/record/index.vue";
+import User from "@/views/user/index.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -24,19 +27,22 @@ const routes: RouteRecordRaw[] = [
       {
         path: "/",
         name: "Home",
-        component: () => import("@/views/home/index.vue"),
+        // component: () => import("@/views/home/index.vue"),
+        component: Home,
         meta: { index: 0 },
       },
       {
         path: "/record",
         name: "Record",
-        component: () => import("@/views/record/index.vue"),
+        // component: () => import("@/views/record/index.vue"),
+        component: Record,
         meta: { index: 1 },
       },
       {
         path: "/user",
         name: "User",
-        component: () => import("@/views/user/index.vue"),
+        // component: () => import("@/views/user/index.vue"),
+        component: User,
         meta: { index: 2 },
       },
     ],

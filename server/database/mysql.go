@@ -35,6 +35,7 @@ func InitMySQL() {
 			//TablePrefix:   "sw_", // 表名前缀，`User` 的表名应该是 `t_users`
 			SingularTable: true, // 使用单数表名，启用该选项后，`User` 的表名应该是 `user`
 		},
+		// SkipDefaultTransaction: true, // 禁用默认事务
 	})
 
 	if err != nil {
