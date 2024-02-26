@@ -6,6 +6,7 @@ import (
 	"puzzle/app/models"
 
 	recordService "puzzle/app/services/record"
+	recordBestAverageSerivce "puzzle/app/services/record-best-average"
 	recordBestSingleSerivce "puzzle/app/services/record-best-single"
 	userService "puzzle/app/services/user"
 	"strconv"
@@ -120,6 +121,7 @@ func ListRecordBestSingleData(c *gin.Context) {
 	var recordBestSingleReq models.RecordBestSingleReq
 	err := c.ShouldBindJSON(&recordBestSingleReq)
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(200, result.Fail("参数错误"))
 		return
 	}
@@ -131,4 +133,22 @@ func ListRecordBestSingleData(c *gin.Context) {
 	}
 
 	c.JSON(200, result.Success(recordBestSingleListResp))
+}
+
+func ListRecordBestAverageData(c *gin.Context) {
+	var recordBestAverageReq models.RecordBestAverageReq
+	err := c.ShouldBindJSON(&recordBestAverageReq)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(200, result.Fail("参数错误"))
+		return
+	}
+
+	recordBestAverageListResp, err := recordBestAverageSerivce.List(recordBestAverageReq)
+	if err != nil {
+		c.JSON(200, result.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, result.Success(recordBestAverageListResp))
 }

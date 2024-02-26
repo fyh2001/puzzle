@@ -3,6 +3,7 @@ package rabbitmq
 import (
 	"fmt"
 	"log"
+	"puzzle/app/services"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -17,8 +18,8 @@ type RabbitMQ struct {
 }
 
 type RabbitMQMessage struct {
-	Dimension int
-	Message   string
+	RankUpdate services.RankUpdate
+	Message    string
 }
 
 // failOnErr 错误处理函数

@@ -14,7 +14,7 @@ type RecordBestAverage struct {
 	RecordIds             string    `json:"recordIds"`                       // 记录ID
 	RecordAverageDuration int       `json:"recordAverageDuration"`           // 平均耗时
 	RecordBreakCount      int       `json:"recordBreakCount"`                // 破纪录次数
-	Rank                  int       `json:"rank"`                            // 排名
+	Ranked                int       `json:"ranked"`                          // 排名
 	CreatedAt             time.Time `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt             time.Time `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 }
@@ -34,6 +34,7 @@ type RecordBestAverageReq struct {
 	DurationRange    []int            `json:"durationRange"`    // 耗时范围
 	DateRange        []time.Time      `json:"dateRange"`        // 日期范围
 	RankRange        []int            `json:"rankRange"`        // 排名范围
+	BreakCountRange  []int            `json:"breakCountRange"`  // 破纪录次数范围
 	Pagination       utils.Pagination `gorm:"embedded"`         // 分页
 	Sorted           string           `json:"sorted"`           // 排序
 	OrderBy          string           `json:"orderBy"`          // 排序字段
@@ -51,7 +52,7 @@ type RecordBestAverageResp struct {
 	RecordBreakCount      int            `json:"recordBreakCount"`                // 破纪录次数
 	RecordIds             string         `json:"recordIds"`                       // 记录ID
 	RecordAverageDuration int            `json:"recordAverageDuration"`           // 平均耗时
-	Rank                  int            `json:"rank"`                            // 排名
+	Ranked                int            `json:"ranked"`                          // 排名
 	CreatedAt             time.Time      `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt             time.Time      `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 	UserInfo              UserResp       `json:"userInfo" gorm:"-"`               // 用户信息

@@ -41,13 +41,14 @@ const tableColumns = [
     title: "ID",
     key: "id",
     width: 200,
+    align: "center",
   },
   // 模式
   {
     title: "模式",
     key: "type",
-    align: "center",
     width: 120,
+    align: "center",
     render: (row: any) => {
       const typeMap: any = {
         1: "练习",
@@ -68,8 +69,8 @@ const tableColumns = [
   {
     title: "阶数",
     key: "dimension",
-    align: "center",
     width: 120,
+    align: "center",
     render: (row: any) => {
       return (
         <n-tag type="success" size="small">
@@ -82,22 +83,22 @@ const tableColumns = [
   {
     title: "耗时",
     key: "durationFormat",
-    align: "center",
     width: 200,
+    align: "center",
   },
   // 步数
   {
     title: "步数",
     key: "step",
-    align: "center",
     width: 100,
+    align: "center",
   },
   // 打乱
   {
     title: "打乱",
     key: "scramble",
-    align: "center",
     width: 120,
+    align: "center",
     render: (row: any) => {
       return (
         <n-popover z-index={3000} display-directive="if" trigger="hover">
@@ -131,17 +132,6 @@ const tableColumns = [
         </n-popover>
       );
     },
-  },
-  // 还原
-  {
-    title: "还原",
-    key: "solution",
-    align: "center",
-    width: 160,
-    ellipsis: {
-      tooltip: true,
-    },
-    ellipsisComponent: "performant-ellipsis",
   },
   // idx
   {
@@ -203,7 +193,7 @@ const tableColumns = [
     title: "操作",
     key: "action",
     align: "center",
-    width: 200,
+    width: 300,
     render: (row: any) => {
       return (
         <div class="flex justify-center gap-2">
@@ -400,11 +390,11 @@ const handleDetailDialog = (row: any) => {
               </div>
             </n-descriptions-item>
             <n-descriptions-item label="手机号">
-              {row.userInfo.phone}
+              {row.userInfo.phone === "" ? "-" : row.userInfo.phone}
             </n-descriptions-item>
             <n-descriptions-item label="邮箱">
               <n-ellipsis style="max-width: 240px">
-                {row.userInfo.email}
+                {row.userInfo.email === "" ? "-" : row.userInfo.email}
               </n-ellipsis>
             </n-descriptions-item>
             <n-descriptions-item label="账号状态">
@@ -664,6 +654,7 @@ onMounted(() => {
     <!-- 表格 -->
     <div>
       <n-data-table
+        ref
         class="mt-5"
         :loading="isDataTableLoading"
         :columns="tableColumns"

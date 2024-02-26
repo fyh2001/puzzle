@@ -5,6 +5,7 @@ import (
 )
 
 type CallbackFunc[T any] func(T) error
+type CallbackFunc2 func(args ...interface{}) error
 
 type rabbitMQ[T any] struct {
 	ExchangeName string          // 交换机名称
@@ -24,7 +25,7 @@ var recordRankUpdateQueue = []rabbitMQ[any]{
 	{
 		QueueName:    "best_average_rank_update_queue",
 		ExchangeName: "",
-		callback:     nil,
+		callback:     commonService.UpdateRecordBestAverageRank,
 	},
 	{
 		QueueName:    "best_step_rank_update_queue",

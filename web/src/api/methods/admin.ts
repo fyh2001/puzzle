@@ -7,6 +7,8 @@ import type {
   RecordListResp,
   RecordBestSingleReq,
   RecordBestSingleListResp,
+  RecordBestAverageReq,
+  RecordBestAverageListResp,
 } from "@/types/record";
 const baseURL = "/admin";
 
@@ -68,6 +70,17 @@ export const recordBestSingleRequest = {
   ): Promise<HttpBaseResp<RecordBestSingleListResp>> =>
     request({
       url: `${baseURL}/record-best-single-manage/list`,
+      method: "post",
+      data,
+    }),
+};
+
+export const recordBestAverageRequest = {
+  list: (
+    data: RecordBestAverageReq
+  ): Promise<HttpBaseResp<RecordBestAverageListResp>> =>
+    request({
+      url: `${baseURL}/record-best-average-manage/list`,
       method: "post",
       data,
     }),

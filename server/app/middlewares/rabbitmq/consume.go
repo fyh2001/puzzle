@@ -55,9 +55,10 @@ func (r *RabbitMQ) Consume(callback CallbackFunc[any]) {
 				log.Printf("消息解析失败: %s", msg)
 			}
 
-			callback(result.Dimension) // 调用回调函数处理消息
-
-			log.Println("记录排名更新成功")
+			if result.Message == "rank update" {
+				callback(result.RankUpdate) // 调用回调函数处理消息
+				log.Println("记录排名更新成功")
+			}
 
 			d.Ack(false) // 手动应答
 		}

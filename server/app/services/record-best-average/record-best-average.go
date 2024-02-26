@@ -1,7 +1,9 @@
 package recordbestaverage
 
 import (
+	"encoding/json"
 	"errors"
+	"puzzle/app/middlewares/rabbitmq"
 	"puzzle/app/models"
 	commonService "puzzle/app/services"
 	userService "puzzle/app/services/user"
@@ -9,7 +11,27 @@ import (
 	"puzzle/utils"
 	"strconv"
 	"strings"
+
+	"gorm.io/gorm"
 )
+
+// publishMessage 发送消息至消息队列
+func publishMessage(rankUpdate commonService.RankUpdate) {
+	mq := rabbitmq.NewRabbitMQ("best_average_rank_update_queue", "", "")
+	defer mq.Destory()
+
+	message := rabbitmq.RabbitMQMessage{
+		RankUpdate: rankUpdate,
+		Message:    "rank update",
+	}
+
+	messageByte, err := json.Marshal(message)
+	if err != nil {
+		return
+	}
+
+	mq.Publish(messageByte)
+}
 
 // check 校验参数
 func check(record models.RecordBestAverage) error {
@@ -49,6 +71,12 @@ func Insert(record models.RecordBestAverage) error {
 		return err
 	}
 
+	// 往消息队列中发送消息
+	publishMessage(commonService.RankUpdate{
+		Dimension: record.Dimension,
+		Type:      record.Type,
+	})
+
 	return nil
 }
 
@@ -58,15 +86,15 @@ func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListRe
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
 		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return recordListResp, errors.New("查询用户信息失败")
 		}
 
 		if userInfo.Id == "" {
-			return recordListResp, errors.New("用户不存在")
+			recordReq.UserIdStr = "-1"
+		} else {
+			recordReq.UserIdStr = userInfo.Id
 		}
-
-		recordReq.UserIdStr = userInfo.Id
 	}
 
 	recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
@@ -96,6 +124,24 @@ func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListRe
 		}
 		if recordReq.DurationRange[1] != 0 {
 			db = db.Where("record_duration <= ?", recordReq.DurationRange[1])
+		}
+	}
+
+	if len(recordReq.RankRange) == 2 {
+		if recordReq.RankRange[0] != 0 {
+			db = db.Where("rank >= ?", recordReq.RankRange[0])
+		}
+		if recordReq.RankRange[01] != 0 {
+			db = db.Where("rank <= ?", recordReq.RankRange[1])
+		}
+	}
+
+	if len(recordReq.BreakCountRange) == 2 {
+		if recordReq.BreakCountRange[0] != 0 {
+			db = db.Where("record_break_count >= ?", recordReq.BreakCountRange[0])
+		}
+		if recordReq.BreakCountRange[1] != 0 {
+			db = db.Where("record_break_count <= ?", recordReq.BreakCountRange[1])
 		}
 	}
 
@@ -258,6 +304,12 @@ func Update(record models.RecordBestAverage) error {
 	if err != nil {
 		return err
 	}
+
+	// 往消息队列中发送消息
+	publishMessage(commonService.RankUpdate{
+		Dimension: record.Dimension,
+		Type:      record.Type,
+	})
 
 	return nil
 }

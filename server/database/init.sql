@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `record_best_single` (
   `record_duration` INT NOT NULL COMMENT '记录耗时',
   `record_step` INT NOT NULL COMMENT '记录步数',
   `record_break_count` INT NOT NULL DEFAULT 1 COMMENT '打破最佳单次记录的次数',
-  `rank` INT UNSIGNED COMMENT '排名',
+  `ranked` INT UNSIGNED COMMENT '排名',
   `created_at` DATETIME NOT NULL COMMENT '创建时间',
   `updated_at` DATETIME NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `record_best_single` (
 ALTER TABLE `record_best_single` ADD INDEX `idx_record_best_single_user_id` (`user_id`);
 ALTER TABLE `record_best_single` ADD INDEX `idx_record_best_single_dimension` (`dimension`);
 ALTER TABLE `record_best_single` ADD INDEX `idx_record_best_single_record_duration` (`record_duration`);
-ALTER TABLE `record_best_single` ADD INDEX `idx_record_best_single_rank` (`rank`);
+ALTER TABLE `record_best_single` ADD INDEX `idx_record_best_single_ranked` (`ranked`);
 
 
 DROP TABLE IF EXISTS `record_best_average`;
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `record_best_average` (
   `record_ids` TEXT NOT NULL COMMENT '记录ID',
   `record_average_duration` INT NOT NULL COMMENT '记录平均用时',
   `record_break_count` INT NOT NULL DEFAULT 1 COMMENT '打破最佳平均记录的次数',
-  `rank` INT UNSIGNED COMMENT '排名',
+  `ranked` INT UNSIGNED COMMENT '排名',
   `created_at` DATETIME NOT NULL COMMENT '创建时间',
   `updated_at` DATETIME NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
@@ -112,7 +112,7 @@ ALTER TABLE `record_best_average` ADD INDEX `idx_record_best_average_user_id` (`
 ALTER TABLE `record_best_average` ADD INDEX `idx_record_best_average_dimension` (`dimension`);
 ALTER TABLE `record_best_average` ADD INDEX `idx_record_best_average_type` (`type`);
 ALTER TABLE `record_best_average` ADD INDEX `idx_record_best_average_record_average_duration` (`record_average_duration`);
-ALTER TABLE `record_best_average` ADD INDEX `idx_record_best_average_rank` (`rank`);
+ALTER TABLE `record_best_average` ADD INDEX `idx_record_best_average_ranked` (`ranked`);
 
 
 DROP TABLE IF EXISTS `record_best_step`;
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `record_best_step` (
   `record_id` BIGINT(20) UNSIGNED NOT NULL COMMENT '记录ID',
   `record_step` INT NOT NULL COMMENT '记录步数',
   `record_break_count` INT NOT NULL DEFAULT 1 COMMENT '打破最佳步数记录的次数',
-  `rank` INT UNSIGNED COMMENT '排名',
+  `ranked` INT UNSIGNED COMMENT '排名',
   `created_at` DATETIME NOT NULL COMMENT '创建时间',
   `updated_at` DATETIME NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `record_best_step` (
 ALTER TABLE `record_best_step` ADD INDEX `idx_record_best_step_user_id` (`user_id`);
 ALTER TABLE `record_best_step` ADD INDEX `idx_record_best_step_dimension` (`dimension`);
 ALTER TABLE `record_best_step` ADD INDEX `idx_record_best_step_record_step` (`record_step`);
-ALTER TABLE `record_best_step` ADD INDEX `idx_record_best_step_rank` (`rank`);
+ALTER TABLE `record_best_step` ADD INDEX `idx_record_best_step_ranked` (`ranked`);
 
 
 DROP TABLE IF EXISTS `scramble`;

@@ -10,7 +10,27 @@ import (
 	"puzzle/database"
 	"puzzle/utils"
 	"strconv"
+
+	"gorm.io/gorm"
 )
+
+// publishMessage 发送消息至消息队列
+func publishMessage(rankUpdate commonService.RankUpdate) {
+	mq := rabbitmq.NewRabbitMQ("best_single_rank_update_queue", "", "")
+	defer mq.Destory()
+
+	message := rabbitmq.RabbitMQMessage{
+		RankUpdate: rankUpdate,
+		Message:    "rank update",
+	}
+
+	messageByte, err := json.Marshal(message)
+	if err != nil {
+		return
+	}
+
+	mq.Publish(messageByte)
+}
 
 func check(record models.RecordBestSingle) error {
 	if record.UserId == 0 {
@@ -46,37 +66,15 @@ func Insert(record models.RecordBestSingle) error {
 
 	record.RecordBreakCount = 1
 
-	// database.GetMySQL().Transaction(func(tx *gorm.DB) error {
-
-	// 	// 插入记录
-	// 	err = tx.Create(&record).Error
-	// 	if err != nil {
-	// 		tx.Rollback()
-	// 		return errors.New("插入失败")
-	// 	}
-
-	// 	return nil
-	// })
-
 	err = database.GetMySQL().Create(&record).Error
 	if err != nil {
 		return err
 	}
 
-	mq := rabbitmq.NewRabbitMQ("best_single_rank_update_queue", "", "")
-	defer mq.Destory()
-
-	message := rabbitmq.RabbitMQMessage{
+	// 发送消息至消息队列
+	publishMessage(commonService.RankUpdate{
 		Dimension: record.Dimension,
-		Message:   "rank update",
-	}
-
-	messageByte, err := json.Marshal(message)
-	if err != nil {
-		return errors.New("消息序列化失败")
-	}
-
-	mq.Publish(messageByte)
+	})
 
 	return nil
 }
@@ -87,15 +85,15 @@ func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
 		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return recordListResp, errors.New("查询用户信息失败")
 		}
 
 		if userInfo.Id == "" {
-			return recordListResp, errors.New("用户不存在")
+			recordReq.UserIdStr = "-1"
+		} else {
+			recordReq.UserIdStr = userInfo.Id
 		}
-
-		recordReq.UserIdStr = userInfo.Id
 	}
 
 	recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
@@ -139,6 +137,24 @@ func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp
 		}
 		if recordReq.StepRange[1] != 0 {
 			db = db.Where("record_step <= ?", recordReq.StepRange[1])
+		}
+	}
+
+	if len(recordReq.RankRange) == 2 {
+		if recordReq.RankRange[0] != 0 {
+			db = db.Where("rank >= ?", recordReq.RankRange[0])
+		}
+		if recordReq.RankRange[01] != 0 {
+			db = db.Where("rank <= ?", recordReq.RankRange[1])
+		}
+	}
+
+	if len(recordReq.BreakCountRange) == 2 {
+		if recordReq.BreakCountRange[0] != 0 {
+			db = db.Where("record_break_count >= ?", recordReq.BreakCountRange[0])
+		}
+		if recordReq.BreakCountRange[1] != 0 {
+			db = db.Where("record_break_count <= ?", recordReq.BreakCountRange[1])
 		}
 	}
 
@@ -202,12 +218,17 @@ func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp
 		recordMap := make(map[string][]models.RecordResp)
 
 		for _, record := range recordList.Records {
-			recordMap[record.UserId] = append(recordMap[record.UserId], record)
+			key := record.UserId + "-" + strconv.Itoa(record.Dimension)
+
+			recordMap[key] = append(recordMap[key], record)
 		}
 
 		for i, record := range recordListResp.Records {
-			recordListResp.Records[i].RecordDetail.Records = recordMap[record.UserId]
-			recordListResp.Records[i].RecordDetail.Total = int64(len(recordMap[record.UserId]))
+
+			key := record.UserId + "-" + strconv.Itoa(record.Dimension)
+
+			recordListResp.Records[i].RecordDetail.Records = recordMap[key]
+			recordListResp.Records[i].RecordDetail.Total = int64(len(recordMap[key]))
 		}
 	}
 
@@ -298,34 +319,10 @@ func Update(record models.RecordBestSingle) error {
 		return errors.New("更新失败")
 	}
 
-	mq := rabbitmq.NewRabbitMQ("best_single_rank_update_queue", "", "")
-	defer mq.Destory()
-
-	message := rabbitmq.RabbitMQMessage{
+	// 发送消息至消息队列
+	publishMessage(commonService.RankUpdate{
 		Dimension: record.Dimension,
-		Message:   "rank update",
-	}
-
-	messageByte, err := json.Marshal(message)
-	if err != nil {
-		return errors.New("消息序列化失败")
-	}
-
-	mq.Publish(messageByte)
-
-	return nil
-}
-
-// UpdateRank 更新排名
-func UpdateRank(dimension any) error {
-	db := database.GetMySQL().Table("record_best_single")
-
-	err := db.Exec(
-		"CREATE TEMPORARY TABLE temp_rank SELECT id FROM record_best_single WHERE dimension = ? ORDER BY record_duration;SET @rank=0;UPDATE record_best_single AS r JOIN temp_rank AS tr ON r.id = tr.id SET r.rank = (@rank := @rank + 1);DROP TEMPORARY TABLE IF EXISTS temp_rank;", dimension).Error
-
-	if err != nil {
-		return errors.New("更新失败")
-	}
+	})
 
 	return nil
 }

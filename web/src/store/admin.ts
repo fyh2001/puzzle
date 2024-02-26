@@ -4,6 +4,7 @@ import {
   userManageRequest,
   recordManageRequest,
   recordBestSingleRequest,
+  recordBestAverageRequest,
 } from "api/admin";
 import { formatDurationInRecord } from "@/utils/time";
 import type { AuthReq, AdminData } from "@/types/admin";
@@ -13,6 +14,8 @@ import type {
   RecordReq,
   RecordBestSingleReq,
   RecordBestSingleResp,
+  RecordBestAverageReq,
+  RecordBestAverageResp,
 } from "@/types/record";
 
 export const useAdminStore = defineStore("admin", {
@@ -34,6 +37,10 @@ export const useAdminStore = defineStore("admin", {
         total: 0,
       },
       bestSingleRecord: <AdminData<RecordBestSingleResp>>{
+        list: [],
+        total: 0,
+      },
+      bestAverageRecord: <AdminData<RecordBestAverageResp>>{
         list: [],
         total: 0,
       },
@@ -80,6 +87,27 @@ export const useAdminStore = defineStore("admin", {
       });
     },
     getBestSingleRecordTotal: (state) => state.data.bestSingleRecord.total,
+    getBestAverageRecordList: (state) => {
+      return state.data.bestAverageRecord.list.map((record) => {
+        const durationFormat = formatDurationInRecord(
+          record.recordAverageDuration
+        );
+        const recordDetail = record.recordDetail.records.map((record) => {
+          const durationFormat = formatDurationInRecord(record.duration);
+          return {
+            ...record,
+            durationFormat,
+          };
+        });
+
+        return {
+          ...record,
+          durationFormat,
+          recordDetail,
+        };
+      });
+    },
+    getBestAverageRecordTotal: (state) => state.data.bestAverageRecord.total,
   },
 
   actions: {
@@ -126,7 +154,7 @@ export const useAdminStore = defineStore("admin", {
       return { code, msg, data: updateResp };
     },
 
-    // 获取记录列表
+    // 获取个人记录列表
     async fetchRecordList(queryForm: RecordReq) {
       const {
         data: { code, data: recordListResp, msg },
@@ -159,8 +187,18 @@ export const useAdminStore = defineStore("admin", {
         this.data.bestSingleRecord.total = recordListResp.total;
       }
 
-      console.log(this.getBestSingleRecordList);
+      return { code, msg };
+    },
 
+    // 获取最佳平均记录列表
+    async fetchRecordBestAverageList(queryForm: RecordBestAverageReq) {
+      const {
+        data: { code, data: recordListResp, msg },
+      } = await recordBestAverageRequest.list(queryForm);
+      if (code === 200) {
+        this.data.bestAverageRecord.list = recordListResp.records;
+        this.data.bestAverageRecord.total = recordListResp.total;
+      }
       return { code, msg };
     },
   },
