@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	mapset "github.com/deckarep/golang-set"
 	"gorm.io/gorm"
 )
 
@@ -214,12 +215,28 @@ func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListRe
 		recordMap := make(map[string][]models.RecordResp)
 
 		for _, record := range recordList.Records {
-			recordMap[record.UserId] = append(recordMap[record.UserId], record)
+			key := record.UserId + "-" + strconv.Itoa(record.Dimension)
+			recordMap[key] = append(recordMap[key], record)
 		}
 
 		for i, record := range recordListResp.Records {
-			recordListResp.Records[i].RecordDetail.Records = recordMap[record.UserId]
-			recordListResp.Records[i].RecordDetail.Total = int64(len(recordMap[record.UserId]))
+			key := record.UserId + "-" + strconv.Itoa(record.Dimension)
+
+			recordSet := mapset.NewSet()
+
+			// 逗号分隔的字符串转为数组
+			recordIdArr := strings.Split(record.RecordIds, ",")
+
+			for _, recordId := range recordIdArr {
+				recordSet.Add(recordId)
+			}
+
+			for _, record := range recordMap[key] {
+				if recordSet.Contains(record.Id) {
+					recordListResp.Records[i].RecordDetail.Records = append(recordListResp.Records[i].RecordDetail.Records, record)
+				}
+			}
+			recordListResp.Records[i].RecordDetail.Total = int64(len(recordListResp.Records[i].RecordDetail.Records))
 		}
 	}
 

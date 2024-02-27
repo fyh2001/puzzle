@@ -467,8 +467,6 @@ const getData = async () => {
     Message.error(msg);
   }
 
-  console.log(adminStore.getBestAverageRecordList);
-
   isDataTableLoading.value = false;
 };
 

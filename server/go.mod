@@ -36,6 +36,7 @@ require (
 )
 
 require (
+	github.com/deckarep/golang-set v1.8.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jinzhu/inflection v1.0.0 // indirect
