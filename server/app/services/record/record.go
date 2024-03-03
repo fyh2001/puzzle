@@ -144,9 +144,16 @@ func List(recordReq models.RecordReq) (models.RecordListResp, error) {
 		recordReq.UserIdStr = userInfo.Id
 	}
 
-	recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
-	recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
-	recordReq.Idx, _ = strconv.ParseInt(recordReq.IdxStr, 10, 64)
+	// 转换字符串为数字
+	if recordReq.IdStr != "" {
+		recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
+	}
+	if recordReq.UserIdStr != "" {
+		recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
+	}
+	if recordReq.IdStr != "" {
+		recordReq.Idx, _ = strconv.ParseInt(recordReq.IdxStr, 10, 64)
+	}
 
 	if recordReq.OrderBy == "" {
 		recordReq.OrderBy = "id"

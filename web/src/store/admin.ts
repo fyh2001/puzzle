@@ -182,6 +182,8 @@ export const useAdminStore = defineStore("admin", {
         data: { code, data: recordListResp, msg },
       } = await recordBestSingleRequest.list(queryForm);
 
+      console.log(recordListResp);
+
       if (code === 200) {
         this.data.bestSingleRecord.list = recordListResp.records;
         this.data.bestSingleRecord.total = recordListResp.total;

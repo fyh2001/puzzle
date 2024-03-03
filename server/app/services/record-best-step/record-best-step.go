@@ -63,9 +63,16 @@ func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, er
 		recordReq.UserIdStr = userInfo.Id
 	}
 
-	recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
-	recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
-	recordReq.RecordId, _ = strconv.ParseInt(recordReq.RecordIdStr, 10, 64)
+	if recordReq.IdStr != "" {
+		recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
+	}
+	if recordReq.UserIdStr != "" {
+		recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
+	}
+
+	if recordReq.RecordIdStr != "" {
+		recordReq.RecordId, _ = strconv.ParseInt(recordReq.RecordIdStr, 10, 64)
+	}
 
 	if recordReq.OrderBy == "" {
 		recordReq.OrderBy = "id"

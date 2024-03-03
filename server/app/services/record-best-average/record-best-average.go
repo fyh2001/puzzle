@@ -98,8 +98,13 @@ func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListRe
 		}
 	}
 
-	recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
-	recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
+	if recordReq.UserIdStr != "" {
+		recordReq.UserId, _ = strconv.ParseInt(recordReq.UserIdStr, 10, 64)
+	}
+
+	if recordReq.IdStr != "" {
+		recordReq.Id, _ = strconv.ParseInt(recordReq.IdStr, 10, 64)
+	}
 
 	if recordReq.OrderBy == "" {
 		recordReq.OrderBy = "id"
