@@ -1,7 +1,7 @@
 export default {
   name: "indigo",
-  label: '靛蓝',
-  menuIconClass: 'text-[#6366f1]',
+  label: "靛蓝",
+  menuIconClass: "text-[#6366f1]",
   light: {
     common: {
       bodyColor: "#f0f2f5",
@@ -11,9 +11,9 @@ export default {
       // tabbar选中的颜色
       tabarSelectBoxColor: "rgb(99, 102, 241)",
       // 排名总结栏的背景色
-      rankSummaryBackgroundColor: "#4f46e5",
+      rankSummaryBackgroundColor: "#eef2ff", //indigo-50
       // 排名总结栏的字体颜色
-      rankSummaryFontColor: "#4f46e5",
+      rankSummaryTextColor: "#4f46e5",
       // 用户卡片的背景色
       userCardBackgroundColor: "#fff",
       // 登陆面板的背景色
@@ -36,9 +36,9 @@ export default {
       // tabbar选中的颜色
       tabarSelectBoxColor: "rgb(99, 102, 241)",
       // 排名总结栏的背景色
-      rankSummaryBackgroundColor: "#4f46e5",
+      rankSummaryBackgroundColor: "#eef2ff", //indigo-50
       // 排名总结栏的字体颜色
-      rankSummaryFontColor: "#4f46e5",
+      rankSummaryTextColor: "#4f46e5",
       // 用户卡片的背景色
       userCardBackgroundColor: "#262626",
       // 登陆面板的背景色

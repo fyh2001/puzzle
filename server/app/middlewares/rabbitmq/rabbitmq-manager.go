@@ -30,7 +30,7 @@ var recordRankUpdateQueue = []rabbitMQ[any]{
 	{
 		QueueName:    "best_step_rank_update_queue",
 		ExchangeName: "",
-		callback:     nil,
+		callback:     commonService.UpdateRecordBestStepRank,
 	},
 }
 

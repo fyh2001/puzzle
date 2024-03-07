@@ -28,6 +28,7 @@ export interface CreateRecordReq {
 
 export interface RecordReq {
   id?: string;
+  ids?: string[];
   userId?: string;
   dimension?: number | null;
   type?: number | null;
@@ -106,6 +107,7 @@ export interface RecordBestSingleResp {
   dimension: number;
   recordId: string;
   recordDuration: number;
+  recordDurationFormat: string;
   recordStep: number;
   recordBreakCount: number;
   ranked: number;
@@ -159,7 +161,9 @@ export interface RecordBestAverageResp {
   type: number;
   recordIds: string;
   recordAverageDuration: number;
+  recordAverageDurationFormat: string;
   ranked: number;
+  recordBreakCount: number;
   createdAt: string;
   updatedAt: string;
   userInfo: UserResp;
@@ -173,32 +177,47 @@ export interface RecordBestAverageListResp {
 
 // 最佳步数
 export interface RecordBestStepModel {
+  id: string;
   userId: string;
   dimension: number;
   recordId: string;
   recordStep: number;
+  ranked: number;
+  breakCount: number;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface RecordBestStepReq {
-  userId?: number;
-  dimension?: number;
-  recordId?: number;
-  stepRange?: [number, number];
+  id?: string;
+  userId?: string;
+  username?: string;
+  nickname?: string;
+  dimension?: number | null;
+  recordId?: string;
+  stepRange?: (number | string | null)[];
+  rankRange?: (number | string | null)[];
+  breakCountRange?: (number | string | null)[];
   dateRange?: [string, string];
   pagination?: Pagination;
   sorted?: string;
+  orderBy?: string;
+  needUserInfo?: boolean;
+  needRecordDetail?: boolean;
 }
 
 export interface RecordBestStepResp {
+  id: string;
   userId: string;
-  userInfo: UserResp;
   dimension: number;
   recordId: string;
   recordStep: number;
+  ranked: number;
+  breakCount: number;
   createdAt: string;
   updatedAt: string;
+  userInfo: UserResp;
+  recordDetail: RecordListResp;
 }
 
 export interface RecordBestStepListResp {

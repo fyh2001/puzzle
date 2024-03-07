@@ -88,6 +88,10 @@ func UserLogin(u models.UserLoginReq) (models.UserLoginResp, error) {
 func List(u models.UserReq) (models.UserListResp, error) {
 	var userResp models.UserListResp
 
+	if u.IdStr != "" {
+		u.Id, _ = strconv.ParseInt(u.IdStr, 10, 64)
+	}
+
 	if u.OrderBy == "" {
 		u.OrderBy = "id"
 	}

@@ -5,6 +5,7 @@ import {
   recordManageRequest,
   recordBestSingleRequest,
   recordBestAverageRequest,
+  recordBestStepRequest,
 } from "api/admin";
 import { formatDurationInRecord } from "@/utils/time";
 import type { AuthReq, AdminData } from "@/types/admin";
@@ -16,6 +17,8 @@ import type {
   RecordBestSingleResp,
   RecordBestAverageReq,
   RecordBestAverageResp,
+  RecordBestStepReq,
+  RecordBestStepResp,
 } from "@/types/record";
 
 export const useAdminStore = defineStore("admin", {
@@ -44,6 +47,10 @@ export const useAdminStore = defineStore("admin", {
         list: [],
         total: 0,
       },
+      bestStepRecord: <AdminData<RecordBestStepResp>>{
+        list: [],
+        total: 0,
+      },
     },
   }),
 
@@ -55,6 +62,7 @@ export const useAdminStore = defineStore("admin", {
 
       return state.authorization.token;
     },
+    getSecretUrl: (state) => state.authorization.secretUrl,
     getUserList: (state) => state.data.user.list,
     getUserTotal: (state) => state.data.user.total,
     getPersonRecordList: (state) => {
@@ -108,9 +116,27 @@ export const useAdminStore = defineStore("admin", {
       });
     },
     getBestAverageRecordTotal: (state) => state.data.bestAverageRecord.total,
+    getBestStepRecordList: (state) => {
+      return state.data.bestStepRecord.list.map((record) => {
+        const recordDetail = record.recordDetail.records.map((record) => {
+          const durationFormat = formatDurationInRecord(record.duration);
+          return {
+            ...record,
+            durationFormat,
+          };
+        });
+
+        return {
+          ...record,
+          recordDetail,
+        };
+      });
+    },
+    getBestStepRecordTotal: (state) => state.data.bestStepRecord.total,
   },
 
   actions: {
+    // 登录
     async auth(data: AuthReq): Promise<boolean> {
       const {
         data: { code, data: authResp },
@@ -126,6 +152,29 @@ export const useAdminStore = defineStore("admin", {
       return false;
     },
 
+    // 获取二维码
+    async fetchSecretUrl() {
+      const {
+        data: { code, data: secretUrlResp },
+      } = await authRequest.getUrl();
+
+      if (code === 200) {
+        this.authorization.secretUrl = secretUrlResp.secretUrl;
+      }
+    },
+
+    // 重置二维码
+    async resetOtp() {
+      const {
+        data: { code, data: secretUrlResp },
+      } = await authRequest.resetOtp();
+
+      if (code === 200) {
+        this.authorization.secretUrl = secretUrlResp.secretUrl;
+      }
+    },
+
+    // 重置信息
     resetaAuthorization() {
       this.authorization.token = "";
       this.authorization.secretUrl = "";
@@ -202,6 +251,20 @@ export const useAdminStore = defineStore("admin", {
         this.data.bestAverageRecord.list = recordListResp.records;
         this.data.bestAverageRecord.total = recordListResp.total;
       }
+      return { code, msg };
+    },
+
+    // 获取最佳步数记录列表
+    async fetchRecordBestStepList(queryForm: RecordBestStepReq) {
+      const {
+        data: { code, data: recordListResp, msg },
+      } = await recordBestStepRequest.list(queryForm);
+
+      if (code === 200) {
+        this.data.bestStepRecord.list = recordListResp.records;
+        this.data.bestStepRecord.total = recordListResp.total;
+      }
+
       return { code, msg };
     },
   },

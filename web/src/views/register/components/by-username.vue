@@ -120,7 +120,12 @@ const registerHandler = async () => {
         <n-form-item path="username" style="--n-label-height: 0px">
           <n-input
             v-model:value="formValue.username"
-            style="--n-height: 50px; --n-border-radius: 0.75rem"
+            style="
+              --n-height: 50px;
+              --n-border-radius: 0.75rem;
+              --n-border-hover: var(--primary-color);
+              --n-border-focus: var(--primary-color);
+            "
             placeholder="用于登录的用户名"
             size="large"
           />
@@ -128,7 +133,12 @@ const registerHandler = async () => {
         <n-form-item path="nickname" style="--n-label-height: 10px">
           <n-input
             v-model:value="formValue.nickname"
-            style="--n-height: 50px; --n-border-radius: 0.75rem"
+            style="
+              --n-height: 50px;
+              --n-border-radius: 0.75rem;
+              --n-border-hover: var(--primary-color);
+              --n-border-focus: var(--primary-color);
+            "
             placeholder="用于展示的昵称"
             size="large"
           />
@@ -138,7 +148,12 @@ const registerHandler = async () => {
             v-model:value="formValue.password"
             type="password"
             show-password-on="click"
-            style="--n-height: 50px; --n-border-radius: 0.75rem"
+            style="
+              --n-height: 50px;
+              --n-border-radius: 0.75rem;
+              --n-border-hover: var(--primary-color);
+              --n-border-focus: var(--primary-color);
+            "
             placeholder="用于登录的密码"
             size="large"
           />

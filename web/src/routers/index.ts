@@ -10,7 +10,7 @@ import {
   EventNoteRound,
   BookmarkBorderRound,
   GridOnRound,
-  SettingsRound,
+  KeyRound,
 } from "@vicons/material";
 import { markRaw } from "vue";
 import { useAdminStore } from "@/store/admin";
@@ -46,6 +46,12 @@ const routes: RouteRecordRaw[] = [
         meta: { index: 2 },
       },
     ],
+  },
+  {
+    path: "/record-detail",
+    name: "RecordDetail",
+    component: () => import("@/views/record-detail/index.vue"),
+    // props: true,
   },
   {
     path: "/register",
@@ -147,12 +153,12 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "setting",
-        name: "Setting",
-        component: () => import("@/views/admin/setting/index.vue"),
+        path: "setting-secret",
+        name: "SettingSecret",
+        component: () => import("@/views/admin/secret/index.vue"),
         meta: {
-          title: "系统设置",
-          icon: markRaw(SettingsRound),
+          title: "后台秘钥",
+          icon: markRaw(KeyRound),
         },
       },
     ],

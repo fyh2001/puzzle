@@ -111,7 +111,12 @@ const loginHandler = async () => {
         <n-form-item path="username" style="--n-label-height: 0px">
           <n-input
             v-model:value="formValue.username"
-            style="--n-height: 50px; --n-border-radius: 0.75rem"
+            style="
+              --n-height: 50px;
+              --n-border-radius: 0.75rem;
+              --n-border-hover: var(--primary-color);
+              --n-border-focus: var(--primary-color);
+            "
             placeholder="邮箱/手机号码/用户名"
             size="large"
           />
@@ -122,7 +127,12 @@ const loginHandler = async () => {
             v-model:value="formValue.password"
             type="password"
             show-password-on="click"
-            style="--n-height: 50px; --n-border-radius: 0.75rem"
+            style="
+              --n-height: 50px;
+              --n-border-radius: 0.75rem;
+              --n-border-hover: var(--primary-color);
+              --n-border-focus: var(--primary-color);
+            "
             placeholder="请输入密码"
             size="large"
           />

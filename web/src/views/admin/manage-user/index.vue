@@ -35,13 +35,15 @@ const tableColumns = [
   {
     title: "ID",
     key: "id",
+    align: "center",
   },
   {
     title: "头像",
     key: "avatar",
+    align: "center",
     render: (row: any) => {
       return (
-        <div class="flex items-center">
+        <div class="flex justify-center items-center">
           <n-avatar size="small" src={row.avatar || defalutAvatar} />
         </div>
       );
@@ -50,19 +52,23 @@ const tableColumns = [
   {
     title: "用户名",
     key: "username",
+    align: "center",
   },
   {
     title: "昵称",
     key: "nickname",
+    align: "center",
   },
 
   {
     title: "手机",
     key: "phone",
+    align: "center",
   },
   {
     title: "邮箱",
     key: "email",
+    align: "center",
   },
   {
     title: "账号状态",
@@ -95,6 +101,7 @@ const tableColumns = [
   {
     title: "创建时间",
     key: "createdAt",
+    align: "center",
     render: (row: any) => {
       return new Date(row.createdAt).toLocaleString();
     },
@@ -102,6 +109,7 @@ const tableColumns = [
   {
     title: "更新时间",
     key: "updatedAt",
+    align: "center",
     render: (row: any) => {
       return new Date(row.updatedAt).toLocaleString();
     },

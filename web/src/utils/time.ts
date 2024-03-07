@@ -40,7 +40,7 @@ export const formatDurationInRecord = (duration: number) => {
 
   return `${minute < 10 ? "0" + minute : minute}:${
     second < 10 ? "0" + second : second
-  }:${
+  }.${
     millisecond < 100
       ? millisecond < 10
         ? "00" + millisecond

@@ -137,7 +137,6 @@ export const useRecordStore = defineStore("record", {
       });
 
       if (code === 200) {
-        console.log(recordList);
         this.rankedRecord.bestAverage5 = recordList;
       }
     },

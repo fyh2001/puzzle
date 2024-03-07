@@ -1,7 +1,7 @@
 export default {
   name: "amber",
-  label: '琥珀',
-  menuIconClass: 'text-[#f59e0b]',
+  label: "琥珀",
+  menuIconClass: "text-[#f59e0b]",
   light: {
     common: {
       bodyColor: "#f0f2f5",
@@ -11,9 +11,9 @@ export default {
       // tabbar选中的颜色
       tabarSelectBoxColor: "rgba(216,118,7,0.85)",
       // 排名总结栏的背景色
-      rankSummaryBackgroundColor: "#d97706",
+      rankSummaryBackgroundColor: "#fffbeb", // amber-50
       // 排名总结栏的字体颜色
-      rankSummaryFontColor: "#d97706",
+      rankSummaryTextColor: "#d97706",
       // 用户卡片的背景色
       userCardBackgroundColor: "#fff",
       // 登陆面板的背景色
@@ -36,9 +36,9 @@ export default {
       // tabbar选中的颜色
       tabarSelectBoxColor: "rgba(216,118,7,0.85)",
       // 排名总结栏的背景色
-      rankSummaryBackgroundColor: "#d97706",
+      rankSummaryBackgroundColor: "#fffbeb", // amber-50
       // 排名总结栏的字体颜色
-      rankSummaryFontColor: "#d97706",
+      rankSummaryTextColor: "#d97706",
       // 用户卡片的背景色
       userCardBackgroundColor: "#262626",
       // 登陆面板的背景色

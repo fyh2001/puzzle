@@ -135,10 +135,10 @@ func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListRe
 
 	if len(recordReq.RankRange) == 2 {
 		if recordReq.RankRange[0] != 0 {
-			db = db.Where("rank >= ?", recordReq.RankRange[0])
+			db = db.Where("ranked >= ?", recordReq.RankRange[0])
 		}
 		if recordReq.RankRange[01] != 0 {
-			db = db.Where("rank <= ?", recordReq.RankRange[1])
+			db = db.Where("ranked <= ?", recordReq.RankRange[1])
 		}
 	}
 

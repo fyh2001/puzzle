@@ -1,24 +1,52 @@
 <script lang="tsx" setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useRecordStore } from "@/store/record";
 import { useGameStore } from "@/store/game";
+import { useUserStore } from "@/store/user";
+import { useThemeStore } from "@/store/theme";
+import { recordRequest } from "api/record";
+import { formatDurationInRecord } from "@/utils/time";
 import type { Pagination } from "@/types/pagination";
+import type { RecordBestSingleResp } from "@/types/record";
+import router from "@/routers";
 
 const recordStore = useRecordStore();
 const gameStore = useGameStore();
+const userStore = useUserStore();
+const themeStore = useThemeStore();
 
 const isLoading = ref(false);
+
+// 总结栏背景颜色
+const summaryBackgroundColor = computed(
+  () =>
+    (
+      themeStore.loadedThemesMap.get(themeStore.themeColor)?.[
+        themeStore.getDarkMode ? "dark" : "light"
+      ] as any
+    )?.common?.rankSummaryBackgroundColor
+);
+
+// 总结栏文字颜色
+const summaryTextColor = computed(
+  () =>
+    (
+      themeStore.loadedThemesMap.get(themeStore.themeColor)?.[
+        themeStore.getDarkMode ? "dark" : "light"
+      ] as any
+    )?.common?.rankSummaryTextColor
+);
+
+// 个人记录
+const recordPersonData = ref<RecordBestSingleResp>();
 
 // 表格字段
 const tableColumns = [
   {
     title: "No",
-    dataIndex: "index",
-    key: "index",
+    dataIndex: "ranked",
+    key: "ranked",
     width: "65",
-    render: (_: Object, index: number) => {
-      return (pagination.page - 1) * 10 + index + 1;
-    },
   },
   {
     title: "用户",
@@ -40,6 +68,44 @@ const tableColumns = [
   },
 ];
 
+// 总结栏
+const tableSummary = () => {
+  return {
+    ranked: {
+      value: <div>{recordPersonData.value?.ranked}</div>,
+      colSpan: 1,
+    },
+    nickname: {
+      value: <div>{recordPersonData.value?.userInfo?.nickname}</div>,
+      colSpan: 1,
+    },
+    duration: {
+      value: <div>{recordPersonData.value?.recordDurationFormat}</div>,
+      colSpan: 1,
+    },
+    step: {
+      value: <div>{recordPersonData.value?.recordStep}</div>,
+      colSpan: 1,
+    },
+  };
+};
+
+// 表格行点击
+const handleTableRowClick = (rowData: any) => {
+  return {
+    onClick: () => {
+      console.log(rowData),
+        router.push({
+          name: "RecordDetail",
+          query: {
+            data: JSON.stringify(rowData),
+            type: "bestSingle",
+          },
+        });
+    },
+  };
+};
+
 // 分页
 const pagination: Pagination = {
   page: 1,
@@ -58,9 +124,33 @@ const getRecords = async () => {
   await recordStore.getBestSingleRecords({
     pagination,
     dimension: gameStore.getDimension,
+    orderBy: "ranked",
+    needUserInfo: true,
   });
 
   isLoading.value = false;
+};
+
+// 获取个人记录
+const getRecordPersion = async () => {
+  const {
+    data: { code, data: recordPersonResp },
+  } = await recordRequest.listBestSingle({
+    pagination: {
+      page: 1,
+      pageSize: 1,
+    },
+    dimension: gameStore.getDimension,
+    userId: userStore.getUser.id,
+    needUserInfo: true,
+  });
+
+  if (code === 200) {
+    recordPersonData.value = recordPersonResp.records[0] || {};
+    recordPersonData.value.recordDurationFormat = formatDurationInRecord(
+      recordPersonData.value.recordDuration
+    );
+  }
 };
 
 // 监听阶数和模式变化
@@ -74,6 +164,7 @@ watch(
 
 onMounted(() => {
   getRecords();
+  getRecordPersion();
 });
 </script>
 
@@ -84,6 +175,8 @@ onMounted(() => {
       :loading="isLoading"
       :columns="tableColumns"
       :data="recordStore.getBestSingleRecordList"
+      :row-props="handleTableRowClick"
+      :summary="tableSummary"
       :bordered="false"
     />
     <n-pagination
@@ -97,19 +190,17 @@ onMounted(() => {
   </div>
 </template>
 
-<style>
-.n-data-table-th__title {
+<style scoped>
+:deep .n-data-table-th__title {
   text-align: center;
 }
 
-td.n-data-table-td.n-data-table-td {
+:deep td.n-data-table-td.n-data-table-td {
   text-align: center;
 }
 
-/**
-.n-data-table .n-data-table-td.n-data-table-td--summary {
-  @apply bg-indigo-50 border border-indigo-200;
-  background-color: v-bind(--rank-summary-background-color);
+:deep .n-data-table .n-data-table-td.n-data-table-td--summary {
+  background-color: v-bind(summaryBackgroundColor);
+  color: v-bind(summaryTextColor);
 }
-*/
 </style>

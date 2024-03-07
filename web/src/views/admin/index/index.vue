@@ -8,6 +8,7 @@ import {
   GridOnRound,
   SettingsRound,
   MenuRound,
+  KeyRound,
 } from "@vicons/material";
 import { PersonCircleOutline } from "@vicons/ionicons5";
 import router from "@/routers";
@@ -132,18 +133,27 @@ const menuOptions: MenuOption[] = [
   },
   // 系统设置
   {
-    label: () => {
-      return (
-        <router-link to="/admin/setting" replace>
-          系统设置
-        </router-link>
-      );
-    },
+    label: "系统设置",
     breadcrumbTitle: "系统设置",
     key: "setting",
     icon: () => {
       return <n-icon size="24" component={SettingsRound} />;
     },
+    children: [
+      {
+        label: () => {
+          return (
+            <router-link to="/admin/setting-secret" replace>
+              后台秘钥
+            </router-link>
+          );
+        },
+        key: "setting-secret",
+        icon: () => {
+          return <n-icon size="24" component={KeyRound} />;
+        },
+      },
+    ],
   },
 ];
 
@@ -187,10 +197,10 @@ const currentBreadcrumbArr = computed(() => {
         :collapsed="collapsed"
       >
         <div
-          class="p-4 text-center text-5 text-green-7 font-bold font-mono"
-          v-if="!collapsed"
+          class="flex justify-center items-center gap-2 p-4 text-center text-5 text-green-7 font-bold font-mono"
         >
-          Puzzle 管理系统
+          <n-icon size="24" :component="GridOnRound" />
+          <div v-if="!collapsed">Puzzle 管理系统</div>
         </div>
         <n-menu
           :value="router.currentRoute.value.path.replace(/^\/admin\/?/, '')"
@@ -232,7 +242,7 @@ const currentBreadcrumbArr = computed(() => {
           <router-view v-slot="{ Component, route }">
             <transition
               :name="route.meta.transition as string || 'fade'"
-              mode="default"
+              mode="out-in"
             >
               <component :is="Component" />
             </transition>

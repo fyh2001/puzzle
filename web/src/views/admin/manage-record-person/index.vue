@@ -4,7 +4,7 @@ import { ref, onMounted } from "vue";
 import { useDialog, useMessage } from "naive-ui";
 import { useAdminStore } from "@/store/admin";
 import { defalutAvatar } from "@/config/index";
-import DefoGameMapMini from "@/views/admin/index/components/defo-game-map-mini.vue";
+import DefoGameMapMini from "@/components/defo-game-map-mini.vue";
 import type { Pagination } from "@/types/pagination";
 import type { RecordReq } from "@/types/record";
 
@@ -193,7 +193,7 @@ const tableColumns = [
     title: "操作",
     key: "action",
     align: "center",
-    width: 300,
+    width: 240,
     render: (row: any) => {
       return (
         <div class="flex justify-center gap-2">

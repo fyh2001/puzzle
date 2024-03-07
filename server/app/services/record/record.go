@@ -155,6 +155,14 @@ func List(recordReq models.RecordReq) (models.RecordListResp, error) {
 		recordReq.Idx, _ = strconv.ParseInt(recordReq.IdxStr, 10, 64)
 	}
 
+	if len(recordReq.IdsStr) > 0 {
+		for _, idStr := range recordReq.IdsStr {
+			id, _ := strconv.ParseInt(idStr, 10, 64)
+			recordReq.Ids = append(recordReq.Ids, id)
+		}
+
+	}
+
 	if recordReq.OrderBy == "" {
 		recordReq.OrderBy = "id"
 	}

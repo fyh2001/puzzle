@@ -1,14 +1,36 @@
 package recordbeststep
 
 import (
+	"encoding/json"
 	"errors"
+	"puzzle/app/middlewares/rabbitmq"
 	"puzzle/app/models"
 	commonService "puzzle/app/services"
 	userService "puzzle/app/services/user"
 	"puzzle/database"
 	"puzzle/utils"
 	"strconv"
+
+	"gorm.io/gorm"
 )
+
+// publishMessage 发送消息至消息队列
+func publishMessage(rankUpdate commonService.RankUpdate) {
+	mq := rabbitmq.NewRabbitMQ("best_step_rank_update_queue", "", "")
+	defer mq.Destory()
+
+	message := rabbitmq.RabbitMQMessage{
+		RankUpdate: rankUpdate,
+		Message:    "rank update",
+	}
+
+	messageByte, err := json.Marshal(message)
+	if err != nil {
+		return
+	}
+
+	mq.Publish(messageByte)
+}
 
 // check 检查参数
 func check(record models.RecordBestStep) error {
@@ -43,6 +65,11 @@ func Insert(record models.RecordBestStep) error {
 		return errors.New("添加失败")
 	}
 
+	// 发送消息至消息队列
+	publishMessage(commonService.RankUpdate{
+		Dimension: record.Dimension,
+	})
+
 	return nil
 }
 
@@ -52,15 +79,15 @@ func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, er
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
 		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return recordBestStepListResp, errors.New("查询用户信息失败")
 		}
 
 		if userInfo.Id == "" {
-			return recordBestStepListResp, errors.New("用户不存在")
+			recordReq.UserIdStr = "-1"
+		} else {
+			recordReq.UserIdStr = userInfo.Id
 		}
-
-		recordReq.UserIdStr = userInfo.Id
 	}
 
 	if recordReq.IdStr != "" {
@@ -93,10 +120,33 @@ func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, er
 	}
 
 	if len(recordReq.StepRange) == 2 {
-		db = db.Where("record_step >= ? AND record_step <= ?", recordReq.StepRange[0], recordReq.StepRange[1])
+		if recordReq.StepRange[0] != 0 {
+			db = db.Where("record_step >= ?", recordReq.StepRange[0])
+		}
+		if recordReq.StepRange[1] != 0 {
+			db = db.Where("record_step <= ?", recordReq.StepRange[1])
+		}
 	}
 
-	if len(recordReq.DateRange) == 2 {
+	if len(recordReq.RankRange) == 2 {
+		if recordReq.RankRange[0] != 0 {
+			db = db.Where("ranked >= ?", recordReq.RankRange[0])
+		}
+		if recordReq.RankRange[01] != 0 {
+			db = db.Where("ranked <= ?", recordReq.RankRange[1])
+		}
+	}
+
+	if len(recordReq.BreakCountRange) == 2 {
+		if recordReq.BreakCountRange[0] != 0 {
+			db = db.Where("record_break_count >= ?", recordReq.BreakCountRange[0])
+		}
+		if recordReq.BreakCountRange[1] != 0 {
+			db = db.Where("record_break_count <= ?", recordReq.BreakCountRange[1])
+		}
+	}
+
+	if len(recordReq.DateRange) == 2 && !recordReq.DateRange[0].IsZero() && !recordReq.DateRange[1].IsZero() {
 		db = db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
 	}
 
@@ -247,6 +297,11 @@ func Update(record models.RecordBestStep) error {
 	if err != nil {
 		return errors.New("更新失败")
 	}
+
+	// 发送消息至消息队列
+	publishMessage(commonService.RankUpdate{
+		Dimension: record.Dimension,
+	})
 
 	return nil
 }

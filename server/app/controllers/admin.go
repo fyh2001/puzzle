@@ -8,6 +8,7 @@ import (
 	recordService "puzzle/app/services/record"
 	recordBestAverageSerivce "puzzle/app/services/record-best-average"
 	recordBestSingleSerivce "puzzle/app/services/record-best-single"
+	recordBestStepSerivce "puzzle/app/services/record-best-step"
 	userService "puzzle/app/services/user"
 	"strconv"
 
@@ -151,4 +152,22 @@ func ListRecordBestAverageData(c *gin.Context) {
 	}
 
 	c.JSON(200, result.Success(recordBestAverageListResp))
+}
+
+func ListRecordBestStepData(c *gin.Context) {
+	var recordBestStepReq models.RecordBestStepReq
+	err := c.ShouldBindJSON(&recordBestStepReq)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(200, result.Fail("参数错误"))
+		return
+	}
+
+	recordBestStepListResp, err := recordBestStepSerivce.List(recordBestStepReq)
+	if err != nil {
+		c.JSON(200, result.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, result.Success(recordBestStepListResp))
 }

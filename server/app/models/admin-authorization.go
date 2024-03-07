@@ -9,3 +9,7 @@ type AdminAuthorizationResp struct {
 	OptUrl string `json:"optUrl"`
 	Token  string `json:"token"`
 }
+
+type SecretResp struct {
+	SecretUrl string `json:"secretUrl"`
+}

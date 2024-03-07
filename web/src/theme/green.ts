@@ -1,7 +1,7 @@
 export default {
   name: "green",
-  label: '翠绿',
-  menuIconClass: 'text-[#18A058]',
+  label: "翠绿",
+  menuIconClass: "text-[#18A058]",
   light: {
     common: {
       bodyColor: "#f0f2f5",
@@ -10,9 +10,9 @@ export default {
       // tabbar选中的颜色
       tabarSelectBoxColor: "#18A058",
       // 排名总结栏的背景色
-      rankSummaryBackgroundColor: "#18A058",
+      rankSummaryBackgroundColor: "#f0fdf4",
       // 排名总结栏的字体颜色
-      rankSummaryFontColor: "#18A058",
+      rankSummaryTextColor: "#18A058",
       // 用户卡片的背景色
       userCardBackgroundColor: "#fff",
       // 登陆面板的背景色
@@ -34,9 +34,9 @@ export default {
       // tabbar选中的颜色
       tabarSelectBoxColor: "#18A058",
       // 排名总结栏的背景色
-      rankSummaryBackgroundColor: "#18A058",
+      rankSummaryBackgroundColor: "#f0fdf4",
       // 排名总结栏的字体颜色
-      rankSummaryFontColor: "#18A058",
+      rankSummaryTextColor: "#18A058",
       // 用户卡片的背景色
       userCardBackgroundColor: "#262626",
       // 登陆面板的背景色

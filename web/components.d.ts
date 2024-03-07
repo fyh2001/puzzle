@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AVerificationCode: typeof import('@arco-design/web-vue')['VerificationCode']
+    DefoGameMapMini: typeof import('./src/components/defo-game-map-mini.vue')['default']
     Dropdown: typeof import('./src/components/dropdown.vue')['default']
     GlobalProvider: typeof import('./src/components/global-provider.vue')['default']
     NAvatar: typeof import('naive-ui')['NAvatar']

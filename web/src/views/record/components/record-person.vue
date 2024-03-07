@@ -1,11 +1,14 @@
 <script lang="tsx" setup>
 import { ref, onMounted, watch } from "vue";
+import router from "@/routers";
 import { useRecordStore } from "@/store/record";
 import { useGameStore } from "@/store/game";
+import { useUserStore } from "@/store/user";
 import type { Pagination } from "@/types/pagination";
 
 const recordStore = useRecordStore();
 const gameStore = useGameStore();
+const userStore = useUserStore();
 
 const isLoading = ref(false);
 
@@ -53,6 +56,22 @@ const tableColumns = [
   },
 ];
 
+// 表格行点击
+const handleTableRowClick = (rowData: any) => {
+  return {
+    onClick: () => {
+      console.log(rowData),
+        router.push({
+          name: "RecordDetail",
+          query: {
+            data: JSON.stringify(rowData),
+            type: "person",
+          },
+        });
+    },
+  };
+};
+
 // 分页
 const pagination: Pagination = {
   page: 1,
@@ -74,6 +93,7 @@ const getRecords = async () => {
     pagination,
     dimension: gameStore.getDimension,
     type: gameStore.getGameMode,
+    userId: userStore.getUser.id,
   });
 
   isLoading.value = false;
@@ -100,6 +120,7 @@ onMounted(() => {
       :loading="isLoading"
       :columns="tableColumns"
       :data="recordStore.getPersonRecordList"
+      :row-props="handleTableRowClick"
       :bordered="false"
     />
     <n-pagination

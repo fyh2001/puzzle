@@ -81,6 +81,12 @@ func InitRouter() *gin.Engine {
 			{
 				recordBestAverageManage.POST("/list", controllers.ListRecordBestAverageData) // 最佳平均记录列表
 			}
+
+			// 最佳步数记录
+			recordBestStepManage := admin.Group("/record-best-step-manage").Use(jwt.AdminJWT())
+			{
+				recordBestStepManage.POST("/list", controllers.ListRecordBestStepData) // 最佳步数记录列表
+			}
 		}
 	}
 

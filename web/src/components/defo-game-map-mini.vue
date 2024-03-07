@@ -21,12 +21,21 @@ defineComponent({
 
 const gameStore = useGameStore();
 
-const props = defineProps<{
-  scramble: string;
-  dimension: any;
-  solution?: string;
-  buttonAlign?: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    scramble: string;
+    dimension: any;
+    solution?: string;
+    buttonAlign?: string;
+    buttonSize?: string;
+    buttonClass?: string;
+  }>(),
+  {
+    buttonAlign: "center",
+    buttonSize: "large",
+    buttonClass: "",
+  }
+);
 
 // 是否正在加载
 const isLoding = ref(false);
@@ -142,8 +151,8 @@ watch(
   <div w-full h-full>
     <n-tag
       :bordered="false"
-      type="success"
-      class="mb-4 rounded text-4.5 font-bold font-mono"
+      type="primary"
+      class="mb-4 rounded text-4 font-bold font-mono"
       v-if="solution"
     >
       <template #icon>
@@ -195,10 +204,11 @@ watch(
     <div v-if="solution">
       <div class="flex justify-between items-center mt-4">
         <n-button
+          :class="buttonClass"
           strong
           secondary
           type="primary"
-          size="large"
+          :size="buttonSize"
           @click="handleAutoPlay"
           :disabled="gameMapListIndex === gameMapList.length - 1"
           >{{ autoPlayLabel }}</n-button
@@ -218,17 +228,18 @@ watch(
           <n-button
             strong
             secondary
-            size="large"
+            :size="buttonSize"
             type="primary"
-            :class="{ invisible: !timer }"
+            :class="[buttonClass, { invisible: !timer }]"
             >播放速度 {{ speedLabelOptions[speed] }}</n-button
           >
         </n-dropdown>
         <n-button
+          :class="buttonClass"
           strong
           secondary
           type="primary"
-          size="large"
+          :size="buttonSize"
           @click="
             () => {
               handleAutoPlayClear();
@@ -239,10 +250,11 @@ watch(
           >上一步</n-button
         >
         <n-button
+          :class="buttonClass"
           strong
           secondary
           type="primary"
-          size="large"
+          :size="buttonSize"
           @click="
             () => {
               handleAutoPlayClear();

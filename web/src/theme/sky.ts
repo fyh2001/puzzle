@@ -1,7 +1,7 @@
 export default {
   name: "sky",
-  label: '天空',
-  menuIconClass: 'text-[#0ea5e9]',
+  label: "天空",
+  menuIconClass: "text-[#0ea5e9]",
   light: {
     common: {
       bodyColor: "#f0f2f5",
@@ -11,9 +11,9 @@ export default {
       // tabbar选中的颜色
       tabarSelectBoxColor: "#0ea5e9",
       // 排名总结栏的背景色
-      rankSummaryBackgroundColor: "#38bdf8",
+      rankSummaryBackgroundColor: "#f0f9ff", // sky-50
       // 排名总结栏的字体颜色
-      rankSummaryFontColor: "#38bdf8",
+      rankSummaryTextColor: "#38bdf8",
       // 用户卡片的背景色
       userCardBackgroundColor: "#fff",
       // 登陆面板的背景色
@@ -36,9 +36,9 @@ export default {
       // tabbar选中的颜色
       tabarSelectBoxColor: "#0ea5e9",
       // 排名总结栏的背景色
-      rankSummaryBackgroundColor: "#38bdf8",
+      rankSummaryBackgroundColor: "#f0f9ff", // sky-50
       // 排名总结栏的字体颜色
-      rankSummaryFontColor: "#38bdf8",
+      rankSummaryTextColor: "#38bdf8",
       // 用户卡片的背景色
       userCardBackgroundColor: "#262626",
       // 登陆面板的背景色

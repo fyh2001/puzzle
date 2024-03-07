@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"puzzle/app/common/result"
+	"puzzle/app/models"
 	adminAuthorizationService "puzzle/app/services/admin-authorization"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,11 @@ func ResetOtp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, result.Success(url))
+	secretResp := models.SecretResp{
+		SecretUrl: url,
+	}
+
+	c.JSON(200, result.Success(secretResp))
 }
 
 func Authorization(c *gin.Context) {
@@ -48,5 +53,9 @@ func GetUrl(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, result.Success(url))
+	secretResp := models.SecretResp{
+		SecretUrl: url,
+	}
+
+	c.JSON(200, result.Success(secretResp))
 }
