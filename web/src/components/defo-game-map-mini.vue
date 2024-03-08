@@ -14,10 +14,13 @@ import {
   handleClick,
   createHashMap,
 } from "@/common/game";
+import { useI18n } from "vue-i18n";
 
 defineComponent({
   name: "DefoGameMapMini",
 });
+
+const { t } = useI18n();
 
 const gameStore = useGameStore();
 
@@ -77,12 +80,12 @@ const getSolutionCase = () => {
 // 下一步按钮label
 const nextLabel = computed(() => {
   return gameMapListIndex.value === gameMapList.value.length - 1
-    ? "复 原"
-    : "下一步";
+    ? t("miniGameMap.reset")
+    : t("miniGameMap.next");
 });
 // 当前自动播放按钮label
 const autoPlayLabel = computed(() => {
-  return timer.value ? "暂停播放" : "自动播放";
+  return timer.value ? t("miniGameMap.stopPlay") : t("miniGameMap.autoPlay");
 });
 // 当前自动播放的定时器
 let timer: any = ref(null);
@@ -158,7 +161,8 @@ watch(
       <template #icon>
         <n-icon :component="SwipeLeftRound" />
       </template>
-      步数: {{ gameMapListIndex }} / {{ gameMapList.length - 1 }}
+      {{ t("miniGameMap.step") }}: {{ gameMapListIndex }} /
+      {{ gameMapList.length - 1 }}
     </n-tag>
     <!-- Map -->
     <div class="grid gap-2 p-1 w-full h-full rounded-md" v-if="!solution">
@@ -231,7 +235,8 @@ watch(
             :size="buttonSize"
             type="primary"
             :class="[buttonClass, { invisible: !timer }]"
-            >播放速度 {{ speedLabelOptions[speed] }}</n-button
+            >{{ t("miniGameMap.rate") }}
+            {{ speedLabelOptions[speed] }}</n-button
           >
         </n-dropdown>
         <n-button
@@ -247,7 +252,7 @@ watch(
             }
           "
           :disabled="gameMapListIndex === 0"
-          >上一步</n-button
+          >{{ t("miniGameMap.last") }}</n-button
         >
         <n-button
           :class="buttonClass"

@@ -6,6 +6,9 @@ import RecordBestAverageDetail from "@/views/record-detail/components/record-bes
 import RecordBestStepDetail from "@/views/record-detail/components/record-best-step-detail.vue";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const route = useRoute();
 
@@ -27,7 +30,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col h-screen">
-    <top-bar class="pt-2" title="记录详情" />
+    <top-bar class="pt-2" :title="t('recordDetail.title')" />
 
     <div class="flex-grow p-4" v-if="data">
       <record-person-detail :detailData="data" v-if="type === 'person'" />

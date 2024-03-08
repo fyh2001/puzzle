@@ -7,6 +7,9 @@ import { recordRequest } from "api/record";
 import { UserResp } from "@/types/user";
 import { RecordResp } from "@/types/record";
 import { formatDurationInRecord } from "@/utils/time";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   detailData: any;
@@ -15,9 +18,9 @@ const props = defineProps<{
 console.log(props.detailData);
 
 const gameMode: any = {
-  1: "练习",
-  2: "排位",
-  3: "对战",
+  1: t("recordDetail.content.gameMode.content.practice"),
+  2: t("recordDetail.content.gameMode.content.rank"),
+  3: t("recordDetail.content.gameMode.content.battle"),
 };
 
 const userInfo = ref<UserResp>();
@@ -96,25 +99,49 @@ onMounted(() => {
             label-placement="left"
             bordered
           >
-            <n-descriptions-item label="类型">
-              {{ props.detailData.type }} 次平均
+            <n-descriptions-item :label="t('recordDetail.content.type.label')">
+              {{
+                t("recordDetail.content.type.content.bestAverage", {
+                  type: props.detailData.type,
+                })
+              }}
             </n-descriptions-item>
-            <n-descriptions-item label="阶数">
-              {{ props.detailData.dimension }} 阶
+            <n-descriptions-item
+              :label="t('recordDetail.content.dimension.label')"
+            >
+              {{
+                t("recordDetail.content.dimension.content", {
+                  dimension: props.detailData.dimension,
+                })
+              }}
             </n-descriptions-item>
-            <n-descriptions-item label="排名">
-              第 {{ props.detailData.ranked }} 名
+            <n-descriptions-item :label="t('recordDetail.content.rank.label')">
+              {{
+                t("recordDetail.content.rank.content", {
+                  rank: props.detailData.ranked,
+                })
+              }}
             </n-descriptions-item>
-            <n-descriptions-item label="平均耗时">
+            <n-descriptions-item :label="t('recordDetail.content.duration')">
               {{ props.detailData.duration }}
             </n-descriptions-item>
-            <n-descriptions-item label="记录打破次数">
-              {{ props.detailData.recordBreakCount }} 次
+            <n-descriptions-item
+              :label="t('recordDetail.content.recordBreakCount.label')"
+            >
+              {{
+                t(
+                  "recordDetail.content.recordBreakCount.content",
+                  {
+                    recordBreakCount: props.detailData.recordBreakCount,
+                  },
+                  props.detailData.recordBreakCount
+                )
+              }}
             </n-descriptions-item>
-            <n-descriptions-item label="初次纪录">
+            <n-descriptions-item :label="t('recordDetail.content.createdAt')">
               {{ new Date(props.detailData.createdAt).toLocaleString() }}
             </n-descriptions-item>
-            <n-descriptions-item label="上次纪录">
+            <n-descriptions-item :label="t('recordDetail.content.updatedAt')">
               {{ new Date(props.detailData.updatedAt).toLocaleString() }}
             </n-descriptions-item>
           </n-descriptions>
@@ -127,30 +154,45 @@ onMounted(() => {
       >
         <n-descriptions
           :column="2"
-          :title="`第${index + 1}次记录`"
+          :title="
+            t('recordDetail.content.detailDataTitle', { index: index + 1 })
+          "
           class="w-full"
           label-align="center"
           label-placement="left"
           bordered
         >
-          <n-descriptions-item label="游戏模式">
+          <n-descriptions-item
+            :label="t('recordDetail.content.gameMode.label')"
+          >
             <div>{{ gameMode[data.type] }}</div>
           </n-descriptions-item>
-          <n-descriptions-item label="阶数">
-            {{ data.dimension }} 阶
+          <n-descriptions-item
+            :label="t('recordDetail.content.dimension.label')"
+          >
+            {{
+              t("recordDetail.content.dimension.content", {
+                dimension: props.detailData.dimension,
+              })
+            }}
           </n-descriptions-item>
-          <n-descriptions-item label="耗时">
+          <n-descriptions-item :label="t('recordDetail.content.duration')">
             {{ data.durationFormat }}
           </n-descriptions-item>
-          <n-descriptions-item label="步数">
+          <n-descriptions-item :label="t('recordDetail.content.step')">
             {{ data.step }}
           </n-descriptions-item>
-          <n-descriptions-item label="记录时间" :span="2">
+          <n-descriptions-item
+            :label="t('recordDetail.content.dateTime')"
+            :span="2"
+          >
             {{ new Date(data.createdAt).toLocaleString() }}
           </n-descriptions-item>
         </n-descriptions>
         <n-descriptions bordered class="w-full">
-          <n-descriptions-item label="打乱与还原">
+          <n-descriptions-item
+            :label="t('recordDetail.content.scrambleAndSolution')"
+          >
             <DefoGameMapMini
               :dimension="data?.dimension"
               :scramble="data?.scramble"

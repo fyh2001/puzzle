@@ -1,29 +1,37 @@
 <script lang="ts" setup>
-const props = defineProps({
-  title: String, //标题
-  /**
-   * 标题字体大小
-   * @default 26px
-   */
-  textSize: {
-    type: String,
-    default: "26px",
-  },
+import { computed } from "vue";
+import { useCommonStore } from "@/store/common";
 
-  /**
-   * 标题字体颜色
-   * @default #000
-   */
-  textColor: {
-    type: String,
-    default: "var(--neutralTextBase)",
-  },
+const commonStore = useCommonStore();
+
+interface TextSize {
+  size: string;
+  language: string;
+}
+
+const props = withDefaults(
+  defineProps<{
+    title: string;
+    textSize?: TextSize[];
+    textColor?: string;
+  }>(),
+  {
+    title: "",
+    textColor: "var(--neutralTextBase)",
+  }
+);
+
+const textSizeComputed = computed(() => {
+  return (
+    props.textSize?.find((item) => item.language === commonStore.getLanguage)
+      ?.size || "26px"
+  );
 });
 </script>
 
 <template>
   <div>
-    <n-el :style="{ fontSize: textSize, color: textColor }">{{
+    <n-el :style="{ fontSize: textSizeComputed, color: textColor }">{{
       props.title
     }}</n-el>
   </div>

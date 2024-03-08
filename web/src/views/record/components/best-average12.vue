@@ -9,6 +9,9 @@ import { formatDurationInRecord } from "@/utils/time";
 import type { Pagination } from "@/types/pagination";
 import type { RecordBestAverageResp } from "@/types/record";
 import router from "@/routers";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const recordStore = useRecordStore();
 const gameStore = useGameStore();
@@ -41,7 +44,7 @@ const summaryTextColor = computed(
 const recordPersonData = ref<RecordBestAverageResp>();
 
 // 表格字段
-const tableColumns = [
+const tableColumns = computed(() => [
   {
     title: "No",
     dataIndex: "ranked",
@@ -49,33 +52,35 @@ const tableColumns = [
     width: "65",
   },
   {
-    title: "用户",
+    title: t("record.table.column.user"),
     dataIndex: "nickname",
     key: "nickname",
   },
   {
-    title: "平均时长",
+    title: t("record.table.column.duration"),
     dataIndex: "duration",
     key: "duration",
     ellipsis: {
       tooltip: true,
     },
   },
-];
+]);
 
 // 总结栏
 const tableSummary = () => {
   return {
     ranked: {
-      value: <div>{recordPersonData.value?.ranked}</div>,
+      value: <div>{recordPersonData.value?.ranked || "-"}</div>,
       colSpan: 1,
     },
     nickname: {
-      value: <div>{recordPersonData.value?.userInfo?.nickname}</div>,
+      value: <div>{recordPersonData.value?.userInfo?.nickname || "-"}</div>,
       colSpan: 1,
     },
     duration: {
-      value: <div>{recordPersonData.value?.recordAverageDurationFormat}</div>,
+      value: (
+        <div>{recordPersonData.value?.recordAverageDurationFormat || "-"}</div>
+      ),
       colSpan: 1,
     },
   };
@@ -139,9 +144,11 @@ const getRecordPersion = async () => {
 
   if (code === 200) {
     recordPersonData.value = recordPersonResp.records[0] || {};
-    recordPersonData.value.recordAverageDurationFormat = formatDurationInRecord(
-      recordPersonData.value.recordAverageDuration
-    );
+
+    if (recordPersonData.value.recordAverageDuration) {
+      recordPersonData.value.recordAverageDurationFormat =
+        formatDurationInRecord(recordPersonData.value.recordAverageDuration);
+    }
   }
 };
 

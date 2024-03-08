@@ -1,10 +1,13 @@
 <script lang="tsx" setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import router from "@/routers";
 import { useRecordStore } from "@/store/record";
 import { useGameStore } from "@/store/game";
 import { useUserStore } from "@/store/user";
 import type { Pagination } from "@/types/pagination";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const recordStore = useRecordStore();
 const gameStore = useGameStore();
@@ -13,7 +16,7 @@ const userStore = useUserStore();
 const isLoading = ref(false);
 
 // 表格字段
-const tableColumns = [
+const tableColumns = computed(() => [
   {
     title: "No",
     dataIndex: "index",
@@ -26,7 +29,7 @@ const tableColumns = [
     },
   },
   {
-    title: "时长",
+    title: t("record.table.column.duration"),
     dataIndex: "duration",
     key: "duration",
     ellipsis: {
@@ -34,12 +37,13 @@ const tableColumns = [
     },
   },
   {
-    title: "步数",
+    title: t("record.table.column.step"),
     dataIndex: "step",
     key: "step",
+    width: "80",
   },
   {
-    title: "ao5",
+    title: "Ao5",
     dataIndex: "ao5",
     key: "ao5",
     ellipsis: {
@@ -47,14 +51,14 @@ const tableColumns = [
     },
   },
   {
-    title: "ao12",
+    title: "Ao12",
     dataIndex: "ao12",
     key: "ao12",
     ellipsis: {
       tooltip: true,
     },
   },
-];
+]);
 
 // 表格行点击
 const handleTableRowClick = (rowData: any) => {

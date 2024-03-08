@@ -8,6 +8,9 @@ import { recordRequest } from "api/record";
 import type { Pagination } from "@/types/pagination";
 import type { RecordBestStepResp } from "@/types/record";
 import router from "@/routers";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const recordStore = useRecordStore();
 const gameStore = useGameStore();
@@ -40,7 +43,7 @@ const summaryTextColor = computed(
 const recordPersonData = ref<RecordBestStepResp>();
 
 // 表格字段
-const tableColumns = [
+const tableColumns = computed(() => [
   {
     title: "No",
     dataIndex: "ranked",
@@ -48,30 +51,30 @@ const tableColumns = [
     width: "65",
   },
   {
-    title: "用户",
+    title: t("record.table.column.user"),
     dataIndex: "nickname",
     key: "nickname",
   },
   {
-    title: "步数",
+    title: t("record.table.column.step"),
     dataIndex: "step",
     key: "step",
   },
-];
+]);
 
 // 总结栏
 const tableSummary = () => {
   return {
     ranked: {
-      value: <div>{recordPersonData.value?.ranked}</div>,
+      value: <div>{recordPersonData.value?.ranked || "-"}</div>,
       colSpan: 1,
     },
     nickname: {
-      value: <div>{recordPersonData.value?.userInfo?.nickname}</div>,
+      value: <div>{recordPersonData.value?.userInfo?.nickname || "-"}</div>,
       colSpan: 1,
     },
     step: {
-      value: <div>{recordPersonData.value?.recordStep}</div>,
+      value: <div>{recordPersonData.value?.recordStep || "-"}</div>,
       colSpan: 1,
     },
   };

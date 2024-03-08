@@ -13,9 +13,9 @@ export const useGameStore = defineStore("game", {
     getDimension: (state) => state.dimension,
     getGameMode: (state) => state.gameMode,
     getGameModeLabel: (state) => {
-      if (state.gameMode === 1) return "练习";
-      if (state.gameMode === 2) return "排位";
-      if (state.gameMode === 3) return "对战";
+      if (state.gameMode === 1) return "practice";
+      if (state.gameMode === 2) return "rank";
+      if (state.gameMode === 3) return "battle";
     },
     getCellSet: (state) => {
       if (state.colorPattern === 0) {

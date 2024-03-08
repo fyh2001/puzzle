@@ -7,12 +7,18 @@ import {
   AttachEmailOutlined,
   StorefrontRound,
   BookmarkRound,
+  LanguageRound,
 } from "@vicons/material";
 import router from "@/routers/index";
 import { useThemeStore } from "@/store/theme";
+import { useCommonStore } from "@/store/common";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t, locale } = useI18n();
 
 const themeStore = useThemeStore();
+const commonStore = useCommonStore();
 
 const emit = defineEmits(["select"]);
 
@@ -30,7 +36,7 @@ const options = computed(() => [
     type: "divider",
   },
   {
-    label: "深色模式",
+    label: t("dropdown.darkMode.label"),
     key: "dark",
     disabled: false,
     icon: () => {
@@ -42,7 +48,7 @@ const options = computed(() => [
     },
     children: [
       {
-        label: "开启",
+        label: t("dropdown.darkMode.on"),
         key: "darkOn",
         disabled: false,
         icon: () => {
@@ -58,7 +64,7 @@ const options = computed(() => [
         },
       },
       {
-        label: "关闭",
+        label: t("dropdown.darkMode.off"),
         key: "darkOff",
         disabled: false,
         icon: () => {
@@ -76,7 +82,7 @@ const options = computed(() => [
     ],
   },
   {
-    label: "主题色",
+    label: t("dropdown.theme.label"),
     key: "themeColor",
     disabled: false,
     icon: () => {
@@ -87,7 +93,7 @@ const options = computed(() => [
       );
     },
     children: themeStore.loadedThemes.map((theme) => ({
-      label: theme.label,
+      label: t(`dropdown.theme.color.${theme.name}`),
       key: theme.name,
       disabled: false,
       icon: () => (
@@ -100,7 +106,35 @@ const options = computed(() => [
     })),
   },
   {
-    label: "设置",
+    label: t("dropdown.language.label"),
+    key: "language",
+    icon: () => {
+      return (
+        <n-el class="flex items-center" style="color: var(--primary-color)">
+          <n-icon size="18" component={LanguageRound} />
+        </n-el>
+      );
+    },
+    children: [
+      {
+        label: t("dropdown.language.content.cn"),
+        key: "cn",
+        disabled: false,
+      },
+      {
+        label: t("dropdown.language.content.us"),
+        key: "us",
+        disabled: false,
+      },
+      {
+        label: t("dropdown.language.content.jp"),
+        key: "jp",
+        disabled: false,
+      },
+    ],
+  },
+  {
+    label: t("dropdown.setting.label"),
     key: "setting",
     disabled: true,
     icon: () => {
@@ -112,7 +146,7 @@ const options = computed(() => [
     },
   },
   {
-    label: "更新日志",
+    label: t("dropdown.updateLog.label"),
     key: "updateLog",
     disabled: false,
     icon: () => {
@@ -124,7 +158,7 @@ const options = computed(() => [
     },
   },
   {
-    label: "用户反馈",
+    label: t("dropdown.feedback.label"),
     key: "feedback",
     disabled: true,
     icon: () => {
@@ -141,6 +175,18 @@ const handleSelect = (key: string) => {
   const func = {
     darkOn: () => themeStore.openDarkMode(),
     darkOff: () => themeStore.closeDarkMode(),
+    cn: () => {
+      locale.value = "cn";
+      commonStore.changeLanguage("cn");
+    },
+    us: () => {
+      locale.value = "us";
+      commonStore.changeLanguage("us");
+    },
+    jp: () => {
+      locale.value = "jp";
+      commonStore.changeLanguage("jp");
+    },
     // 主题切换
     ...themeStore.loadedThemes.reduce((obj, theme) => {
       obj[theme.name] = () => themeStore.changeThemeColor(theme.name);

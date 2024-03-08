@@ -7,6 +7,9 @@ import { salt } from "@/config/index";
 import { useMessage } from "naive-ui";
 import { userRequest } from "api/user";
 import { useUserStore } from "@/store/user";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const userStore = useUserStore();
 
@@ -24,14 +27,14 @@ const formValue = ref({
 // 验证规则
 const regulation = {
   username: {
-    label: "用户名",
+    label: t("login.byUsername.rules.username.label"),
     expression: /^[a-zA-Z0-9]{6,12}$/,
-    message: "用户名只允许是6-12位字母或数字的组合",
+    message: t("login.byUsername.rules.username.message.pattern"),
   },
   password: {
-    label: "密码",
+    label: t("login.byUsername.rules.password.label"),
     expression: /^[a-zA-Z0-9]{6,12}$/,
-    message: "密码只允许是6-12位字母或数字的组合",
+    message: t("login.byUsername.rules.password.message.pattern"),
   },
 };
 
@@ -46,7 +49,11 @@ const loginButtonDisabled = computed(() => {
 // 表单验证规则
 const rules = {
   username: [
-    { required: true, message: "请输入账号", trigger: "blur" },
+    {
+      required: true,
+      message: t("login.byUsername.rules.username.message.required"),
+      trigger: "blur",
+    },
     {
       pattern: regulation.username.expression,
       message: regulation.username.message,
@@ -54,7 +61,11 @@ const rules = {
     },
   ],
   password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
+    {
+      required: true,
+      message: t("login.byUsername.rules.password.message.required"),
+      trigger: "blur",
+    },
     {
       pattern: regulation.password.expression,
       message: regulation.password.message,
@@ -74,7 +85,7 @@ const loginHandler = async () => {
       regulation.password.expression.test(formValue.value.password)
     )
   ) {
-    return Message.error("请按照规则填写");
+    return Message.error(t("login.byUsername.rules.rulesError"));
   }
 
   // 登录
@@ -91,7 +102,7 @@ const loginHandler = async () => {
 
     // await saveUnUploadRecords(); // 保存未上传的记录
 
-    Message.success("登录成功"); // 提示登录成功
+    Message.success(t("login.message.success")); // 提示登录成功
     return setTimeout(() => router.replace("/user"), 1000); // 1秒后返回上一页
   }
 
@@ -105,7 +116,7 @@ const loginHandler = async () => {
       class="px-5 py-6 w-full rd-3 shadow translate-y-1/4"
       style="background: var(--login-panel-background-color)"
     >
-      <title-bar class="mb-4" title="登录" />
+      <title-bar class="mb-4" :title="t('login.title')" />
       <!-- 表单 -->
       <n-form ref="formRef" :label-width="80" :model="formValue" :rules="rules">
         <n-form-item path="username" style="--n-label-height: 0px">
@@ -117,7 +128,7 @@ const loginHandler = async () => {
               --n-border-hover: var(--primary-color);
               --n-border-focus: var(--primary-color);
             "
-            placeholder="邮箱/手机号码/用户名"
+            :placeholder="t('login.byUsername.placeholder.username')"
             size="large"
           />
         </n-form-item>
@@ -133,7 +144,7 @@ const loginHandler = async () => {
               --n-border-hover: var(--primary-color);
               --n-border-focus: var(--primary-color);
             "
-            placeholder="请输入密码"
+            :placeholder="t('login.byUsername.placeholder.password')"
             size="large"
           />
         </n-form-item>
@@ -146,16 +157,18 @@ const loginHandler = async () => {
           class="w-full h-12 rounded-xl text-5 shadow"
           :disabled="loginButtonDisabled"
           @click="loginHandler"
-          >登录</n-button
+          >{{ t("login.byUsername.button.login") }}</n-button
         >
       </div>
 
       <div class="flex justify-center items-center mt-4 text-gray gap-2">
-        <div>手机号登录</div>
+        <div>{{ t("login.byUsername.other.loginByPhone") }}</div>
         <div>|</div>
-        <div @click="$router.replace('register')">立刻注册</div>
+        <div @click="$router.replace('register')">
+          {{ t("login.byUsername.other.register") }}
+        </div>
         <div>|</div>
-        <div>忘记密码?</div>
+        <div>{{ t("login.byUsername.other.forgotPassword") }}</div>
       </div>
     </n-el>
   </div>

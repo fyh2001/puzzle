@@ -4,6 +4,9 @@ import { defineProps, onMounted, ref } from "vue";
 import { defalutAvatar } from "@/config";
 import { userRequest } from "@/api/methods/user";
 import { UserResp } from "@/types/user";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   detailData: any;
@@ -12,15 +15,15 @@ const props = defineProps<{
 console.log(props.detailData);
 
 const gameMode: any = {
-  1: "练习",
-  2: "排位",
-  3: "对战",
+  1: t("recordDetail.content.gameMode.content.practice"),
+  2: t("recordDetail.content.gameMode.content.rank"),
+  3: t("recordDetail.content.gameMode.content.battle"),
 };
 
 const recordStatus: any = {
-  1: "正常",
-  2: "冻结",
-  3: "删除",
+  1: t("recordDetail.content.status.content.normal"),
+  2: t("recordDetail.content.status.content.freeze"),
+  3: t("recordDetail.content.status.content.delete"),
 };
 
 const userInfo = ref<UserResp>();
@@ -77,22 +80,32 @@ onMounted(() => {
             label-placement="left"
             bordered
           >
-            <n-descriptions-item label="游戏模式">
+            <n-descriptions-item
+              :label="t('recordDetail.content.gameMode.label')"
+            >
               {{ gameMode[props.detailData.type] }}
             </n-descriptions-item>
-            <n-descriptions-item label="阶数">
-              {{ props.detailData.dimension }} 阶
+            <n-descriptions-item
+              :label="t('recordDetail.content.dimension.label')"
+            >
+              {{
+                t("recordDetail.content.dimension.content", {
+                  dimension: props.detailData.dimension,
+                })
+              }}
             </n-descriptions-item>
-            <n-descriptions-item label="耗时">
+            <n-descriptions-item :label="t('recordDetail.content.duration')">
               {{ props.detailData.duration }}
             </n-descriptions-item>
-            <n-descriptions-item label="步数">
+            <n-descriptions-item :label="t('recordDetail.content.step')">
               {{ props.detailData.step }}
             </n-descriptions-item>
-            <n-descriptions-item label="记录状态">
+            <n-descriptions-item
+              :label="t('recordDetail.content.status.label')"
+            >
               {{ recordStatus[props.detailData.status] }}
             </n-descriptions-item>
-            <n-descriptions-item label="记录时间">
+            <n-descriptions-item :label="t('recordDetail.content.dateTime')">
               {{ new Date(props.detailData.createdAt).toLocaleString() }}
             </n-descriptions-item>
           </n-descriptions>
@@ -107,24 +120,37 @@ onMounted(() => {
           label-placement="left"
           bordered
         >
-          <n-descriptions-item label="游戏模式">
+          <n-descriptions-item
+            :label="t('recordDetail.content.gameMode.label')"
+          >
             <div>{{ gameMode[props.detailData.type] }}</div>
           </n-descriptions-item>
-          <n-descriptions-item label="阶数">
-            {{ props.detailData.dimension }} 阶
+          <n-descriptions-item
+            :label="t('recordDetail.content.dimension.label')"
+          >
+            {{
+              t("recordDetail.content.dimension.content", {
+                dimension: props.detailData.dimension,
+              })
+            }}
           </n-descriptions-item>
-          <n-descriptions-item label="耗时">
+          <n-descriptions-item :label="t('recordDetail.content.duration')">
             {{ props.detailData.duration }}
           </n-descriptions-item>
-          <n-descriptions-item label="步数">
+          <n-descriptions-item :label="t('recordDetail.content.step')">
             {{ props.detailData.step }}
           </n-descriptions-item>
-          <n-descriptions-item label="记录时间" :span="2">
+          <n-descriptions-item
+            :label="t('recordDetail.content.dateTime')"
+            :span="2"
+          >
             {{ new Date(props.detailData.createdAt).toLocaleString() }}
           </n-descriptions-item>
         </n-descriptions>
         <n-descriptions bordered class="w-full">
-          <n-descriptions-item label="打乱与还原">
+          <n-descriptions-item
+            :label="t('recordDetail.content.scrambleAndSolution')"
+          >
             <DefoGameMapMini
               :dimension="props.detailData?.dimension"
               :scramble="props.detailData?.scramble"

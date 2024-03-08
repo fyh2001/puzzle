@@ -9,18 +9,22 @@ import { useUserStore } from "@/store/user";
 import router from "@/routers/index";
 import { useDialog, useMessage } from "naive-ui";
 import { defalutAvatar } from "@/config/index";
+import { useI18n } from "vue-i18n";
+import { computed } from "vue";
+
+const { t } = useI18n();
 
 const Dialog = useDialog();
 const Message = useMessage();
 
 const userStore = useUserStore();
 
-const options = [
+const options = computed(() => [
   {
-    label: "编辑资料",
+    label: t("mine.dropdown.content.editProfile"),
     key: "editProfile",
     disabled: false,
-    show: userStore.token !== "",
+    show: userStore.getToken !== null,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -35,10 +39,10 @@ const options = [
     },
   },
   {
-    label: "修改密码",
+    label: t("mine.dropdown.content.editPassword"),
     key: "changePassword",
     disabled: true,
-    show: userStore.token !== "",
+    show: userStore.getToken !== null,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -48,10 +52,10 @@ const options = [
     },
   },
   {
-    label: "退出登录",
+    label: t("mine.dropdown.content.logout.label"),
     key: "logout",
     // disabled: true,
-    show: userStore.token !== "",
+    show: userStore.getToken !== null,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -62,13 +66,13 @@ const options = [
     props: {
       onClick: () => {
         Dialog.warning({
-          title: "提示",
-          content: "确定退出登录吗？",
-          positiveText: "确定",
-          negativeText: "取消",
+          title: t("mine.dropdown.content.logout.title"),
+          content: t("mine.dropdown.content.logout.content"),
+          positiveText: t("mine.dropdown.content.logout.confirm"),
+          negativeText: t("mine.dropdown.content.logout.cancel"),
           onPositiveClick: () => {
-            localStorage.clear();
-            Message.success("退出登录成功");
+            userStore.logout();
+            Message.success(t("mine.dropdown.content.logout.message.success"));
 
             setTimeout(() => {
               window.location.reload();
@@ -78,18 +82,18 @@ const options = [
       },
     },
   },
-];
+]);
 </script>
 
 <template>
   <div class="p-4 w-screen">
     <div class="flex justify-between items-center">
-      <title-bar title="用户" />
+      <title-bar :title="t('mine.title')" />
 
       <dropdown
-        content="功能"
+        :content="t('mine.dropdown.label')"
         :options="options"
-        :show-divider="userStore.getToken != ''"
+        :show-divider="userStore.getToken !== null"
       />
     </div>
 
@@ -167,7 +171,7 @@ const options = [
               :src="defalutAvatar"
               :fallback-src="defalutAvatar"
             />
-            <div class="text-5">点我登录</div>
+            <div class="text-5">{{ t("mine.login") }}</div>
           </div>
         </transition>
       </div>

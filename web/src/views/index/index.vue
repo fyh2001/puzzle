@@ -6,20 +6,23 @@ import {
 } from "@vicons/material";
 import Tabbar from "@/components/tabbar.vue";
 import type { TabbarItem } from "@/components/tabbar.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const tabsContent: TabbarItem[] = [
   {
-    label: "练习",
+    label: t("tabbar.practice"),
     icon: VideogameAssetOutlined,
     path: "/",
   },
   {
-    label: "记录",
+    label: t("tabbar.record"),
     icon: InsertChartOutlinedRound,
     path: "/record",
   },
   {
-    label: "我的",
+    label: t("tabbar.user"),
     icon: PersonOutlineRound,
     path: "/user",
   },

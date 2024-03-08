@@ -28,6 +28,9 @@ import { useGameStore } from "@/store/game";
 import { useMessage } from "naive-ui";
 import { recordRequest } from "@/api/methods/record";
 import { scrambleRequest } from "api/scramble";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const Message = useMessage();
 
@@ -35,9 +38,9 @@ const gameStore = useGameStore();
 const scrambleStore = useScrambleStore();
 
 // 下拉选项
-const dropdownOptions = [
+const dropdownOptions = computed(() => [
   {
-    label: "游戏模式",
+    label: t("home.dropdown.mode.label"),
     key: "mode",
     disabled: false,
     icon: () => {
@@ -49,7 +52,7 @@ const dropdownOptions = [
     },
     children: [
       {
-        label: "练习",
+        label: t("home.dropdown.mode.content.practice"),
         key: "practice",
         disabled: false,
         icon: () => {
@@ -66,7 +69,7 @@ const dropdownOptions = [
         },
       },
       {
-        label: "排位",
+        label: t("home.dropdown.mode.content.rank"),
         key: "ranked",
         disabled: false,
         icon: () => {
@@ -83,7 +86,7 @@ const dropdownOptions = [
         },
       },
       {
-        label: "对战",
+        label: t("home.dropdown.mode.content.battle"),
         key: "battle",
         disabled: true,
         icon: () => {
@@ -102,7 +105,7 @@ const dropdownOptions = [
     ],
   },
   {
-    label: "阶数选择",
+    label: t("home.dropdown.dimension.label"),
     key: "dimension",
     icon: () => {
       return (
@@ -179,7 +182,7 @@ const dropdownOptions = [
     ],
   },
   {
-    label: "颜色模式",
+    label: t("home.dropdown.colorPattern.label"),
     key: "colorPattern",
     icon: () => {
       return (
@@ -190,7 +193,7 @@ const dropdownOptions = [
     },
     children: [
       {
-        label: "层先",
+        label: t("home.dropdown.colorPattern.content.layerFirst"),
         key: "layerFirst",
         disabled: false,
         icon: () => {
@@ -207,7 +210,7 @@ const dropdownOptions = [
         },
       },
       {
-        label: "降阶",
+        label: t("home.dropdown.colorPattern.content.decreaseDimension"),
         key: "decreaseDimension",
         disabled: false,
         icon: () => {
@@ -225,7 +228,7 @@ const dropdownOptions = [
       },
     ],
   },
-];
+]);
 
 const gameMap = ref([
   [1, 2, 3, 4],
@@ -478,8 +481,12 @@ watch(
   <div class="fixed inset-0 p-4 h-screen">
     <!-- 顶部 -->
     <div class="flex justify-between items-center mb-6">
-      <title-bar :title="gameStore.getGameModeLabel" />
-      <dropdown content="功能" :options="dropdownOptions" :showDivider="true" />
+      <title-bar :title="t('gameModeLabel.' + gameStore.getGameModeLabel)" />
+      <dropdown
+        :content="t('home.dropdown.label')"
+        :options="dropdownOptions"
+        :showDivider="true"
+      />
     </div>
 
     <n-spin :show="isLoding" description="正在获取打乱" size="large">
@@ -508,18 +515,18 @@ watch(
         <!-- 时间与步数 -->
         <div class="w-42 text-center tabular-nums">
           <div class="text-8 font-bold">{{ gameTime }}</div>
-          <div class="text-4">步数: {{ gameStep }}</div>
+          <div class="text-4">{{ t("home.step") }} : {{ gameStep }}</div>
         </div>
 
         <n-button
-          class="w-30 h-15 text-5 shadow"
+          class="min-w-30 h-15 text-5 shadow"
           strong
           secondary
           type="primary"
           :disabled="btnDisabled"
           @click="handleScramble"
         >
-          打乱
+          {{ t("home.scramble") }}
         </n-button>
       </div>
     </n-spin>

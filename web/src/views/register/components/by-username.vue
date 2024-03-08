@@ -6,6 +6,9 @@ import { md5 } from "js-md5";
 import { salt } from "@/config/index";
 import { useMessage } from "naive-ui";
 import { userRequest } from "api/user";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 // 消息提示
 const Message = useMessage();
@@ -22,19 +25,19 @@ const formValue = ref({
 // 验证规则
 const regulation = {
   username: {
-    label: "用户名",
+    label: t("register.byUsername.rules.username.label"),
     expression: /^[a-zA-Z0-9]{6,12}$/,
-    message: "用户名只允许是6-12位字母或数字的组合",
+    message: t("register.byUsername.rules.username.message.pattern"),
   },
   password: {
-    label: "密码",
+    label: t("register.byUsername.rules.password.label"),
     expression: /^[a-zA-Z0-9]{6,12}$/,
-    message: "密码只允许是6-12位字母或数字的组合",
+    message: t("register.byUsername.rules.password.message.pattern"),
   },
   nickname: {
-    label: "昵称",
+    label: t("register.byUsername.rules.nickname.label"),
     expression: /^[^@# ,.?，。？]{2,15}$/,
-    message: "昵称不允许出现除了@# ,.?，。？以外的字符，且长度为2-15位",
+    message: t("register.byUsername.rules.nickname.message.pattern"),
   },
 };
 
@@ -50,7 +53,11 @@ const registerButtonDisabled = computed(() => {
 // 表单验证规则
 const rules = {
   username: [
-    { required: true, message: "请输入账号", trigger: "blur" },
+    {
+      required: true,
+      message: t("register.byUsername.rules.username.label"),
+      trigger: "blur",
+    },
     {
       pattern: regulation.username.expression,
       message: regulation.username.message,
@@ -58,7 +65,11 @@ const rules = {
     },
   ],
   nickname: [
-    { required: true, message: "请输入昵称", trigger: "blur" },
+    {
+      required: true,
+      message: t("register.byUsername.rules.nickname.label"),
+      trigger: "blur",
+    },
     {
       pattern: regulation.nickname.expression,
       message: regulation.nickname.message,
@@ -66,7 +77,11 @@ const rules = {
     },
   ],
   password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
+    {
+      required: true,
+      message: t("register.byUsername.rules.password.label"),
+      trigger: "blur",
+    },
     {
       pattern: regulation.password.expression,
       message: regulation.password.message,
@@ -87,7 +102,7 @@ const registerHandler = async () => {
       regulation.password.expression.test(formValue.value.password)
     )
   ) {
-    return Message.error("请按照规则填写");
+    return Message.error(t("register.byUsername.rules.rulesError"));
   }
 
   // 注册
@@ -100,7 +115,7 @@ const registerHandler = async () => {
   });
 
   if (code === 200) {
-    Message.success("注册成功"); // 提示注册成功
+    Message.success(t("register.message.success")); // 提示注册成功
     return setTimeout(() => router.replace("/login"), 1000); // 1秒后返回上一页
   }
 
@@ -114,7 +129,7 @@ const registerHandler = async () => {
       class="px-5 py-6 w-full rd-3 shadow translate-y-1/8"
       style="background: var(--register-panel-background-color)"
     >
-      <title-bar class="mb-4" title="注册" />
+      <title-bar class="mb-4" :title="t('register.title')" />
       <!-- 表单 -->
       <n-form ref="formRef" :label-width="80" :model="formValue" :rules="rules">
         <n-form-item path="username" style="--n-label-height: 0px">
@@ -126,7 +141,7 @@ const registerHandler = async () => {
               --n-border-hover: var(--primary-color);
               --n-border-focus: var(--primary-color);
             "
-            placeholder="用于登录的用户名"
+            :placeholder="t('register.byUsername.placeholder.username')"
             size="large"
           />
         </n-form-item>
@@ -139,7 +154,7 @@ const registerHandler = async () => {
               --n-border-hover: var(--primary-color);
               --n-border-focus: var(--primary-color);
             "
-            placeholder="用于展示的昵称"
+            :placeholder="t('register.byUsername.placeholder.nickname')"
             size="large"
           />
         </n-form-item>
@@ -154,7 +169,7 @@ const registerHandler = async () => {
               --n-border-hover: var(--primary-color);
               --n-border-focus: var(--primary-color);
             "
-            placeholder="用于登录的密码"
+            :placeholder="t('register.byUsername.placeholder.password')"
             size="large"
           />
         </n-form-item>
@@ -167,16 +182,18 @@ const registerHandler = async () => {
           class="w-full h-12 rounded-xl text-5 shadow"
           :disabled="registerButtonDisabled"
           @click="registerHandler"
-          >注册</n-button
+          >{{ t("register.byUsername.button.register") }}</n-button
         >
       </div>
 
       <div class="flex justify-center items-center mt-4 text-gray gap-2">
-        <div>手机号登录</div>
+        <div>{{ t("register.byUsername.other.loginByPhone") }}</div>
         <div>|</div>
-        <div @click="router.replace('login')">立刻登录</div>
+        <div @click="router.replace('login')">
+          {{ t("register.byUsername.other.login") }}
+        </div>
         <div>|</div>
-        <div>忘记密码?</div>
+        <div>{{ t("register.byUsername.other.forgotPassword") }}</div>
       </div>
     </n-el>
   </div>

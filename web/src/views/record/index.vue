@@ -24,18 +24,21 @@ import bestAverage5 from "@/views/record/components/best-average5.vue";
 import bestAverage12 from "@/views/record/components/best-average12.vue";
 import bestStep from "@/views/record/components/best-step.vue";
 import { useGameStore } from "@/store/game";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const gameStore = useGameStore();
 
 // 自定义表格选项
-const tableOptions = {
+const tableOptions = computed(() => ({
   mine: {
-    title: "我的记录",
+    title: t("record.dropdown.mine.label"),
     view: recordPerson,
     disabled: false,
     children: {
       practice: {
-        title: "练习",
+        title: t("record.dropdown.mine.content.practice"),
         icon: markRaw(WorkspacePremiumRound),
         disabled: false,
         methods: () => {
@@ -43,7 +46,7 @@ const tableOptions = {
         },
       },
       myRank: {
-        title: "排名",
+        title: t("record.dropdown.mine.content.rank"),
         icon: markRaw(MovingRound),
         disabled: false,
         methods: () => {
@@ -51,7 +54,7 @@ const tableOptions = {
         },
       },
       myBattle: {
-        title: "对战",
+        title: t("record.dropdown.mine.content.battle"),
         icon: markRaw(CableRound),
         disabled: true,
         methods: () => {
@@ -61,29 +64,29 @@ const tableOptions = {
     },
   },
   all: {
-    title: "总排名",
+    title: t("record.dropdown.rank.label"),
     disabled: false,
     children: {
       bestSingle: {
-        title: "最佳单次",
+        title: t("record.dropdown.rank.content.bestSingle"),
         icon: markRaw(TimerOutlined),
         disabled: false,
         view: bestSingle,
       },
       bestAverage5: {
-        title: "最佳5次平均",
+        title: t("record.dropdown.rank.content.bestAverage5"),
         icon: markRaw(Filter5Round),
         disabled: false,
         view: bestAverage5,
       },
       bestAverage12: {
-        title: "最佳12次平均",
+        title: t("record.dropdown.rank.content.bestAverage12"),
         icon: markRaw(Filter9PlusRound),
         disabled: false,
         view: bestAverage12,
       },
       bestStep: {
-        title: "最佳步数",
+        title: t("record.dropdown.rank.content.bestStep"),
         icon: markRaw(SwipeLeftRound),
         disabled: false,
         view: bestStep,
@@ -91,27 +94,32 @@ const tableOptions = {
     },
   },
   weekly: {
-    title: "周排名",
+    title: t("record.dropdown.rankWeekly.label"),
+    disabled: true,
     children: {
       bestSingle: {
-        title: "最佳单次",
+        title: t("record.dropdown.rankWeekly.content.bestSingle"),
         icon: markRaw(TimerOutlined),
+        disabled: true,
       },
       bestAverage5: {
-        title: "最佳5次平均",
+        title: t("record.dropdown.rankWeekly.content.bestAverage5"),
         icon: markRaw(Filter5Round),
+        disabled: true,
       },
       bestAverage12: {
-        title: "最佳12次平均",
+        title: t("record.dropdown.rankWeekly.content.bestAverage12"),
         icon: markRaw(Filter9PlusRound),
+        disabled: true,
       },
       bestStepCount: {
-        title: "最佳步数",
+        title: t("record.dropdown.rankWeekly.content.bestStep"),
         icon: markRaw(SwipeLeftRound),
+        disabled: true,
       },
     },
   },
-};
+}));
 
 const IIcon = (icon: Component) => () =>
   (
@@ -121,10 +129,10 @@ const IIcon = (icon: Component) => () =>
   );
 
 // 功能下拉框选项
-const options = [
+const options = computed(() => [
   // 阶数
   {
-    label: "阶数选择",
+    label: t("record.dropdown.dimension.label"),
     key: "dimension",
     icon: IIcon(DashboardCustomizeRound),
     children: [
@@ -190,9 +198,9 @@ const options = [
   },
   // 我的记录
   {
-    label: "我的记录",
+    label: t("record.dropdown.mine.label"),
     key: "record",
-    disabled: tableOptions.mine.disabled,
+    disabled: tableOptions.value.mine.disabled,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -200,29 +208,31 @@ const options = [
         </n-el>
       );
     },
-    children: Object.entries(tableOptions.mine.children).map(([key, val]) => ({
-      label: val.title,
-      key: key,
-      disabled: val?.disabled || false,
-      props: {
-        onClick: () => {
-          currentTableOptions.value = "mine";
-          currentChildOption.value = key;
-          val.methods();
+    children: Object.entries(tableOptions.value.mine.children).map(
+      ([key, val]) => ({
+        label: val.title,
+        key: key,
+        disabled: val?.disabled || false,
+        props: {
+          onClick: () => {
+            currentTableOptions.value = "mine";
+            currentChildOption.value = key;
+            val.methods();
+          },
         },
-      },
-      icon: () => (
-        <n-el class="flex items-center" style="color: var(--primary-color)">
-          <n-icon size="18" component={val.icon} />
-        </n-el>
-      ),
-    })),
+        icon: () => (
+          <n-el class="flex items-center" style="color: var(--primary-color)">
+            <n-icon size="18" component={val.icon} />
+          </n-el>
+        ),
+      })
+    ),
   },
   // 总排名
   {
-    label: "总排名",
+    label: t("record.dropdown.rank.label"),
     key: "rank",
-    disabled: tableOptions.all?.disabled,
+    disabled: tableOptions.value.all?.disabled,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -230,26 +240,28 @@ const options = [
         </n-el>
       );
     },
-    children: Object.entries(tableOptions.all.children).map(([key, val]) => ({
-      label: val.title,
-      key: key,
-      disabled: val?.disabled || false,
-      props: {
-        onClick: () => {
-          currentTableOptions.value = "all";
-          currentChildOption.value = key;
+    children: Object.entries(tableOptions.value.all.children).map(
+      ([key, val]) => ({
+        label: val.title,
+        key: key,
+        disabled: val?.disabled || false,
+        props: {
+          onClick: () => {
+            currentTableOptions.value = "all";
+            currentChildOption.value = key;
+          },
         },
-      },
-      icon: () => (
-        <n-el class="flex items-center" style="color: var(--primary-color)">
-          <n-icon size="18" component={val.icon} />
-        </n-el>
-      ),
-    })),
+        icon: () => (
+          <n-el class="flex items-center" style="color: var(--primary-color)">
+            <n-icon size="18" component={val.icon} />
+          </n-el>
+        ),
+      })
+    ),
   },
   // 周排名
   {
-    label: "周排名",
+    label: t("record.dropdown.rankWeekly.label"),
     key: "weekRank",
     disabled: true,
     icon: () => {
@@ -259,54 +271,26 @@ const options = [
         </n-el>
       );
     },
-    children: [
-      {
-        label: "最佳单次",
-        key: "weekBestSingle",
-        icon: () => {
-          return (
-            <n-el class="flex items-center" style="color: var(--primary-color)">
-              <n-icon size="18" component={TimerOutlined} />
-            </n-el>
-          );
+    children: Object.entries(tableOptions.value.weekly.children).map(
+      ([key, val]) => ({
+        label: val.title,
+        key: key,
+        disabled: val?.disabled || false,
+        props: {
+          onClick: () => {
+            currentTableOptions.value = "all";
+            currentChildOption.value = key;
+          },
         },
-      },
-      {
-        label: "最佳5次平均",
-        key: "weekBestAverage5",
-        icon: () => {
-          return (
-            <n-el class="flex items-center" style="color: var(--primary-color)">
-              <n-icon size="18" component={Filter5Round} />
-            </n-el>
-          );
-        },
-      },
-      {
-        label: "最佳12次平均",
-        key: "weekBestAverage12",
-        icon: () => {
-          return (
-            <n-el class="flex items-center" style="color: var(--primary-color)">
-              <n-icon size="18" component={Filter9PlusRound} />
-            </n-el>
-          );
-        },
-      },
-      {
-        label: "最佳步数",
-        key: "weekBestStepCount",
-        icon: () => {
-          return (
-            <n-el class="flex items-center" style="color: var(--primary-color)">
-              <n-icon size="18" component={SwipeLeftRound} />
-            </n-el>
-          );
-        },
-      },
-    ],
+        icon: () => (
+          <n-el class="flex items-center" style="color: var(--primary-color)">
+            <n-icon size="18" component={val.icon} />
+          </n-el>
+        ),
+      })
+    ),
   },
-];
+]);
 
 // 当前表格选项
 const currentTableOptions = ref("mine");
@@ -316,7 +300,7 @@ const currentChildOption = ref("");
 // 当前表格视图
 const curDataTableView = computed(() => {
   // @ts-ignore
-  const rankType = tableOptions[currentTableOptions.value];
+  const rankType = tableOptions.value[currentTableOptions.value];
   return rankType.children?.[currentChildOption.value]?.view || rankType.view;
 });
 
@@ -326,7 +310,7 @@ const curDataTableLabel = computed((): string | undefined => {
 
   // @ts-ignore
   // 主表格标题
-  const rankType = tableOptions[currentTableOptions.value];
+  const rankType = tableOptions.value[currentTableOptions.value];
   resultArr.push(rankType.title);
 
   // 子表格标题
@@ -334,7 +318,7 @@ const curDataTableLabel = computed((): string | undefined => {
     resultArr.push(rankType.children[currentChildOption.value]?.title);
 
   // 阶数
-  resultArr.push(gameStore.dimension + "阶");
+  resultArr.push(gameStore.dimension + "x" + gameStore.dimension);
 
   return resultArr.join(" - ");
 });
@@ -354,7 +338,19 @@ onMounted(() => {
   <div class="p-4">
     <!-- 标题与功能按钮 -->
     <div class="flex justify-between items-center">
-      <title-bar title="记录及排名" />
+      <title-bar
+        :title="t('record.title')"
+        :textSize="[
+          {
+            size: '17px',
+            language: 'us',
+          },
+          {
+            size: '17px',
+            language: 'jp',
+          },
+        ]"
+      />
 
       <dropdown showDivider :options="options" :content="curDataTableLabel" />
     </div>

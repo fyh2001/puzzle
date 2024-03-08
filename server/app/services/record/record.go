@@ -314,6 +314,7 @@ func updateRecordBestSingle(record models.Record) error {
 			err = recordBestSingleSerivce.Update(models.RecordBestSingle{
 				Id:               id,
 				RecordId:         record.Id,
+				Dimension:        record.Dimension,
 				RecordDuration:   record.Duration,
 				RecordStep:       record.Step,
 				RecordBreakCount: recordBestSingle.Records[0].RecordBreakCount + 1,
@@ -421,6 +422,8 @@ func updateRecordBestAverage5(record models.Record) error {
 			err = recordBestAverageSerivce.Update(models.RecordBestAverage{
 				Id:                    id,
 				RecordIds:             recordIdsStr,
+				Dimension:             record.Dimension,
+				Type:                  5,
 				RecordAverageDuration: averageDuration,
 				RecordBreakCount:      recordBestAverage.Records[0].RecordBreakCount + 1,
 			})
@@ -526,6 +529,8 @@ func updateRecordBestAverage12(record models.Record) error {
 			err = recordBestAverageSerivce.Update(models.RecordBestAverage{
 				Id:                    id,
 				RecordIds:             recordIdsStr,
+				Dimension:             record.Dimension,
+				Type:                  12,
 				RecordAverageDuration: averageDuration,
 				RecordBreakCount:      recordBestAverage.Records[0].RecordBreakCount + 1,
 			})
@@ -582,6 +587,7 @@ func updateRecordBestStep(record models.Record) error {
 			err = recordBestStepSerivce.Update(models.RecordBestStep{
 				Id:               id,
 				RecordId:         record.Id,
+				Dimension:        record.Dimension,
 				RecordStep:       record.Step,
 				RecordBreakCount: recordBestStep.Records[0].RecordBreakCount + 1,
 			})
