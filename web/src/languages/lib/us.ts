@@ -168,7 +168,6 @@ export default {
       detailDataTitle: "No. {index} Record",
     },
   },
-
   mine: {
     title: "Mine",
     dropdown: {
@@ -191,7 +190,6 @@ export default {
     },
     login: "Click to Login",
   },
-
   login: {
     title: "Login",
     byUsername: {
