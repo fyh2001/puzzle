@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { computed } from "vue";
 import {
   VideogameAssetOutlined,
   InsertChartOutlinedRound,
@@ -10,7 +11,7 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
-const tabsContent: TabbarItem[] = [
+const tabsContent = computed<TabbarItem[]>(() => [
   {
     label: t("tabbar.practice"),
     icon: VideogameAssetOutlined,
@@ -26,7 +27,7 @@ const tabsContent: TabbarItem[] = [
     icon: PersonOutlineRound,
     path: "/user",
   },
-];
+]);
 </script>
 
 <template>
