@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ChevronRightRound } from "@vicons/material";
 import { defaultAvatar } from "@/config";
+
 defineProps<{
   label: string;
   content?: string;
