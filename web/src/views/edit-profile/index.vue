@@ -48,7 +48,7 @@ const commonUpdate = (form: Record<string, any>) => {
           <template #dialog="dialogProps" v-if="data.dialog">
             <component :is="data.dialog" v-bind="dialogProps"/>
           </template>
-        </ec-item>
+        </profile-item>
       </div>
     </div>
   </div>
