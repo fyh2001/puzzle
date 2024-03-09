@@ -17,7 +17,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	err = userService.UserRegister(registerReq)
+	err = userService.UserRegister(&registerReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -37,7 +37,7 @@ func Login(c *gin.Context) {
 	}
 
 	// 登录
-	userInfo, err := userService.UserLogin(loginReq)
+	userInfo, err := userService.UserLogin(&loginReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -57,11 +57,46 @@ func ListUser(c *gin.Context) {
 	}
 
 	// 查询用户列表
-	userList, err := userService.List(userReq)
+	userList, err := userService.List(&userReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
 	}
 
 	c.JSON(200, HttpResult.Success(userList))
+}
+
+func GetUserInfo(c *gin.Context) {
+	userId, _ := c.Get("userId")
+
+	userInfo, err := userService.GetUserInfo(userId.(int64))
+	if err != nil {
+		c.JSON(200, HttpResult.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, HttpResult.Success(userInfo))
+}
+
+func UpdateAvatar(c *gin.Context) {
+	var user models.User
+
+	userId, _ := c.Get("userId")
+
+	avatar, err := c.FormFile("avatar")
+	if err != nil {
+		c.JSON(200, HttpResult.Fail("参数错误"))
+		return
+	}
+
+	user.Id = userId.(int64)
+
+	// 更新头像
+	err = userService.UpdateAvatar(&user, avatar)
+	if err != nil {
+		c.JSON(200, HttpResult.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, HttpResult.Success("更新成功"))
 }

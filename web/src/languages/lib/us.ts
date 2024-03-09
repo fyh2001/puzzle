@@ -190,6 +190,27 @@ export default {
     },
     login: "Click to Login",
   },
+  editProfile: {
+    title: "Edit Profile",
+    content: {
+      avatar: "Avatar",
+      username: "Username",
+      nickname: "Nickname",
+    },
+    dialog: {
+      avatar: {
+        label: "Change Avatar",
+        submit: "Confirm",
+      },
+      uploadLabel: "Select File",
+    },
+    messgae: {
+      avatar: {
+        success: "Change Avatar Success",
+        error: "Change Avatar Failed",
+      },
+    },
+  },
   login: {
     title: "Login",
     byUsername: {
@@ -267,7 +288,7 @@ export default {
           message: {
             required: "Please enter a nickname",
             pattern:
-              "Nickname cannot contain characters other than @# ,.?，。？ and must be 2-15 characters long",
+              "Nickname cannot contain characters other than {'@'} # ,.?，。？ and must be 2-15 characters long",
           },
         },
       },

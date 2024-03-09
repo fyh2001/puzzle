@@ -121,7 +121,7 @@ export default {
     },
   },
   recordDetail: {
-    title: "Record Detail",
+    title: "记录详情",
     content: {
       gameMode: {
         label: "游戏模式",
@@ -189,6 +189,27 @@ export default {
       },
     },
     login: "点我登录",
+  },
+  editProfile: {
+    title: "编辑资料",
+    content: {
+      avatar: "头像",
+      username: "用户名",
+      nickname: "昵称",
+    },
+    dialog: {
+      avatar: {
+        label: "修改头像",
+        submit: "确认修改",
+      },
+      uploadLabel: "选择文件",
+    },
+    messgae: {
+      avatar: {
+        success: "修改头像成功",
+        error: "修改头像失败",
+      },
+    },
   },
   login: {
     title: "登录",
@@ -264,7 +285,8 @@ export default {
           label: "昵称",
           message: {
             required: "请输入昵称",
-            pattern: "昵称不允许出现除了@# ,.?，。？以外的字符，且长度为2-15位",
+            pattern:
+              "昵称不允许出现除了{'@'}# ,.?，。？以外的字符，且长度为2-15位",
           },
         },
       },

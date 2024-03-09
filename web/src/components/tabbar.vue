@@ -62,7 +62,10 @@ onMounted(() =>
     <!-- 选择框 -->
     <n-el
       class="absolute left-0 h-10 rounded-xl bg-[#669933] bg-indigo-5 transition-all duration-300"
-      style="background: var(--tabar-select-box-color)"
+      style="
+        background: var(--tabar-select-box-color);
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+      "
       :style="{
         width: boxRect.width + 'px',
         transform: 'translateX(' + boxRect.left + 'px)',

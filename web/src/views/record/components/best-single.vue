@@ -96,14 +96,13 @@ const tableSummary = () => {
 const handleTableRowClick = (rowData: any) => {
   return {
     onClick: () => {
-      console.log(rowData),
-        router.push({
-          name: "RecordDetail",
-          query: {
-            data: JSON.stringify(rowData),
-            type: "bestSingle",
-          },
-        });
+      router.push({
+        name: "RecordDetail",
+        query: {
+          data: JSON.stringify(rowData),
+          type: "bestSingle",
+        },
+      });
     },
   };
 };
@@ -206,5 +205,16 @@ onMounted(() => {
 :deep .n-data-table .n-data-table-td.n-data-table-td--summary {
   background-color: v-bind(summaryBackgroundColor);
   color: v-bind(summaryTextColor);
+}
+
+:deep n-data-table-tr n-data-table-tr--summary {
+  background-color: v-bind(summaryBackgroundColor);
+  color: v-bind(summaryTextColor);
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
+:deep .n-data-table .n-data-table-wrapper {
+  overflow: hidden;
+  border-radius: 0.5rem;
 }
 </style>

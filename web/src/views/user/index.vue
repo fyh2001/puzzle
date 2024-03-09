@@ -8,7 +8,7 @@ import Dropdown from "@/components/dropdown.vue";
 import { useUserStore } from "@/store/user";
 import router from "@/routers/index";
 import { useDialog, useMessage } from "naive-ui";
-import { defalutAvatar } from "@/config/index";
+import { defaultAvatar } from "@/config/index";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 
@@ -34,7 +34,7 @@ const options = computed(() => [
     },
     props: {
       onClick: () => {
-        router.push("/user-edit-profile");
+        router.push("/edit-profile");
       },
     },
   },
@@ -110,16 +110,16 @@ const options = computed(() => [
         <transition name="left" appear>
           <div class="text-center">
             <n-avatar
-              class="mb-6 shadow"
+              class="mb-6 shadow-lg"
               object-fit="cover"
               round
               :size="100"
               :src="
                 userStore.getUser.avatar !== ''
                   ? userStore.getUser.avatar
-                  : defalutAvatar
+                  : defaultAvatar
               "
-              :fallback-src="defalutAvatar"
+              :fallback-src="defaultAvatar"
             />
             <div class="text-5">{{ userStore.getUser.nickname }}</div>
           </div>
@@ -168,8 +168,8 @@ const options = computed(() => [
               class="mb-6 shadow"
               :size="100"
               round
-              :src="defalutAvatar"
-              :fallback-src="defalutAvatar"
+              :src="defaultAvatar"
+              :fallback-src="defaultAvatar"
             />
             <div class="text-5">{{ t("mine.login") }}</div>
           </div>

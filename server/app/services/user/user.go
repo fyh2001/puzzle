@@ -2,7 +2,9 @@ package user
 
 import (
 	"errors"
+	"mime/multipart"
 	"puzzle/app/models"
+	"puzzle/app/services/cos"
 	"puzzle/database"
 	"puzzle/utils"
 	jwt "puzzle/utils/jwt"
@@ -10,17 +12,17 @@ import (
 )
 
 // UserRegister 用户注册
-func UserRegister(u models.UserRegisterReq) error {
+func UserRegister(u *models.UserRegisterReq) error {
 
 	// 判断用户名是否存在
 	var tempUser models.User
-	err := database.GetMySQL().Table("user").Where("username = ?", u.Username).First(&tempUser).Error
+	err := database.GetMySQL().Table("user").Where("username = ? AND status = ?", u.Username, 1).First(&tempUser).Error
 	if err == nil {
 		return errors.New("用户名已存在")
 	}
 
 	// 判断昵称是否存在
-	_ = database.GetMySQL().Table("user").Where("nickname = ?", u.Nickname).First(&tempUser).Error
+	_ = database.GetMySQL().Table("user").Where("nickname = ? AND status = ?", u.Nickname, 1).First(&tempUser).Error
 	if tempUser.Id != 0 {
 		return errors.New("昵称已存在")
 	}
@@ -39,7 +41,7 @@ func UserRegister(u models.UserRegisterReq) error {
 }
 
 // UserLogin 用户登录
-func UserLogin(u models.UserLoginReq) (models.UserLoginResp, error) {
+func UserLogin(u *models.UserLoginReq) (models.UserLoginResp, error) {
 	var loginResp models.UserLoginResp
 
 	// 根据用户名获取用户信息
@@ -85,7 +87,7 @@ func UserLogin(u models.UserLoginReq) (models.UserLoginResp, error) {
 }
 
 // List 获取用户列表
-func List(u models.UserReq) (models.UserListResp, error) {
+func List(u *models.UserReq) (models.UserListResp, error) {
 	var userResp models.UserListResp
 
 	if u.IdStr != "" {
@@ -154,14 +156,72 @@ func List(u models.UserReq) (models.UserListResp, error) {
 	return userResp, nil
 }
 
-// UpdateUser 更新用户
-func Update(u models.User) error {
+// GetUserInfo 获取用户信息
+func GetUserInfo(userId int64) (models.UserResp, error) {
+	var user models.UserResp
+	err := database.GetMySQL().Table("user").Where("id = ? AND status = ?", userId, 1).First(&user).Error
+	if err != nil {
+		return user, errors.New("用户不存在")
+	}
 
-	u.Password = utils.MD5(u.Password)
+	return user, nil
+}
+
+// UpdateUser 更新用户
+func Update(u *models.User) error {
+
+	if u.Password != "" {
+		u.Password = utils.MD5(u.Password)
+	}
+
+	// 删除用户
+	if u.Status == 3 {
+		var user models.User
+		err := database.GetMySQL().Table("user").Where("id = ?", u.Id).First(&user).Error
+		if err != nil {
+			return errors.New("用户不存在")
+		}
+
+		u.Username = user.Username + "_del"
+		u.Nickname = user.Nickname + "_del"
+	}
 
 	err := database.GetMySQL().Table("user").Updates(&u).Error
 	if err != nil {
 		return errors.New("更新失败")
+	}
+
+	return nil
+}
+
+// UpdateAvatar 更新用户头像
+func UpdateAvatar(u *models.User, file *multipart.FileHeader) error {
+	// 上传头像
+	filePath, err := cos.UploadAvatar(file)
+	if err != nil {
+		return err
+	}
+
+	var user models.User
+	err = database.GetMySQL().Table("user").Where("id = ? AND status = ?", u.Id, 1).First(&user).Error
+	if err != nil {
+		return errors.New("用户不存在")
+	}
+
+	// 删除旧头像
+	if user.Avatar != "" {
+		err = cos.DeleteAvatar(user.Avatar)
+		if err != nil {
+			return err
+		}
+	}
+
+	u.Avatar = filePath
+
+	// 更新头像
+	err = database.GetMySQL().Table("user").Updates(u).Error
+	if err != nil {
+		return errors.New("更新用户头像失败")
 	}
 
 	return nil

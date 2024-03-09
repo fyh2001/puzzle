@@ -27,7 +27,7 @@ func ListUserData(c *gin.Context) {
 
 	userReq.Id, _ = strconv.ParseInt(userReq.IdStr, 10, 64)
 
-	userListResp, err := userService.List(userReq)
+	userListResp, err := userService.List(&userReq)
 
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
@@ -57,7 +57,7 @@ func UpdateUserData(c *gin.Context) {
 		Status:   userReq.Status,
 	}
 
-	err = userService.Update(user)
+	err = userService.Update(&user)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return

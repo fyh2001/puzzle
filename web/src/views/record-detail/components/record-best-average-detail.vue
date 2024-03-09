@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DefoGameMapMini from "@/components/defo-game-map-mini.vue";
 import { defineProps, onMounted, ref } from "vue";
-import { defalutAvatar } from "@/config";
+import { defaultAvatar } from "@/config";
 import { userRequest } from "api/user";
 import { recordRequest } from "api/record";
 import { UserResp } from "@/types/user";
@@ -14,8 +14,6 @@ const { t } = useI18n();
 const props = defineProps<{
   detailData: any;
 }>();
-
-console.log(props.detailData);
 
 const gameMode: any = {
   1: t("recordDetail.content.gameMode.content.practice"),
@@ -57,7 +55,6 @@ const getRecordDetail = async () => {
       item.durationFormat = formatDurationInRecord(item.duration);
       return item;
     });
-    console.log(recordDetail.value);
   }
 };
 
@@ -80,8 +77,10 @@ onMounted(() => {
           <n-avatar
             class="shadow-lg"
             round
+            object-fit="cover"
             :size="120"
-            :src="userInfo?.avatar || defalutAvatar"
+            :src="userInfo?.avatar || defaultAvatar"
+            :fallback-src="defaultAvatar"
           />
           <n-el class="text-gray-5 text-4 font-bold">{{
             userInfo?.nickname

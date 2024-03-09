@@ -64,14 +64,13 @@ const tableColumns = computed(() => [
 const handleTableRowClick = (rowData: any) => {
   return {
     onClick: () => {
-      console.log(rowData),
-        router.push({
-          name: "RecordDetail",
-          query: {
-            data: JSON.stringify(rowData),
-            type: "person",
-          },
-        });
+      router.push({
+        name: "RecordDetail",
+        query: {
+          data: JSON.stringify(rowData),
+          type: "person",
+        },
+      });
     },
   };
 };
@@ -138,19 +137,17 @@ onMounted(() => {
   </div>
 </template>
 
-<style>
-.n-data-table-th__title {
+<style scoped>
+:deep .n-data-table-th__title {
   text-align: center;
 }
 
-td.n-data-table-td.n-data-table-td {
+:deep td.n-data-table-td.n-data-table-td {
   text-align: center;
 }
 
-/**
-.n-data-table .n-data-table-td.n-data-table-td--summary {
-  @apply bg-indigo-50 border border-indigo-200;
-  background-color: v-bind(--rank-summary-background-color);
+:deep .n-data-table .n-data-table-wrapper {
+  overflow: hidden;
+  border-radius: 0.5rem;
 }
-*/
 </style>

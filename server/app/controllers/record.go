@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	HttpResult "puzzle/app/common/result"
 	"puzzle/app/models"
 	recordService "puzzle/app/services/record"
@@ -20,8 +19,6 @@ func InsertRecord(c *gin.Context) {
 		c.JSON(200, HttpResult.Fail("参数错误"))
 		return
 	}
-
-	fmt.Printf("record: %v\n", record)
 
 	encryptionParams := utils.EncryptionParams{
 		Dimension: record.Dimension,

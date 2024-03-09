@@ -59,6 +59,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/views/register/index.vue"),
   },
   {
+    path: "/edit-profile",
+    name: "EditProfile",
+    component: () => import("@/views/edit-profile/index.vue"),
+  },
+  {
     path: "/login",
     name: "Login",
     component: () => import("@/views/login/index.vue"),

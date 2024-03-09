@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { userRequest } from "api/user";
 import type { UserResp } from "@/types/user";
 
 export const useUserStore = defineStore("user", {
@@ -46,6 +47,16 @@ export const useUserStore = defineStore("user", {
         updatedAt: "",
       };
       this.token = null;
+    },
+
+    async fetchUser() {
+      const {
+        data: { code, data: userInfo },
+      } = await userRequest.getUserInfo();
+
+      if (code === 200) {
+        this.setUser(userInfo);
+      }
     },
   },
 });

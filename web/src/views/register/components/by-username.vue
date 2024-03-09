@@ -55,7 +55,7 @@ const rules = {
   username: [
     {
       required: true,
-      message: t("register.byUsername.rules.username.label"),
+      message: t("register.byUsername.rules.username.message.required"),
       trigger: "blur",
     },
     {
@@ -67,7 +67,7 @@ const rules = {
   nickname: [
     {
       required: true,
-      message: t("register.byUsername.rules.nickname.label"),
+      message: t("register.byUsername.rules.nickname.message.required"),
       trigger: "blur",
     },
     {
@@ -79,7 +79,7 @@ const rules = {
   password: [
     {
       required: true,
-      message: t("register.byUsername.rules.password.label"),
+      message: t("register.byUsername.rules.password.message.required"),
       trigger: "blur",
     },
     {

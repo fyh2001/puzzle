@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DefoGameMapMini from "@/components/defo-game-map-mini.vue";
 import { defineProps, onMounted, ref } from "vue";
-import { defalutAvatar } from "@/config";
+import { defaultAvatar } from "@/config";
 import { userRequest } from "api/user";
 import { recordRequest } from "api/record";
 import { UserResp } from "@/types/user";
@@ -77,8 +77,10 @@ onMounted(() => {
           <n-avatar
             class="shadow-lg"
             round
+            object-fit="cover"
             :size="120"
-            :src="userInfo?.avatar || defalutAvatar"
+            :src="userInfo?.avatar || defaultAvatar"
+            :fallback-src="defaultAvatar"
           />
           <n-el class="text-gray-5 text-4 font-bold">{{
             userInfo?.nickname

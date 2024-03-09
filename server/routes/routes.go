@@ -22,9 +22,11 @@ func InitRouter() *gin.Engine {
 		// 用户
 		user := root.Group("/user")
 		{
-			user.POST("/register", controllers.Register) // 用户注册
-			user.POST("/login", controllers.Login)       // 用户登录
-			user.POST("/list", controllers.ListUser)     // 列表查询
+			user.POST("/register", controllers.Register)                     // 用户注册
+			user.POST("/login", controllers.Login)                           // 用户登录
+			user.POST("/list", controllers.ListUser)                         // 列表查询
+			user.POST("/get-user-info", jwt.JWT(), controllers.GetUserInfo)  // 获取用户信息
+			user.POST("/update-avatar", jwt.JWT(), controllers.UpdateAvatar) // 更新用户头像
 		}
 
 		// 记录

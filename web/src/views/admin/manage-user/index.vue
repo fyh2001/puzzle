@@ -3,7 +3,7 @@ import { EditNoteRound } from "@vicons/material";
 import { ref, onMounted } from "vue";
 import { useDialog, useMessage } from "naive-ui";
 import { useAdminStore } from "@/store/admin";
-import { defalutAvatar } from "@/config/index";
+import { defaultAvatar } from "@/config/index";
 import { md5 } from "js-md5";
 import { salt } from "@/config/index";
 import type { Pagination } from "@/types/pagination";
@@ -44,7 +44,7 @@ const tableColumns = [
     render: (row: any) => {
       return (
         <div class="flex justify-center items-center">
-          <n-avatar size="small" src={row.avatar || defalutAvatar} />
+          <n-avatar size="small" src={row.avatar || defaultAvatar} />
         </div>
       );
     },

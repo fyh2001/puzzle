@@ -271,7 +271,7 @@ func ListWithUserInfo(recordReq models.RecordBestStepReq) (models.RecordBestStep
 		Ids: userIds,
 	}
 
-	userList, err := userService.List(userReq)
+	userList, err := userService.List(&userReq)
 	if err != nil {
 		return recordBestStepListResp, errors.New("查询用户信息失败")
 	}

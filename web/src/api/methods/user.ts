@@ -5,6 +5,7 @@ import type {
   UserloginReq,
   UserloginResp,
   UserReq,
+  UserResp,
 } from "@/types/user";
 import type { HttpBaseResp } from "@/types/http";
 
@@ -30,5 +31,10 @@ export const userRequest = {
       url: `${baseURL}/list`,
       method: "post",
       data,
+    }),
+  getUserInfo: (): Promise<HttpBaseResp<UserResp>> =>
+    request({
+      url: `${baseURL}/get-user-info`,
+      method: "post",
     }),
 };

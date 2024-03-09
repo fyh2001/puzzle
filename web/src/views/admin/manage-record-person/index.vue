@@ -3,7 +3,7 @@ import { EditNoteRound, GridOnRound } from "@vicons/material";
 import { ref, onMounted } from "vue";
 import { useDialog, useMessage } from "naive-ui";
 import { useAdminStore } from "@/store/admin";
-import { defalutAvatar } from "@/config/index";
+import { defaultAvatar } from "@/config/index";
 import DefoGameMapMini from "@/components/defo-game-map-mini.vue";
 import type { Pagination } from "@/types/pagination";
 import type { RecordReq } from "@/types/record";
@@ -386,7 +386,7 @@ const handleDetailDialog = (row: any) => {
             </n-descriptions-item>
             <n-descriptions-item label="头像">
               <div class="flex items-center">
-                <n-avatar size="small" src={row.avatar || defalutAvatar} />
+                <n-avatar size="small" src={row.avatar || defaultAvatar} />
               </div>
             </n-descriptions-item>
             <n-descriptions-item label="手机号">

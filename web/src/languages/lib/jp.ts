@@ -190,6 +190,27 @@ export default {
     },
     login: "ログインする",
   },
+  editProfile: {
+    title: "プロフィールを編集",
+    content: {
+      avatar: "アバター",
+      username: "ユーザー名",
+      nickname: "ニックネーム",
+    },
+    dialog: {
+      avatar: {
+        label: "アバター",
+        submit: "確認",
+      },
+      uploadLabel: "ファイルを選択",
+    },
+    messgae: {
+      avatar: {
+        success: "アバターを変更しました",
+        error: "アバターの変更に失敗しました",
+      },
+    },
+  },
   login: {
     title: "ログイン",
     byUsername: {
@@ -265,7 +286,7 @@ export default {
           message: {
             required: "ニックネームを入力してください",
             pattern:
-              "@# ,.?，。？以外の文字は許可されず、長さは2-15文字でなければなりません",
+              "{'@'}# ,.?，。？以外の文字は許可されず、長さは2-15文字でなければなりません",
           },
         },
       },
