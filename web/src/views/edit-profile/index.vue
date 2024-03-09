@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import ProFileItem from "@/views/edit-profile/components/profile-item.vue";
+import ProfileItem from "@/views/edit-profile/components/profile-item.vue";
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { defaultAvatar } from "@/config";
@@ -118,7 +118,7 @@ const handleAvatarDialogVisible = async () => {
     <top-bar class="py-4" :title="t('editProfile.title')" />
     <div class="p-4 text-4.2">
       <div class="flex flex-col gap-6 px-6 py-4 bg-white rounded-xl">
-        <pro-file-item
+        <profile-item
           v-for="(data, index) in profileItemOptions"
           :key="index"
           :label="data.label"
