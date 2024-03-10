@@ -68,8 +68,8 @@ const commonUpdate = async (form: UserModel) => {
           :avatar="data.avatar"
           @update="commonUpdate"
         >
-          <template #dialog="dialogProps" v-if="data.dialog">
-            <component :is="data.dialog" v-bind="dialogProps" />
+          <template #dialog v-if="data.dialog">
+            <component :is="data.dialog" :update="commonUpdate" />
           </template>
         </profile-item>
       </div>

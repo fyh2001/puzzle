@@ -4,7 +4,6 @@ import { defaultAvatar } from "@/config";
 import { useDialog, useMessage } from "naive-ui";
 import router from "@/routers";
 import { useEventListener } from "@vueuse/core";
-import type { UserModel } from "@/types/user";
 
 const props = defineProps<{
   label: string;
@@ -12,19 +11,12 @@ const props = defineProps<{
   avatar?: string;
 }>();
 
-const emit = defineEmits<{
-  (e: "update", form: UserModel): void;
-}>();
-
 const slots = defineSlots<{
-  dialog(props: { update: (form: UserModel) => void }): any;
+  dialog(): any;
 }>();
 
 const dialog = useDialog();
 const message = useMessage();
-
-// 公共的更新函数
-const update = (form: Record<string, any>) => emit("update", form);
 
 const showDialog = () => {
   if (!slots.dialog) {
@@ -38,7 +30,7 @@ const showDialog = () => {
     style: { borderRadius: "0.75rem" },
     transformOrigin: "center",
     maskClosable: false,
-    content: () => slots.dialog({ update }),
+    content: slots.dialog,
     onClose: () => {
       window.history.back();
     },
