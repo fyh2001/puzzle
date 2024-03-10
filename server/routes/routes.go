@@ -27,6 +27,7 @@ func InitRouter() *gin.Engine {
 			user.POST("/list", controllers.ListUser)                         // 列表查询
 			user.POST("/get-user-info", jwt.JWT(), controllers.GetUserInfo)  // 获取用户信息
 			user.POST("/update-avatar", jwt.JWT(), controllers.UpdateAvatar) // 更新用户头像
+			user.POST("/update", jwt.JWT(), controllers.UpdateUser)          // 更新用户
 		}
 
 		// 记录

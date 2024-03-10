@@ -2,6 +2,9 @@
 import { ChevronRightRound } from "@vicons/material";
 import { defaultAvatar } from "@/config";
 import { useDialog, useMessage } from "naive-ui";
+import router from "@/routers";
+import { useEventListener } from "@vueuse/core";
+import type { UserModel } from "@/types/user";
 
 const props = defineProps<{
   label: string;
@@ -10,11 +13,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update", form: Record<string, any>): void;
+  (e: "update", form: UserModel): void;
 }>();
 
 const slots = defineSlots<{
-  dialog(props: { update: (form: Record<string, any>) => void }): any;
+  dialog(props: { update: (form: UserModel) => void }): any;
 }>();
 
 const dialog = useDialog();
@@ -25,14 +28,34 @@ const update = (form: Record<string, any>) => emit("update", form);
 
 const showDialog = () => {
   if (!slots.dialog) {
-    message.warning("暂未开放");
-    return;
+    return message.warning("暂未开放");
   }
+
+  handleBackEventLister();
 
   dialog.warning({
     title: props.label,
+    style: { borderRadius: "0.75rem" },
+    transformOrigin: "center",
+    maskClosable: false,
     content: () => slots.dialog({ update }),
+    onClose: () => {
+      window.history.back();
+    },
   });
+};
+
+// 监听返回事件
+const handleBackEventLister = () => {
+  // 防止刷新页面后，路由不变
+  window.history.pushState(null, "", `#${router.currentRoute.value.path}`);
+  useEventListener(
+    "popstate",
+    () => {
+      dialog.destroyAll();
+    },
+    { once: true }
+  );
 };
 </script>
 

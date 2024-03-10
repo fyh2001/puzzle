@@ -199,16 +199,35 @@ export default {
     },
     dialog: {
       avatar: {
-        label: "アバター",
-        submit: "確認",
+        label: "アバターを変更",
+        button: {
+          confirm: "確認",
+        },
+      },
+      username: {
+        label: "ユーザー名を変更",
+        input: {
+          placeholder: "ユーザー名を入力してください",
+        },
+        button: {
+          confirm: "確認",
+        },
+      },
+      nickname: {
+        label: "ニックネームを変更",
+        input: {
+          placeholder: "ニックネームを入力してください",
+        },
+        button: {
+          confirm: "確認",
+          cancel: "キャンセル",
+        },
       },
       uploadLabel: "ファイルを選択",
     },
     messgae: {
-      avatar: {
-        success: "アバターを変更しました",
-        error: "アバターの変更に失敗しました",
-      },
+      success: "編集成功",
+      error: "編集失敗",
     },
   },
   login: {
@@ -286,7 +305,7 @@ export default {
           message: {
             required: "ニックネームを入力してください",
             pattern:
-              "{'@'}# ,.?，。？以外の文字は許可されず、長さは2-15文字でなければなりません",
+              "{'@'}#,.?,. 以外のニックネームは使用できません。 ? 以外の文字で、長さは2～10桁（漢字の場合は6桁）",
           },
         },
       },

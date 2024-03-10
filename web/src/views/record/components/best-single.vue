@@ -194,26 +194,26 @@ onMounted(() => {
 </template>
 
 <style scoped>
-:deep .n-data-table-th__title {
+:deep(.n-data-table-th__title) {
   text-align: center;
 }
 
-:deep td.n-data-table-td.n-data-table-td {
+:deep(td.n-data-table-td.n-data-table-td) {
   text-align: center;
 }
 
-:deep .n-data-table .n-data-table-td.n-data-table-td--summary {
+:deep(.n-data-table .n-data-table-td.n-data-table-td--summary) {
   background-color: v-bind(summaryBackgroundColor);
   color: v-bind(summaryTextColor);
 }
 
-:deep n-data-table-tr n-data-table-tr--summary {
+:deep(n-data-table-tr n-data-table-tr--summary) {
   background-color: v-bind(summaryBackgroundColor);
   color: v-bind(summaryTextColor);
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 
-:deep .n-data-table .n-data-table-wrapper {
+:deep(.n-data-table .n-data-table-wrapper) {
   overflow: hidden;
   border-radius: 0.5rem;
 }

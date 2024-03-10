@@ -27,21 +27,18 @@ const routes: RouteRecordRaw[] = [
       {
         path: "/",
         name: "Home",
-        // component: () => import("@/views/home/index.vue"),
         component: Home,
         meta: { index: 0 },
       },
       {
         path: "/record",
         name: "Record",
-        // component: () => import("@/views/record/index.vue"),
         component: Record,
         meta: { index: 1 },
       },
       {
         path: "/user",
         name: "User",
-        // component: () => import("@/views/user/index.vue"),
         component: User,
         meta: { index: 2 },
       },
@@ -51,7 +48,6 @@ const routes: RouteRecordRaw[] = [
     path: "/record-detail",
     name: "RecordDetail",
     component: () => import("@/views/record-detail/index.vue"),
-    // props: true,
   },
   {
     path: "/register",

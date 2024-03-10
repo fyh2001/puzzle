@@ -2,5 +2,11 @@
   "github-enterprise.uri": "https://enterprise.mstp.online",
   "github.copilot.advanced": {
     "authProvider": "github-enterprise"
-  }
+  },
+  "i18n-ally.localesPaths": ["src/languages/lib"],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.namespace": true,
+  "i18n-ally.enabledParsers": ["js", "ts"],
+  "i18n-ally.sortKeys": true,
+  "i18n-ally.sourceLanguage": "cn"
 }

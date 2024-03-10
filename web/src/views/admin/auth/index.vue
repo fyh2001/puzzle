@@ -44,7 +44,7 @@ const onFinish = (code: string) => {
 </template>
 
 <style scoped>
-:deep body {
+:deep(body) {
   background-color: white;
 }
 </style>

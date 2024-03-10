@@ -200,15 +200,34 @@ export default {
     dialog: {
       avatar: {
         label: "Change Avatar",
-        submit: "Confirm",
+        button: {
+          confirm: "Confirm",
+        },
+      },
+      username: {
+        label: "Change Username",
+        input: {
+          placeholder: "Please enter username",
+        },
+        button: {
+          confirm: "Confirm",
+        },
+      },
+      nickname: {
+        label: "Change Nickname",
+        input: {
+          placeholder: "Please enter nickname",
+        },
+        button: {
+          confirm: "Confirm",
+          cancel: "Cancel",
+        },
       },
       uploadLabel: "Select File",
     },
     messgae: {
-      avatar: {
-        success: "Change Avatar Success",
-        error: "Change Avatar Failed",
-      },
+      success: "Edit Success",
+      error: "Edit Failed",
     },
   },
   login: {
@@ -288,7 +307,7 @@ export default {
           message: {
             required: "Please enter a nickname",
             pattern:
-              "Nickname cannot contain characters other than {'@'} # ,.?，。？ and must be 2-15 characters long",
+              "Nicknames are not allowed except {'@'}#,.?,. ? Characters other than , and the length is 2-10 digits (6 digits for Chinese characters)",
           },
         },
       },

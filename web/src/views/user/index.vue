@@ -10,7 +10,7 @@ import router from "@/routers/index";
 import { useDialog, useMessage } from "naive-ui";
 import { defaultAvatar } from "@/config/index";
 import { useI18n } from "vue-i18n";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 const { t } = useI18n();
 
@@ -83,6 +83,10 @@ const options = computed(() => [
     },
   },
 ]);
+
+onMounted(() => {
+  userStore.fetchUser();
+});
 </script>
 
 <template>

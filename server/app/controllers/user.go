@@ -4,6 +4,7 @@ import (
 	HttpResult "puzzle/app/common/result"
 	"puzzle/app/models"
 	userService "puzzle/app/services/user"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -93,6 +94,38 @@ func UpdateAvatar(c *gin.Context) {
 
 	// 更新头像
 	err = userService.UpdateAvatar(&user, avatar)
+	if err != nil {
+		c.JSON(200, HttpResult.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, HttpResult.Success("更新成功"))
+}
+
+func UpdateUser(c *gin.Context) {
+	var userReq models.UserReq
+
+	err := c.ShouldBind(&userReq)
+	if err != nil {
+		c.JSON(200, HttpResult.Fail("参数错误"))
+		return
+	}
+
+	id, _ := strconv.ParseInt(userReq.IdStr, 10, 64)
+
+	user := models.User{
+		Id:         id,
+		Username:   userReq.Username,
+		Nickname:   userReq.Nickname,
+		AccoladeId: userReq.AccoladeId,
+		Email:      userReq.Email,
+		Phone:      userReq.Phone,
+		Password:   userReq.Password,
+		Status:     userReq.Status,
+	}
+
+	// 更新用户
+	err = userService.Update(&user)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return

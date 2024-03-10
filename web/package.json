@@ -12,6 +12,7 @@
     "@types/node": "^20.11.15",
     "@unocss/reset": "^0.58.4",
     "@unocss/transformer-directives": "^0.58.4",
+    "@vueuse/core": "^10.9.0",
     "axios": "^1.6.7",
     "crypto-js": "^4.2.0",
     "js-md5": "^0.8.3",

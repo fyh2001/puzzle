@@ -200,15 +200,35 @@ export default {
     dialog: {
       avatar: {
         label: "修改头像",
-        submit: "确认修改",
+        button: {
+          confirm: "确认修改",
+        },
+      },
+      username: {
+        label: "修改用户名",
+        input: {
+          placeholder: "请输入用户名",
+        },
+        button: {
+          confirm: "确认",
+        },
+      },
+      nickname: {
+        label: "修改昵称",
+        input: {
+          placeholder: "请输入昵称",
+        },
+        button: {
+          confirm: "确认",
+          cancel: "取消",
+        },
       },
       uploadLabel: "选择文件",
     },
+
     messgae: {
-      avatar: {
-        success: "修改头像成功",
-        error: "修改头像失败",
-      },
+      success: "修改成功",
+      error: "修改失败",
     },
   },
   login: {
@@ -286,7 +306,7 @@ export default {
           message: {
             required: "请输入昵称",
             pattern:
-              "昵称不允许出现除了{'@'}# ,.?，。？以外的字符，且长度为2-15位",
+              "昵称不允许出现除了{'@'}# ,.?，。？以外的字符，且长度为2-10位(中文6位)",
           },
         },
       },

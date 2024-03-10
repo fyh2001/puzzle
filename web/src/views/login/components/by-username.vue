@@ -52,24 +52,24 @@ const rules = {
     {
       required: true,
       message: t("login.byUsername.rules.username.message.required"),
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
     {
       pattern: regulation.username.expression,
       message: regulation.username.message,
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
   ],
   password: [
     {
       required: true,
       message: t("login.byUsername.rules.password.message.required"),
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
     {
       pattern: regulation.password.expression,
       message: regulation.password.message,
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
   ],
 };

@@ -37,4 +37,10 @@ export const userRequest = {
       url: `${baseURL}/get-user-info`,
       method: "post",
     }),
+  update: (data: UserModel): Promise<HttpBaseResp<string>> =>
+    request({
+      url: `${baseURL}/update`,
+      method: "post",
+      data,
+    }),
 };

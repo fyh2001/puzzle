@@ -202,7 +202,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-:deep .n-descriptions.n-descriptions--bordered .n-descriptions-table-wrapper {
+:deep(.n-descriptions.n-descriptions--bordered .n-descriptions-table-wrapper) {
   border-radius: 0.5rem;
 }
 </style>

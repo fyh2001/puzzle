@@ -36,7 +36,8 @@ const regulation = {
   },
   nickname: {
     label: t("register.byUsername.rules.nickname.label"),
-    expression: /^[^@# ,.?，。？]{2,15}$/,
+    expression:
+      /^(?!.*[@# ,.?，。？])([\u4e00-\u9fa5]{2,6}|[a-zA-Z]{2,10}|\d{11}|(?=.*[a-zA-Z0-9].*)([\u4e00-\u9fa5a-zA-Z0-9]{2,8}))$/,
     message: t("register.byUsername.rules.nickname.message.pattern"),
   },
 };
@@ -56,36 +57,36 @@ const rules = {
     {
       required: true,
       message: t("register.byUsername.rules.username.message.required"),
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
     {
       pattern: regulation.username.expression,
       message: regulation.username.message,
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
   ],
   nickname: [
     {
       required: true,
       message: t("register.byUsername.rules.nickname.message.required"),
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
     {
       pattern: regulation.nickname.expression,
       message: regulation.nickname.message,
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
   ],
   password: [
     {
       required: true,
       message: t("register.byUsername.rules.password.message.required"),
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
     {
       pattern: regulation.password.expression,
       message: regulation.password.message,
-      trigger: "blur",
+      trigger: ["blur", "input", "focus"],
     },
   ],
 };
