@@ -2,11 +2,14 @@ package main
 
 import (
 	"puzzle/app/middlewares/rabbitmq"
+	"puzzle/config"
 	"puzzle/database"
 	"puzzle/routes"
 )
 
 func main() {
+	config.InitConfig() // 初始化配置文件
+
 	database.InitMySQL() // 初始化MySQL数据库连接
 	database.InitRedis() // 初始化Redis数据库连接
 

@@ -1,11 +1,12 @@
 <script setup lang="tsx">
 import ProfileItem from "@/views/edit-profile/components/profile-item.vue";
+import AvatarDialog from "@/views/edit-profile/dialog/avatar.vue";
+import UsernameDialog from "@/views/edit-profile/dialog/username.vue";
+import NicknameDialog from "@/views/edit-profile/dialog/nickname.vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { defaultAvatar } from "@/config";
 import { useUserStore } from "@/store/user";
-import AvatarDialog from "@/views/edit-profile/dialog/avatar.vue";
-import NicknameDialog from "@/views/edit-profile/dialog/nickname.vue";
 import { userRequest } from "@/api/methods/user";
 import { useMessage, useDialog } from "naive-ui";
 import type { UserModel } from "@/types/user";
@@ -24,6 +25,7 @@ const profileItemOptions = computed(() => [
   {
     label: t("editProfile.content.username"),
     content: userStore.getUser.username,
+    dialog: UsernameDialog,
   },
   {
     label: t("editProfile.content.nickname"),
@@ -34,8 +36,6 @@ const profileItemOptions = computed(() => [
 
 // 公共的更新函数
 const commonUpdate = async (form: UserModel) => {
-  console.log("common update: ", form);
-
   form.id = userStore.getUser.id;
 
   const {
@@ -48,6 +48,7 @@ const commonUpdate = async (form: UserModel) => {
   } else {
     Message.error(msg);
   }
+
   window.history.back();
   Dialog.destroyAll();
 };

@@ -1,15 +1,20 @@
 package database
 
-import "github.com/redis/go-redis/v9"
+import (
+	"puzzle/config"
+
+	"github.com/redis/go-redis/v9"
+)
 
 var redisClient *redis.Client
 
 func InitRedis() {
 	redisClient = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     config.Settings.Redis.Host + ":" + config.Settings.Redis.Port,
+		Password: config.Settings.Redis.Password, // no password set
+		DB:       config.Settings.Redis.Db,       // use default DB
 	})
+
 }
 
 func GetRedis() *redis.Client {

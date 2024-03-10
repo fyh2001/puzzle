@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"puzzle/app/services"
+	"puzzle/config"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -36,7 +37,11 @@ func NewRabbitMQ(queueName, exchangeName, routeKey string) *RabbitMQ {
 		QueueName:    queueName,
 		ExchangeName: exchangeName,
 		RouteKey:     routeKey,
-		Mqurl:        "amqp://guest:guest@localhost:5672/",
+		Mqurl: fmt.Sprintf("amqp://%s:%s@%s:%s/",
+			config.Settings.RabbitMQ.Username,
+			config.Settings.RabbitMQ.Password,
+			config.Settings.RabbitMQ.Host,
+			config.Settings.RabbitMQ.Port),
 	}
 	var err error
 	rabbitmq.conn, err = amqp.Dial(rabbitmq.Mqurl)

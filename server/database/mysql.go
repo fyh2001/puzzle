@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"puzzle/config"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -18,7 +19,14 @@ var db *gorm.DB
 func InitMySQL() {
 	var err error
 
-	dsn := "root:fang1215@tcp(127.0.0.1:3306)/puzzle?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "root:fang1215@tcp(127.0.0.1:3306)/puzzle?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		config.Settings.Mysql.Username,
+		config.Settings.Mysql.Password,
+		config.Settings.Mysql.Host,
+		config.Settings.Mysql.Port,
+		config.Settings.Mysql.Database,
+	)
 
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer

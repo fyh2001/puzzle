@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"puzzle/config"
 
 	"github.com/tencentyun/cos-go-sdk-v5"
 )
@@ -13,15 +14,15 @@ type CosClient struct {
 	*cos.Client
 }
 
-var BaseURL = "https://defo1215-1307771416.cos.ap-guangzhou.myqcloud.com"
+var BaseURL = config.Settings.Cos.Url
 
 func NewCosClient() *cos.Client {
 	u, _ := url.Parse(BaseURL)
 	b := &cos.BaseURL{BucketURL: u}
 	client := cos.NewClient(b, &http.Client{
 		Transport: &cos.AuthorizationTransport{
-			SecretID:  "AKIDCE8nEQN6bwQhkZ9VcU9amjRIvb6QZWGn",
-			SecretKey: "PcfVBe1B8uVu66vYyCE6lFXeYFk294nJ",
+			SecretID:  config.Settings.Cos.SecretID,
+			SecretKey: config.Settings.Cos.SecretKey,
 		},
 	})
 
