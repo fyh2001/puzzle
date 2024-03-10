@@ -48,6 +48,7 @@ const commonUpdate = async (form: UserModel) => {
   } else {
     Message.error(msg);
   }
+  window.history.back();
   Dialog.destroyAll();
 };
 </script>
