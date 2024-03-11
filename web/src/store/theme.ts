@@ -43,7 +43,7 @@ export const useThemeStore = defineStore("theme", {
     // 同步已加载的主题
     async fetchLoadedThemes() {
       // 动态加载 theme 文件夹下的全部主题，并转换为映射
-      const themeModules = import.meta.glob("@/theme/*.ts");
+      const themeModules = import.meta.glob("@/theme/lib/*.ts");
       Promise.all(Object.values(themeModules).map((val) => val())).then(
         (themes) => {
           this.loadedThemes = themes.map((item: any) => item.default);

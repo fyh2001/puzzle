@@ -14,6 +14,8 @@ import {
 } from "@vicons/material";
 import { markRaw } from "vue";
 import { useAdminStore } from "@/store/admin";
+import { useUserStore } from "@/store/user";
+import { useNotificationStore } from "@/store/notification";
 import Home from "@/views/home/index.vue";
 import Record from "@/views/record/index.vue";
 import User from "@/views/user/index.vue";
@@ -23,6 +25,7 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     name: "Index",
     component: () => import("@/views/index/index.vue"),
+    meta: { notification: true },
     children: [
       {
         path: "/",
@@ -45,20 +48,28 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/edit-profile",
+    name: "EditProfile",
+    component: () => import("@/views/edit-profile/index.vue"),
+  },
+  {
+    path: "/notification",
+    name: "Notification",
+    component: () => import("@/views/notification/index.vue"),
+    meta: { notification: true },
+  },
+  {
     path: "/record-detail",
     name: "RecordDetail",
     component: () => import("@/views/record-detail/index.vue"),
   },
+
   {
     path: "/register",
     name: "Register",
     component: () => import("@/views/register/index.vue"),
   },
-  {
-    path: "/edit-profile",
-    name: "EditProfile",
-    component: () => import("@/views/edit-profile/index.vue"),
-  },
+
   {
     path: "/login",
     name: "Login",
@@ -172,6 +183,7 @@ const router = createRouter(<RouterOptions>{
 });
 
 router.afterEach((to, from) => {
+  // 设置页面切换动画
   if (to.meta.index !== undefined || from.meta.index !== undefined) {
     const toIndex: number = to.meta?.index as number;
     const fromIndex: number = from.meta?.index as number;
@@ -179,11 +191,25 @@ router.afterEach((to, from) => {
     to.meta.transition = toIndex > fromIndex ? "slide-left" : "slide-right";
   }
 
+  // 判断是否需要管理员权限
   if (to.meta.needAdminToken) {
     const adminStore = useAdminStore();
 
     if (adminStore.getToken === "") {
       router.push({ name: "AdminAuth" });
+    }
+  }
+
+  // 判断是否请求通知
+  if (to.meta.notification) {
+    const userStore = useUserStore();
+    const notificationStore = useNotificationStore();
+    // 判断是否登录
+    if (userStore.getToken) {
+      notificationStore.fetchNotificationList({
+        userId: userStore.getUser.id,
+        pagination: { page: 1, pageSize: 10 },
+      });
     }
   }
 });

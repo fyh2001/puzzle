@@ -12,6 +12,7 @@ declare module 'vue' {
     Dropdown: typeof import('./src/components/dropdown.vue')['default']
     GlobalProvider: typeof import('./src/components/global-provider.vue')['default']
     NAvatar: typeof import('naive-ui')['NAvatar']
+    NBadge: typeof import('naive-ui')['NBadge']
     NBreadcrumb: typeof import('naive-ui')['NBreadcrumb']
     NBreadcrumbItem: typeof import('naive-ui')['NBreadcrumbItem']
     NButton: typeof import('naive-ui')['NButton']

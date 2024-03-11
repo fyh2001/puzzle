@@ -12,6 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var tableName = "notification"
+
 func check(notification *models.Notification) error {
 	return nil
 }
@@ -84,38 +86,42 @@ func List(notificationReq *models.NotificationReq) (models.NotificationListResp,
 		notificationReq.OrderBy = "updated_at"
 	}
 
-	db := database.GetMySQL().Table("notification").Order(notificationReq.OrderBy + " " + notificationReq.Sorted)
+	db := database.GetMySQL().Table("notification")
+
+	if notificationReq.Sorted != "" {
+		db.Order(notificationReq.OrderBy + " " + notificationReq.Sorted)
+	}
 
 	if notificationReq.Id != 0 {
-		db.Where("id = ?", notificationReq.Id)
+		db.Where(tableName+"."+"id = ?", notificationReq.Id)
 	}
 
 	if len(notificationReq.Ids) > 0 {
-		db.Where("id in ?", notificationReq.Ids)
+		db.Where(tableName+"."+"id in ?", notificationReq.Ids)
 	}
 
 	if notificationReq.UserId != 0 {
-		db.Where("user_id = 0 OR user_id = ?", notificationReq.UserId)
+		db.Where(tableName+"."+"user_id = 0").Or(tableName+"."+"user_id = ?", notificationReq.UserId)
 	}
 
-	if notificationReq.TypeId == 0 {
-		db.Where("type_id = ?", notificationReq.TypeId)
+	if notificationReq.TypeId != 0 {
+		db.Where(tableName+"."+"type_id = ?", notificationReq.TypeId)
 	}
 
 	if notificationReq.Content != "" {
-		db.Where("content Like ?", "%"+notificationReq.Content+"%")
+		db.Where(tableName+"."+"content Like ?", "%"+notificationReq.Content+"%")
 	}
 
 	if notificationReq.Status != 0 {
-		db.Where("status = ?", notificationReq.Status)
+		db.Where(tableName+"."+"status = ?", notificationReq.Status)
 	}
 
 	if len(notificationReq.DateRange) == 2 {
 		if notificationReq.DateRange[0] != (time.Time{}) {
-			db.Where("created_at >= ?", notificationReq.DateRange[0])
+			db.Where(tableName+"."+"created_at >= ?", notificationReq.DateRange[0])
 		}
 		if notificationReq.DateRange[1] != (time.Time{}) {
-			db.Where("created_at <= ?", notificationReq.DateRange[1])
+			db.Where(tableName+"."+"created_at <= ?", notificationReq.DateRange[1])
 		}
 	}
 
@@ -125,7 +131,10 @@ func List(notificationReq *models.NotificationReq) (models.NotificationListResp,
 		return notificationListResp, errors.New("查询通知总数失败")
 	}
 
-	db.Preload("NotificationUserStatusInfo", "user_id = ?", notificationReq.UserId)
+	db.Preload("NotificationTypeInfo")
+	db.Preload("NotificationUserStatusInfo", "notification_user_status.user_id = ?", notificationReq.UserId)
+
+	db.Joins("LEFT JOIN notification_user_status ON notification.id = notification_user_status.notification_id AND notification_user_status.user_id = ?", notificationReq.UserId).Order("notification_user_status.status").Order("notification.updated_at")
 
 	// 分页
 	if notificationReq.Pagination.Page > 0 && notificationReq.Pagination.PageSize > 0 {

@@ -5,6 +5,9 @@ export default {
     user: "我的",
   },
   dropdown: {
+    notification: {
+      label: "通知",
+    },
     darkMode: {
       label: "深色模式",
       on: "开启",

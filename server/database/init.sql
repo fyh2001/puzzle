@@ -205,5 +205,21 @@ ALTER TABLE `notification_user_status` ADD INDEX `idx_notification_user_status_u
 ALTER TABLE `notification_user_status` ADD INDEX `idx_notification_user_status_status` (`status`);
 
 
+DROP TABLE IF EXISTS `notification_type`;
+CREATE TABLE IF NOT EXISTS `notification_type` (
+  `id` INT(0) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` VARCHAR(20) NOT NULL COMMENT '类型名称',
+  `icon` VARCHAR(255) COMMENT '类型图标',
+  `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态 1:启用 2:冻结 3:删除',
+  `created_at` DATETIME NOT NULL COMMENT '创建时间',
+  `updated_at` DATETIME NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '通知类型表';
 
+-- 为`notification_type`表添加唯一索引，以提高类型名称的唯一性查询效率
+ALTER TABLE `notification_type` ADD UNIQUE INDEX `idx_notification_type_name` (`name`);
+ALTER TABLE `notification_type` ADD INDEX `idx_notification_type_status` (`status`);
 
+BEGIN;
+INSERT INTO `notification_type` (`id`, `name`, `icon`, `status`, `created_at`, `updated_at`) VALUES (1, '系统通知', '', 1, '2024-02-04 23:11:32', '2024-02-04 23:11:32');
+COMMIT;

@@ -5,6 +5,9 @@ export default {
     user: "私の",
   },
   dropdown: {
+    notification: {
+      label: "通知",
+    },
     darkMode: {
       label: "ダークモード",
       on: "オン",

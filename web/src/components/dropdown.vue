@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import {
+  NotificationsActiveRound,
   WbSunnyRound,
   SettingsRound,
   EventNoteRound,
@@ -12,6 +13,7 @@ import {
 import router from "@/routers/index";
 import { useThemeStore } from "@/store/theme";
 import { useCommonStore } from "@/store/common";
+import { useNotificationStore } from "@/store/notification";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -19,6 +21,7 @@ const { t, locale } = useI18n();
 
 const themeStore = useThemeStore();
 const commonStore = useCommonStore();
+const notificationStore = useNotificationStore();
 
 const emit = defineEmits(["select"]);
 
@@ -34,6 +37,25 @@ const options = computed(() => [
     key: "divider",
     show: props.options.length > 0 && props.showDivider,
     type: "divider",
+  },
+  {
+    label: t("dropdown.notification.label"),
+    key: "notification",
+    disabled: false,
+    icon: () => {
+      return (
+        <n-badge
+          dot
+          processing
+          value={notificationStore.getNotificationUnreadTotal}
+          max={10}
+        >
+          <n-el class="flex items center" style="color: var(--primary-color)">
+            <n-icon size="18" component={NotificationsActiveRound} />
+          </n-el>
+        </n-badge>
+      );
+    },
   },
   {
     label: t("dropdown.darkMode.label"),
@@ -148,7 +170,7 @@ const options = computed(() => [
   {
     label: t("dropdown.updateLog.label"),
     key: "updateLog",
-    disabled: false,
+    disabled: true,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -173,6 +195,7 @@ const options = computed(() => [
 
 const handleSelect = (key: string) => {
   const func = {
+    notification: () => router.push("/notification"),
     darkOn: () => themeStore.openDarkMode(),
     darkOff: () => themeStore.closeDarkMode(),
     cn: () => {
@@ -201,16 +224,22 @@ const handleSelect = (key: string) => {
 
 <template>
   <div>
-    <n-dropdown
-      placement="bottom-end"
-      trigger="click"
-      size="large"
-      :options="options"
-      @select="handleSelect"
+    <n-badge
+      processing
+      :value="notificationStore.getNotificationUnreadTotal"
+      :max="10"
     >
-      <n-button strong secondary type="primary">
-        {{ content }}
-      </n-button>
-    </n-dropdown>
+      <n-dropdown
+        placement="bottom-end"
+        trigger="click"
+        size="large"
+        :options="options"
+        @select="handleSelect"
+      >
+        <n-button strong secondary type="primary">
+          {{ content }}
+        </n-button>
+      </n-dropdown>
+    </n-badge>
   </div>
 </template>

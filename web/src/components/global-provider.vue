@@ -2,7 +2,7 @@
   <div>
     <n-config-provider :theme="theme" :theme-overrides="themeColor">
       <n-global-style />
-      <n-message-provider :max="2">
+      <n-message-provider container-class="message" :max="2">
         <n-dialog-provider>
           <slot />
         </n-dialog-provider>
@@ -15,7 +15,7 @@
 import { computed } from "vue";
 import { darkTheme, lightTheme } from "naive-ui";
 import { useThemeStore } from "@/store/theme";
-
+import { themeProvider } from "@/theme";
 const themeStore = useThemeStore();
 
 themeStore.fetchLoadedThemes();
@@ -29,6 +29,8 @@ const themeColor = computed(() => {
   };
   const resultTheme =
     themeStore.loadedThemesMap.get(themeStore.themeColor) || defaultTheme;
-  return resultTheme[themeStore.darkMode ? "dark" : "light"];
+  return themeProvider(resultTheme[themeStore.darkMode ? "dark" : "light"]);
 });
 </script>
+
+<style></style>

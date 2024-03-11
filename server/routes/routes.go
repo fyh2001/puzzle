@@ -50,8 +50,13 @@ func InitRouter() *gin.Engine {
 
 		notification := root.Group("/notification")
 		{
-			notification.POST("/insert", controllers.InsertNotification) // 发布通知
-			notification.POST("/list", controllers.ListNotification)     // 通知列表
+			notification.POST("/insert", controllers.InsertNotification)        // 发布通知
+			notification.POST("/list", jwt.JWT(), controllers.ListNotification) // 通知列表
+		}
+
+		notificationUserStatus := root.Group("/notification-user-status").Use(jwt.JWT())
+		{
+			notificationUserStatus.POST("/insert", controllers.InsertNotificationUserStatus) // 插入通知用户状态
 		}
 
 		// 管理员

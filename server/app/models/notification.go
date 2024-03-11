@@ -41,6 +41,7 @@ type NotificationResp struct {
 	Status                     int                        `json:"status"`                                                                    // 状态 1:已读 2:未读
 	CreatedAt                  time.Time                  `json:"createdAt"`                                                                 // 创建时间
 	UpdatedAt                  time.Time                  `json:"updatedAt"`                                                                 // 更新时间
+	NotificationTypeInfo       NotificationTypeResp       `json:"notificationTypeInfo" gorm:"foreignKey:Id;references:TypeId"`               // 通知类型信息
 	NotificationUserStatusInfo NotificationUserStatusResp `json:"notificationUserStatusInfo" gorm:"foreignKey:NotificationId;references:Id"` // 通知用户状态信息
 }
 

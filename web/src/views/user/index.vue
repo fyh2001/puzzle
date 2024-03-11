@@ -68,6 +68,7 @@ const options = computed(() => [
         Dialog.warning({
           title: t("mine.dropdown.content.logout.title"),
           content: t("mine.dropdown.content.logout.content"),
+          transformOrigin: "center",
           positiveText: t("mine.dropdown.content.logout.confirm"),
           negativeText: t("mine.dropdown.content.logout.cancel"),
           onPositiveClick: () => {

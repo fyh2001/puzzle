@@ -5,6 +5,9 @@ export default {
     user: "Mine",
   },
   dropdown: {
+    notification: {
+      label: "Notification",
+    },
     darkMode: {
       label: "Dark Mode",
       on: "On",

@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import GlobalProvider from "@/components/global-provider.vue";
-import { useThemeStore } from "@/store/theme";
-
 import { onMounted } from "vue";
+import { useThemeStore } from "@/store/theme";
 
 const themeStore = useThemeStore();
 
