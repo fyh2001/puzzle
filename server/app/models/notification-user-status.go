@@ -44,3 +44,7 @@ type NotificationUserStatusListResp struct {
 	Total   int64                    `json:"total"`   // 总数
 	Records []NotificationUserStatus `json:"records"` // 用户通知状态列表
 }
+
+func (n NotificationUserStatusResp) TableName() string {
+	return "notification_user_status"
+}

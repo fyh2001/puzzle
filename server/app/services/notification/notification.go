@@ -16,15 +16,29 @@ func check(notification *models.Notification) error {
 	return nil
 }
 
-func Insert(notification *models.Notification) error {
+func Insert(notificationReq *models.NotificationReq) error {
+
+	if notificationReq.UserIdStr != "" {
+		notificationReq.UserId, _ = strconv.ParseInt(notificationReq.UserIdStr, 10, 64)
+	}
+
+	snowflake := utils.Snowflake{}
+
+	notification := &models.Notification{
+		Id:        snowflake.NextVal(),
+		UserId:    notificationReq.UserId,
+		TypeId:    notificationReq.TypeId,
+		Content:   notificationReq.Content,
+		Status:    1,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
 
 	err := check(notification)
 	if err != nil {
 		return err
 	}
 
-	snowflake := utils.Snowflake{}
-	notification.Id = snowflake.NextVal()
 	notification.Status = 1
 
 	err = database.GetMySQL().Create(notification).Error
@@ -111,7 +125,7 @@ func List(notificationReq *models.NotificationReq) (models.NotificationListResp,
 		return notificationListResp, errors.New("查询通知总数失败")
 	}
 
-	// db.Left
+	db.Preload("NotificationUserStatusInfo", "user_id = ?", notificationReq.UserId)
 
 	// 分页
 	if notificationReq.Pagination.Page > 0 && notificationReq.Pagination.PageSize > 0 {

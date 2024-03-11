@@ -48,6 +48,12 @@ func InitRouter() *gin.Engine {
 			scramble.POST("/get-user-scramble", controllers.GetUserScramble) // 获取用户打乱
 		}
 
+		notification := root.Group("/notification")
+		{
+			notification.POST("/insert", controllers.InsertNotification) // 发布通知
+			notification.POST("/list", controllers.ListNotification)     // 通知列表
+		}
+
 		// 管理员
 		admin := root.Group("/admin")
 		{
