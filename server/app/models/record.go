@@ -52,19 +52,19 @@ type RecordReq struct {
 
 // RecordResp 记录响应模型
 type RecordResp struct {
-	Id        string    `json:"id"`                // 主键ID
-	UserId    string    `json:"userId"`            // 用户ID
-	UserInfo  UserResp  `json:"userInfo" gorm:"-"` // 用户信息
-	Dimension int       `json:"dimension"`         // 阶数 3 | 4 | 5 | 6 | 7 | 8
-	Type      int       `json:"type"`              // 类型 1:练习 2:排行榜 3:对战
-	Duration  int       `json:"duration"`          // 耗时
-	Step      int       `json:"step"`              // 步数
-	Status    int       `json:"status"`            // 状态 1:启用 2:冻结 3:删除
-	Scramble  string    `json:"scramble"`          // 打乱公式
-	Solution  string    `json:"solution"`          // 解法
-	Idx       string    `json:"idx"`               // 打乱随机数
-	CreatedAt time.Time `json:"createdAt"`         // 创建时间
-	UpdatedAt time.Time `json:"updatedAt"`         // 更新时间
+	Id        string    `json:"id"`                                              // 主键ID
+	UserId    string    `json:"userId"`                                          // 用户ID
+	UserInfo  UserResp  `json:"userInfo" gorm:"foreignKey:UserId;references:Id"` // 用户信息
+	Dimension int       `json:"dimension"`                                       // 阶数 3 | 4 | 5 | 6 | 7 | 8
+	Type      int       `json:"type"`                                            // 类型 1:练习 2:排行榜 3:对战
+	Duration  int       `json:"duration"`                                        // 耗时
+	Step      int       `json:"step"`                                            // 步数
+	Status    int       `json:"status"`                                          // 状态 1:启用 2:冻结 3:删除
+	Scramble  string    `json:"scramble"`                                        // 打乱公式
+	Solution  string    `json:"solution"`                                        // 解法
+	Idx       string    `json:"idx"`                                             // 打乱随机数
+	CreatedAt time.Time `json:"createdAt"`                                       // 创建时间
+	UpdatedAt time.Time `json:"updatedAt"`                                       // 更新时间
 }
 
 // RecordListResp 记录列表响应模型

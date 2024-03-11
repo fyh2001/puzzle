@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func check(scramble models.Scramble) error {
+func check(scramble *models.Scramble) error {
 	if scramble.Dimension == 0 {
 		return errors.New("阶数不能为空")
 	}
@@ -28,7 +28,7 @@ func check(scramble models.Scramble) error {
 	return nil
 }
 
-func Insert(scramble models.Scramble) error {
+func Insert(scramble *models.Scramble) error {
 	if err := check(scramble); err != nil {
 		return err
 	}
@@ -37,10 +37,10 @@ func Insert(scramble models.Scramble) error {
 	scramble.Id = snowflake.NextVal()
 	scramble.Status = 1
 
-	return database.GetMySQL().Create(&scramble).Error
+	return database.GetMySQL().Create(scramble).Error
 }
 
-func List(scrambleReq models.ScrambleReq) (models.ScrambleListResp, error) {
+func List(scrambleReq *models.ScrambleReq) (models.ScrambleListResp, error) {
 	var scrambleListResp models.ScrambleListResp
 	db := database.GetMySQL().Table("scramble")
 
@@ -93,7 +93,7 @@ func List(scrambleReq models.ScrambleReq) (models.ScrambleListResp, error) {
 }
 
 // GetNewScamble 获取新的打乱公式
-func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleResp, error) {
+func GetNewScamble(getNewScrambleReq *models.GetNewScambleReq) (models.ScrambleResp, error) {
 	var scrambleResp models.ScrambleResp
 
 	// 获取用户当前的完成状态
@@ -106,7 +106,7 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 		},
 	}
 
-	scrambledUserStatusResp, err := scrambledUserStatusService.List(scrambledUserStatusReq)
+	scrambledUserStatusResp, err := scrambledUserStatusService.List(&scrambledUserStatusReq)
 	if err != nil {
 		return models.ScrambleResp{}, errors.New("查询用户打乱公式状态失败")
 	}
@@ -119,7 +119,7 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 
 		snowflake := utils.Snowflake{}
 
-		scrambleModel := models.Scramble{
+		scrambleModel := &models.Scramble{
 			Id:        snowflake.NextVal(),
 			Dimension: getNewScrambleReq.Dimension,
 			Idx:       idx,
@@ -135,7 +135,7 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 		// 查询用户的打乱公式状态
 		if scrambledUserStatusResp.Total == 0 {
 			// 新增用户的打乱公式状态
-			scrambledUserStatus := models.ScrambledUserStatus{
+			scrambledUserStatus := &models.ScrambledUserStatus{
 				UserId:     getNewScrambleReq.UserId,
 				Dimension:  getNewScrambleReq.Dimension,
 				ScrambleId: scrambleModel.Id,
@@ -150,7 +150,7 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 			// 更新用户的打乱公式状态
 			id, _ := strconv.ParseInt(scrambledUserStatusResp.Records[0].Id, 10, 64)
 
-			scrambledUserStatus := models.ScrambledUserStatus{
+			scrambledUserStatus := &models.ScrambledUserStatus{
 				Id:         id,
 				ScrambleId: scrambleModel.Id,
 				Status:     1,
@@ -178,11 +178,11 @@ func GetNewScamble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleRe
 	return models.ScrambleResp{}, errors.New("当前的打乱公式未完成")
 }
 
-func GetUserScramble(getNewScrambleReq models.GetNewScambleReq) (models.ScrambleResp, error) {
+func GetUserScramble(getNewScrambleReq *models.GetNewScambleReq) (models.ScrambleResp, error) {
 	var scrambleResp models.ScrambleResp
 
 	// 获取用户当前的打乱信息
-	scrambledUserStatusReq := models.ScrambledUserStatusReq{
+	scrambledUserStatusReq := &models.ScrambledUserStatusReq{
 		UserId:    getNewScrambleReq.UserId,
 		Dimension: getNewScrambleReq.Dimension,
 		Pagination: utils.Pagination{
@@ -202,7 +202,7 @@ func GetUserScramble(getNewScrambleReq models.GetNewScambleReq) (models.Scramble
 	}
 
 	// 查询打乱信息
-	scrambleReq := models.ScrambleReq{
+	scrambleReq := &models.ScrambleReq{
 		Id: scrambledUserStatusResp.Records[0].ScrambleId,
 	}
 

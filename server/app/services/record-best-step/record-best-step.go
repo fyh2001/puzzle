@@ -33,7 +33,7 @@ func publishMessage(rankUpdate commonService.RankUpdate) {
 }
 
 // check 检查参数
-func check(record models.RecordBestStep) error {
+func check(record *models.RecordBestStep) error {
 	if record.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -54,13 +54,13 @@ func check(record models.RecordBestStep) error {
 }
 
 // Insert 添加记录
-func Insert(record models.RecordBestStep) error {
+func Insert(record *models.RecordBestStep) error {
 	err := check(record)
 	if err != nil {
 		return err
 	}
 
-	err = database.GetMySQL().Create(&record).Error
+	err = database.GetMySQL().Create(record).Error
 	if err != nil {
 		return errors.New("添加失败")
 	}
@@ -74,7 +74,7 @@ func Insert(record models.RecordBestStep) error {
 }
 
 // List 查询记录
-func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
+func List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
 	var recordBestStepListResp models.RecordBestStepListResp
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
@@ -219,7 +219,7 @@ func List(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, er
 }
 
 // ListWithUserInfo 查询记录并携带用户信息
-func ListWithUserInfo(recordReq models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
+func ListWithUserInfo(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
 	var recordBestStepListResp models.RecordBestStepListResp
 	db := database.GetMySQL().Table("record_best_step").Order("record_step " + recordReq.Sorted)
 
@@ -289,10 +289,10 @@ func ListWithUserInfo(recordReq models.RecordBestStepReq) (models.RecordBestStep
 }
 
 // Update 更新记录
-func Update(record models.RecordBestStep) error {
+func Update(record *models.RecordBestStep) error {
 	db := database.GetMySQL().Table("record_best_step").Where("user_id = ? AND dimension = ?", record.UserId, record.Dimension)
 
-	err := db.Updates(&record).Error
+	err := db.Updates(record).Error
 
 	if err != nil {
 		return errors.New("更新失败")

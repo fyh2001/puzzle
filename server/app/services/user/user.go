@@ -186,7 +186,7 @@ func Update(u *models.User) error {
 		u.Nickname = user.Nickname + "_del"
 	}
 
-	err := database.GetMySQL().Table("user").Updates(&u).Error
+	err := database.GetMySQL().Table("user").Updates(u).Error
 	if err != nil {
 		return errors.New("更新失败")
 	}

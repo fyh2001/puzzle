@@ -37,7 +37,7 @@ func InsertRecord(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	record.UserId = userId.(int64)
 
-	err = recordService.Insert(record)
+	err = recordService.Insert(&record)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -54,7 +54,7 @@ func ListRecord(c *gin.Context) {
 		return
 	}
 
-	recordList, err := recordService.List(recordReq)
+	recordList, err := recordService.List(&recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -71,7 +71,7 @@ func UpdateRecord(c *gin.Context) {
 		return
 	}
 
-	err = recordService.Update(record)
+	err = recordService.Update(&record)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -88,7 +88,7 @@ func ListRecordBestSingle(c *gin.Context) {
 		return
 	}
 
-	recordList, err := recordBestSingleService.List(recordReq)
+	recordList, err := recordBestSingleService.List(&recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -105,7 +105,7 @@ func ListRecordBestAverage(c *gin.Context) {
 		return
 	}
 
-	recordList, err := recordBestAverageService.List(recordReq)
+	recordList, err := recordBestAverageService.List(&recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -122,7 +122,7 @@ func ListRecordBestStep(c *gin.Context) {
 		return
 	}
 
-	recordList, err := recordBestStepSerivce.List(recordReq)
+	recordList, err := recordBestStepSerivce.List(&recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return

@@ -74,7 +74,7 @@ func ListRecordData(c *gin.Context) {
 		return
 	}
 
-	recordListResp, err := recordService.List(recordReq)
+	recordListResp, err := recordService.List(&recordReq)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -109,7 +109,7 @@ func UpdateRecordData(c *gin.Context) {
 		Status:    recordReq.Status,
 	}
 
-	err = recordService.Update(record)
+	err = recordService.Update(&record)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -127,7 +127,7 @@ func ListRecordBestSingleData(c *gin.Context) {
 		return
 	}
 
-	recordBestSingleListResp, err := recordBestSingleSerivce.List(recordBestSingleReq)
+	recordBestSingleListResp, err := recordBestSingleSerivce.List(&recordBestSingleReq)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -145,7 +145,7 @@ func ListRecordBestAverageData(c *gin.Context) {
 		return
 	}
 
-	recordBestAverageListResp, err := recordBestAverageSerivce.List(recordBestAverageReq)
+	recordBestAverageListResp, err := recordBestAverageSerivce.List(&recordBestAverageReq)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -163,7 +163,7 @@ func ListRecordBestStepData(c *gin.Context) {
 		return
 	}
 
-	recordBestStepListResp, err := recordBestStepSerivce.List(recordBestStepReq)
+	recordBestStepListResp, err := recordBestStepSerivce.List(&recordBestStepReq)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return

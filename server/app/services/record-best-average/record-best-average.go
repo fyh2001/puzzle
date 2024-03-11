@@ -35,7 +35,7 @@ func publishMessage(rankUpdate commonService.RankUpdate) {
 }
 
 // check 校验参数
-func check(record models.RecordBestAverage) error {
+func check(record *models.RecordBestAverage) error {
 	if record.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -60,14 +60,14 @@ func check(record models.RecordBestAverage) error {
 }
 
 // Insert 插入一条记录
-func Insert(record models.RecordBestAverage) error {
+func Insert(record *models.RecordBestAverage) error {
 	// 校验参数
 	err := check(record)
 	if err != nil {
 		return err
 	}
 
-	err = database.GetMySQL().Create(&record).Error
+	err = database.GetMySQL().Create(record).Error
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func Insert(record models.RecordBestAverage) error {
 }
 
 // List 记录列表
-func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListResp, error) {
+func List(recordReq *models.RecordBestAverageReq) (models.RecordBestAverageListResp, error) {
 	var recordListResp models.RecordBestAverageListResp
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
@@ -249,10 +249,10 @@ func List(recordReq models.RecordBestAverageReq) (models.RecordBestAverageListRe
 }
 
 // Update 更新记录
-func Update(record models.RecordBestAverage) error {
+func Update(record *models.RecordBestAverage) error {
 	db := database.GetMySQL().Table("record_best_average").Where("user_id = ? AND dimension = ? AND type = ?", record.UserId, record.Dimension, record.Type)
 
-	err := db.Updates(&record).Error
+	err := db.Updates(record).Error
 	if err != nil {
 		return err
 	}

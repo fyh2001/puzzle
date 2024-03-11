@@ -7,7 +7,7 @@ import (
 	"puzzle/utils"
 )
 
-func check(scrambledUserStatus models.ScrambledUserStatus) error {
+func check(scrambledUserStatus *models.ScrambledUserStatus) error {
 	if scrambledUserStatus.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -23,7 +23,7 @@ func check(scrambledUserStatus models.ScrambledUserStatus) error {
 	return nil
 }
 
-func Insert(scrambledUserStatus models.ScrambledUserStatus) error {
+func Insert(scrambledUserStatus *models.ScrambledUserStatus) error {
 	if err := check(scrambledUserStatus); err != nil {
 		return err
 	}
@@ -33,10 +33,10 @@ func Insert(scrambledUserStatus models.ScrambledUserStatus) error {
 	scrambledUserStatus.Id = snowflake.NextVal()
 	scrambledUserStatus.Status = 1
 
-	return database.GetMySQL().Create(&scrambledUserStatus).Error
+	return database.GetMySQL().Create(scrambledUserStatus).Error
 }
 
-func List(scrambledUserStatusReq models.ScrambledUserStatusReq) (models.ScrambledUserStatusListResp, error) {
+func List(scrambledUserStatusReq *models.ScrambledUserStatusReq) (models.ScrambledUserStatusListResp, error) {
 	var scrambledUserStatusListResp models.ScrambledUserStatusListResp
 	db := database.GetMySQL().Table("scrambled_user_status")
 
@@ -82,10 +82,10 @@ func List(scrambledUserStatusReq models.ScrambledUserStatusReq) (models.Scramble
 	return scrambledUserStatusListResp, nil
 }
 
-func Update(scrambledUserStatus models.ScrambledUserStatus) error {
+func Update(scrambledUserStatus *models.ScrambledUserStatus) error {
 	db := database.GetMySQL().Table("scrambled_user_status")
 
-	err := db.Updates(&scrambledUserStatus).Error
+	err := db.Updates(scrambledUserStatus).Error
 	if err != nil {
 		return errors.New("更新失败")
 	}

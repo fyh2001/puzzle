@@ -18,7 +18,7 @@ func GetNewScamble(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	req.UserId = userId.(int64)
 
-	scramble, err := scrambleService.GetNewScamble(req)
+	scramble, err := scrambleService.GetNewScamble(&req)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -37,7 +37,7 @@ func GetUserScramble(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	req.UserId = userId.(int64)
 
-	scramble, err := scrambleService.GetUserScramble(req)
+	scramble, err := scrambleService.GetUserScramble(&req)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return

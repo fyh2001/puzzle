@@ -210,6 +210,8 @@ export const useAdminStore = defineStore("admin", {
       } = await recordManageRequest.list(queryForm);
 
       if (code === 200) {
+        console.log("recordList", recordListResp);
+
         this.data.personRecord.list = recordListResp.records;
         this.data.personRecord.total = recordListResp.total;
       }

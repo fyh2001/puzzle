@@ -31,7 +31,7 @@ func publishMessage(rankUpdate commonService.RankUpdate) {
 	mq.Publish(messageByte)
 }
 
-func check(record models.RecordBestSingle) error {
+func check(record *models.RecordBestSingle) error {
 	if record.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -56,7 +56,7 @@ func check(record models.RecordBestSingle) error {
 }
 
 // Insert 插入一条记录
-func Insert(record models.RecordBestSingle) error {
+func Insert(record *models.RecordBestSingle) error {
 	// 校验参数
 	err := check(record)
 	if err != nil {
@@ -65,7 +65,7 @@ func Insert(record models.RecordBestSingle) error {
 
 	record.RecordBreakCount = 1
 
-	err = database.GetMySQL().Create(&record).Error
+	err = database.GetMySQL().Create(record).Error
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func Insert(record models.RecordBestSingle) error {
 }
 
 // List 查询记录列表
-func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp, error) {
+func List(recordReq *models.RecordBestSingleReq) (models.RecordBestSingleListResp, error) {
 	var recordListResp models.RecordBestSingleListResp
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
@@ -242,10 +242,10 @@ func List(recordReq models.RecordBestSingleReq) (models.RecordBestSingleListResp
 }
 
 // Update 更新记录
-func Update(record models.RecordBestSingle) error {
+func Update(record *models.RecordBestSingle) error {
 	db := database.GetMySQL().Table("record_best_single")
 
-	err := db.Updates(&record).Error
+	err := db.Updates(record).Error
 
 	if err != nil {
 		return errors.New("更新失败")
