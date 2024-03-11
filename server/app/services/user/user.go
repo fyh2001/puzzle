@@ -101,39 +101,39 @@ func List(u *models.UserReq) (models.UserListResp, error) {
 	db := database.GetMySQL().Table("user").Order(u.OrderBy + " " + u.Sorted)
 
 	if u.Id != 0 {
-		db = db.Where("id = ?", u.Id)
+		db.Where("id = ?", u.Id)
 	}
 
 	if u.Username != "" {
-		db = db.Where("username Like ?", "%"+u.Username+"%")
+		db.Where("username Like ?", "%"+u.Username+"%")
 	}
 
 	if u.Nickname != "" {
-		db = db.Where("nickname Like ?", "%"+u.Nickname+"%")
+		db.Where("nickname Like ?", "%"+u.Nickname+"%")
 	}
 
 	if u.AccoladeId != 0 {
-		db = db.Where("accolade_id = ?", u.AccoladeId)
+		db.Where("accolade_id = ?", u.AccoladeId)
 	}
 
 	if u.Email != "" {
-		db = db.Where("email = ?", u.Email)
+		db.Where("email = ?", u.Email)
 	}
 
 	if u.Phone != "" {
-		db = db.Where("phone = ?", u.Phone)
+		db.Where("phone = ?", u.Phone)
 	}
 
 	if u.Status != 0 {
-		db = db.Where("status = ?", u.Status)
+		db.Where("status = ?", u.Status)
 	}
 
 	if len(u.DateRange) == 2 && !u.DateRange[0].IsZero() && !u.DateRange[1].IsZero() {
-		db = db.Where("created_at >= ? and created_at <= ?", u.DateRange[0], u.DateRange[1])
+		db.Where("created_at >= ? and created_at <= ?", u.DateRange[0], u.DateRange[1])
 	}
 
 	if len(u.Ids) > 0 {
-		db = db.Where("id in (?)", u.Ids)
+		db.Where("id in (?)", u.Ids)
 	}
 
 	// 查询总数
@@ -144,7 +144,7 @@ func List(u *models.UserReq) (models.UserListResp, error) {
 
 	// 分页
 	if u.Pagination.Page > 0 && u.Pagination.PageSize > 0 {
-		db = db.Scopes(utils.Paginate(&u.Pagination))
+		db.Scopes(utils.Paginate(&u.Pagination))
 	}
 
 	// 查询列表

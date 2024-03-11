@@ -6,7 +6,6 @@ import (
 	"puzzle/app/middlewares/rabbitmq"
 	"puzzle/app/models"
 	commonService "puzzle/app/services"
-	userService "puzzle/app/services/user"
 	"puzzle/database"
 	"puzzle/utils"
 	"strconv"
@@ -113,46 +112,46 @@ func List(recordReq *models.RecordBestAverageReq) (models.RecordBestAverageListR
 	db := database.GetMySQL().Table("record_best_average").Order(recordReq.OrderBy + " " + recordReq.Sorted)
 
 	if recordReq.UserId != 0 {
-		db = db.Where("user_id = ?", recordReq.UserId)
+		db.Where("user_id = ?", recordReq.UserId)
 	}
 
 	if recordReq.Dimension != 0 {
-		db = db.Where("dimension = ?", recordReq.Dimension)
+		db.Where("dimension = ?", recordReq.Dimension)
 	}
 
 	if recordReq.Type != 0 {
-		db = db.Where("type = ?", recordReq.Type)
+		db.Where("type = ?", recordReq.Type)
 	}
 
 	if len(recordReq.DurationRange) == 2 {
 		if recordReq.DurationRange[0] != 0 {
-			db = db.Where("record_duration >= ?", recordReq.DurationRange[0])
+			db.Where("record_duration >= ?", recordReq.DurationRange[0])
 		}
 		if recordReq.DurationRange[1] != 0 {
-			db = db.Where("record_duration <= ?", recordReq.DurationRange[1])
+			db.Where("record_duration <= ?", recordReq.DurationRange[1])
 		}
 	}
 
 	if len(recordReq.RankRange) == 2 {
 		if recordReq.RankRange[0] != 0 {
-			db = db.Where("ranked >= ?", recordReq.RankRange[0])
+			db.Where("ranked >= ?", recordReq.RankRange[0])
 		}
 		if recordReq.RankRange[01] != 0 {
-			db = db.Where("ranked <= ?", recordReq.RankRange[1])
+			db.Where("ranked <= ?", recordReq.RankRange[1])
 		}
 	}
 
 	if len(recordReq.BreakCountRange) == 2 {
 		if recordReq.BreakCountRange[0] != 0 {
-			db = db.Where("record_break_count >= ?", recordReq.BreakCountRange[0])
+			db.Where("record_break_count >= ?", recordReq.BreakCountRange[0])
 		}
 		if recordReq.BreakCountRange[1] != 0 {
-			db = db.Where("record_break_count <= ?", recordReq.BreakCountRange[1])
+			db.Where("record_break_count <= ?", recordReq.BreakCountRange[1])
 		}
 	}
 
 	if len(recordReq.DateRange) == 2 && !recordReq.DateRange[0].IsZero() && !recordReq.DateRange[1].IsZero() {
-		db = db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
+		db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
 	}
 
 	// 查询总数
@@ -163,40 +162,17 @@ func List(recordReq *models.RecordBestAverageReq) (models.RecordBestAverageListR
 
 	// 分页
 	if recordReq.Pagination.Page > 0 && recordReq.Pagination.PageSize > 0 {
-		db = db.Scopes(utils.Paginate(&recordReq.Pagination))
+		db.Scopes(utils.Paginate(&recordReq.Pagination))
+	}
+
+	if recordReq.NeedUserInfo {
+		db.Preload("UserInfo")
 	}
 
 	// 查询列表
 	err = db.Find(&recordListResp.Records).Error
 	if err != nil {
 		return recordListResp, errors.New("记录查询失败")
-	}
-
-	if recordReq.NeedUserInfo {
-		// 查询用户信息
-		userIds := make([]int64, 0)
-		for _, record := range recordListResp.Records {
-			userId, _ := strconv.ParseInt(record.UserId, 10, 64)
-			userIds = append(userIds, userId)
-		}
-
-		userReq := models.UserReq{
-			Ids: userIds,
-		}
-
-		userList, err := userService.List(&userReq)
-		if err != nil {
-			return recordListResp, errors.New("查询用户信息失败")
-		}
-
-		userMap := make(map[string]models.UserResp)
-		for _, user := range userList.Records {
-			userMap[user.Id] = user
-		}
-
-		for i, record := range recordListResp.Records {
-			recordListResp.Records[i].UserInfo = userMap[record.UserId]
-		}
 	}
 
 	if recordReq.NeedRecordDetail {

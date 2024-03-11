@@ -79,7 +79,8 @@ export const useAdminStore = defineStore("admin", {
     getBestSingleRecordList: (state) => {
       return state.data.bestSingleRecord.list.map((record) => {
         const durationFormat = formatDurationInRecord(record.recordDuration);
-        const recordDetail = record.recordDetail.records.map((record) => {
+
+        const recordDetail = record.recordDetail.map((record) => {
           const durationFormat = formatDurationInRecord(record.duration);
           return {
             ...record,
@@ -210,8 +211,6 @@ export const useAdminStore = defineStore("admin", {
       } = await recordManageRequest.list(queryForm);
 
       if (code === 200) {
-        console.log("recordList", recordListResp);
-
         this.data.personRecord.list = recordListResp.records;
         this.data.personRecord.total = recordListResp.total;
       }
@@ -233,8 +232,6 @@ export const useAdminStore = defineStore("admin", {
         data: { code, data: recordListResp, msg },
       } = await recordBestSingleRequest.list(queryForm);
 
-      console.log(recordListResp);
-
       if (code === 200) {
         this.data.bestSingleRecord.list = recordListResp.records;
         this.data.bestSingleRecord.total = recordListResp.total;
@@ -248,6 +245,8 @@ export const useAdminStore = defineStore("admin", {
       const {
         data: { code, data: recordListResp, msg },
       } = await recordBestAverageRequest.list(queryForm);
+
+      console.log(recordListResp);
 
       if (code === 200) {
         this.data.bestAverageRecord.list = recordListResp.records;

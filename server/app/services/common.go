@@ -17,11 +17,11 @@ func GetUserInfoByUsernameOrNickname(username string, nickname string) (models.U
 	db := database.GetMySQL().Table("user")
 
 	if username != "" {
-		db = db.Where("username Like ?", "%"+username+"%")
+		db.Where("username Like ?", "%"+username+"%")
 	}
 
 	if nickname != "" {
-		db = db.Where("nickname Like ?", "%"+nickname+"%")
+		db.Where("nickname Like ?", "%"+nickname+"%")
 	}
 
 	err := db.First(&user).Error

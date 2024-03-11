@@ -114,7 +114,7 @@ export interface RecordBestSingleResp {
   createdAt: string;
   updatedAt: string;
   userInfo: UserResp;
-  recordDetail: RecordListResp;
+  recordDetail: RecordResp[];
 }
 
 export interface RecordBestSingleListResp {

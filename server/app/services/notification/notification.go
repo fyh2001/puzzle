@@ -73,35 +73,35 @@ func List(notificationReq *models.NotificationReq) (models.NotificationListResp,
 	db := database.GetMySQL().Table("notification").Order(notificationReq.OrderBy + " " + notificationReq.Sorted)
 
 	if notificationReq.Id != 0 {
-		db = db.Where("id = ?", notificationReq.Id)
+		db.Where("id = ?", notificationReq.Id)
 	}
 
 	if len(notificationReq.Ids) > 0 {
-		db = db.Where("id in ?", notificationReq.Ids)
+		db.Where("id in ?", notificationReq.Ids)
 	}
 
 	if notificationReq.UserId != 0 {
-		db = db.Where("user_id = 0 OR user_id = ?", notificationReq.UserId)
+		db.Where("user_id = 0 OR user_id = ?", notificationReq.UserId)
 	}
 
 	if notificationReq.TypeId == 0 {
-		db = db.Where("type_id = ?", notificationReq.TypeId)
+		db.Where("type_id = ?", notificationReq.TypeId)
 	}
 
 	if notificationReq.Content != "" {
-		db = db.Where("content Like ?", "%"+notificationReq.Content+"%")
+		db.Where("content Like ?", "%"+notificationReq.Content+"%")
 	}
 
 	if notificationReq.Status != 0 {
-		db = db.Where("status = ?", notificationReq.Status)
+		db.Where("status = ?", notificationReq.Status)
 	}
 
 	if len(notificationReq.DateRange) == 2 {
 		if notificationReq.DateRange[0] != (time.Time{}) {
-			db = db.Where("created_at >= ?", notificationReq.DateRange[0])
+			db.Where("created_at >= ?", notificationReq.DateRange[0])
 		}
 		if notificationReq.DateRange[1] != (time.Time{}) {
-			db = db.Where("created_at <= ?", notificationReq.DateRange[1])
+			db.Where("created_at <= ?", notificationReq.DateRange[1])
 		}
 	}
 
@@ -115,7 +115,7 @@ func List(notificationReq *models.NotificationReq) (models.NotificationListResp,
 
 	// 分页
 	if notificationReq.Pagination.Page > 0 && notificationReq.Pagination.PageSize > 0 {
-		db = db.Scopes(utils.Paginate(&notificationReq.Pagination))
+		db.Scopes(utils.Paginate(&notificationReq.Pagination))
 	}
 
 	// 查询列表

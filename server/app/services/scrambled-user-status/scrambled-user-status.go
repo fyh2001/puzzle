@@ -41,27 +41,27 @@ func List(scrambledUserStatusReq *models.ScrambledUserStatusReq) (models.Scrambl
 	db := database.GetMySQL().Table("scrambled_user_status")
 
 	if scrambledUserStatusReq.UserId != 0 {
-		db = db.Where("user_id = ?", scrambledUserStatusReq.UserId)
+		db.Where("user_id = ?", scrambledUserStatusReq.UserId)
 	}
 
 	if scrambledUserStatusReq.Dimension != 0 {
-		db = db.Where("dimension = ?", scrambledUserStatusReq.Dimension)
+		db.Where("dimension = ?", scrambledUserStatusReq.Dimension)
 	}
 
 	if scrambledUserStatusReq.ScrambleId != 0 {
-		db = db.Where("scramble_id = ?", scrambledUserStatusReq.ScrambleId)
+		db.Where("scramble_id = ?", scrambledUserStatusReq.ScrambleId)
 	}
 
 	if scrambledUserStatusReq.Status != 0 {
-		db = db.Where("status = ?", scrambledUserStatusReq.Status)
+		db.Where("status = ?", scrambledUserStatusReq.Status)
 	}
 
 	if len(scrambledUserStatusReq.DateRange) == 2 {
-		db = db.Where("created_at BETWEEN ? AND ?", scrambledUserStatusReq.DateRange[0], scrambledUserStatusReq.DateRange[1])
+		db.Where("created_at BETWEEN ? AND ?", scrambledUserStatusReq.DateRange[0], scrambledUserStatusReq.DateRange[1])
 	}
 
 	if scrambledUserStatusReq.Sorted != "" {
-		db = db.Order("created_at " + scrambledUserStatusReq.Sorted)
+		db.Order("created_at " + scrambledUserStatusReq.Sorted)
 	}
 
 	// 查询总数
@@ -71,7 +71,7 @@ func List(scrambledUserStatusReq *models.ScrambledUserStatusReq) (models.Scrambl
 
 	// 分页
 	if scrambledUserStatusReq.Pagination.Page > 0 && scrambledUserStatusReq.Pagination.PageSize > 0 {
-		db = db.Scopes(utils.Paginate(&scrambledUserStatusReq.Pagination))
+		db.Scopes(utils.Paginate(&scrambledUserStatusReq.Pagination))
 	}
 
 	// 查询记录

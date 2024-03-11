@@ -45,31 +45,31 @@ func List(scrambleReq *models.ScrambleReq) (models.ScrambleListResp, error) {
 	db := database.GetMySQL().Table("scramble")
 
 	if scrambleReq.Id != 0 {
-		db = db.Where("id = ?", scrambleReq.Id)
+		db.Where("id = ?", scrambleReq.Id)
 	}
 
 	if scrambleReq.Dimension != 0 {
-		db = db.Where("dimension = ?", scrambleReq.Dimension)
+		db.Where("dimension = ?", scrambleReq.Dimension)
 	}
 
 	if scrambleReq.Idx != 0 {
-		db = db.Where("idx = ?", scrambleReq.Idx)
+		db.Where("idx = ?", scrambleReq.Idx)
 	}
 
 	if scrambleReq.Scramble != "" {
-		db = db.Where("scramble = ?", scrambleReq.Scramble)
+		db.Where("scramble = ?", scrambleReq.Scramble)
 	}
 
 	if scrambleReq.Status != 0 {
-		db = db.Where("status = ?", scrambleReq.Status)
+		db.Where("status = ?", scrambleReq.Status)
 	}
 
 	if len(scrambleReq.DateRange) == 2 {
-		db = db.Where("created_at BETWEEN ? AND ?", scrambleReq.DateRange[0], scrambleReq.DateRange[1])
+		db.Where("created_at BETWEEN ? AND ?", scrambleReq.DateRange[0], scrambleReq.DateRange[1])
 	}
 
 	if scrambleReq.Sorted != "" {
-		db = db.Order("created_at " + scrambleReq.Sorted)
+		db.Order("created_at " + scrambleReq.Sorted)
 	}
 
 	// 获取总数
@@ -80,7 +80,7 @@ func List(scrambleReq *models.ScrambleReq) (models.ScrambleListResp, error) {
 
 	// 分页
 	if scrambleReq.Pagination.PageSize > 0 && scrambleReq.Pagination.Page > 0 {
-		db = db.Scopes(utils.Paginate(&scrambleReq.Pagination))
+		db.Scopes(utils.Paginate(&scrambleReq.Pagination))
 	}
 
 	// 查询记录

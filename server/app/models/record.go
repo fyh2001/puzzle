@@ -54,7 +54,7 @@ type RecordReq struct {
 type RecordResp struct {
 	Id        string    `json:"id"`                                              // 主键ID
 	UserId    string    `json:"userId"`                                          // 用户ID
-	UserInfo  UserResp  `json:"userInfo" gorm:"foreignKey:UserId;references:Id"` // 用户信息
+	UserInfo  UserResp  `json:"userInfo" gorm:"foreignKey:Id;references:UserId"` // 用户信息
 	Dimension int       `json:"dimension"`                                       // 阶数 3 | 4 | 5 | 6 | 7 | 8
 	Type      int       `json:"type"`                                            // 类型 1:练习 2:排行榜 3:对战
 	Duration  int       `json:"duration"`                                        // 耗时
@@ -71,4 +71,8 @@ type RecordResp struct {
 type RecordListResp struct {
 	Total   int64        `json:"total"`
 	Records []RecordResp `json:"records"`
+}
+
+func (recordResp RecordResp) TableName() string {
+	return "record"
 }

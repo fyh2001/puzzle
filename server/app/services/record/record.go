@@ -167,56 +167,56 @@ func List(recordReq *models.RecordReq) (models.RecordListResp, error) {
 		recordReq.OrderBy = "id"
 	}
 
-	db := database.GetMySQL().Table("record").Order("record." + recordReq.OrderBy + " " + recordReq.Sorted)
+	db := database.GetMySQL().Table("record").Order(recordReq.OrderBy + " " + recordReq.Sorted)
 
 	if recordReq.Id != 0 {
-		db = db.Where("id = ?", recordReq.Id)
+		db.Where("id = ?", recordReq.Id)
 	}
 
 	if recordReq.UserId != 0 {
-		db = db.Where("user_id = ?", recordReq.UserId)
+		db.Where("user_id = ?", recordReq.UserId)
 	}
 
 	if recordReq.Dimension != 0 {
-		db = db.Where("dimension = ?", recordReq.Dimension)
+		db.Where("dimension = ?", recordReq.Dimension)
 	}
 
 	if recordReq.Type != 0 {
-		db = db.Where("type = ?", recordReq.Type)
+		db.Where("type = ?", recordReq.Type)
 	}
 
 	if len(recordReq.DurationRange) == 2 {
 		if recordReq.DurationRange[0] != 0 {
-			db = db.Where("duration >= ?", recordReq.DurationRange[0])
+			db.Where("duration >= ?", recordReq.DurationRange[0])
 		}
 		if recordReq.DurationRange[1] != 0 {
-			db = db.Where("duration <= ?", recordReq.DurationRange[1])
+			db.Where("duration <= ?", recordReq.DurationRange[1])
 		}
 	}
 
 	if len(recordReq.StepRange) == 2 {
 		if recordReq.StepRange[0] != 0 {
-			db = db.Where("step >= ?", recordReq.StepRange[0])
+			db.Where("step >= ?", recordReq.StepRange[0])
 		}
 		if recordReq.StepRange[1] != 0 {
-			db = db.Where("step <= ?", recordReq.StepRange[1])
+			db.Where("step <= ?", recordReq.StepRange[1])
 		}
 	}
 
 	if len(recordReq.DateRange) == 2 && !recordReq.DateRange[0].IsZero() && !recordReq.DateRange[1].IsZero() {
-		db = db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
+		db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
 	}
 
 	if recordReq.Idx != 0 {
-		db = db.Where("idx = ?", recordReq.Idx)
+		db.Where("idx = ?", recordReq.Idx)
 	}
 
 	if len(recordReq.Ids) > 0 {
-		db = db.Where("id in (?)", recordReq.Ids)
+		db.Where("id in (?)", recordReq.Ids)
 	}
 
 	if recordReq.Status != 0 {
-		db = db.Where("status = ?", recordReq.Status)
+		db.Where("status = ?", recordReq.Status)
 	}
 
 	// 查询总数
@@ -227,10 +227,12 @@ func List(recordReq *models.RecordReq) (models.RecordListResp, error) {
 
 	// 分页
 	if recordReq.Pagination.Page > 0 && recordReq.Pagination.PageSize > 0 {
-		db = db.Scopes(utils.Paginate(&recordReq.Pagination))
+		db.Scopes(utils.Paginate(&recordReq.Pagination))
 	}
 
-	db.Select("record.*").Preload("UserInfo")
+	if recordReq.NeedUserInfo {
+		db.Preload("UserInfo")
+	}
 
 	// 查询记录
 	err = db.Find(&recordListResp.Records).Error

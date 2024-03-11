@@ -108,46 +108,46 @@ func List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, e
 	db := database.GetMySQL().Table("record_best_step").Order(recordReq.OrderBy + " " + recordReq.Sorted)
 
 	if recordReq.UserId != 0 {
-		db = db.Where("user_id = ?", recordReq.UserId)
+		db.Where("user_id = ?", recordReq.UserId)
 	}
 
 	if recordReq.Dimension != 0 {
-		db = db.Where("dimension = ?", recordReq.Dimension)
+		db.Where("dimension = ?", recordReq.Dimension)
 	}
 
 	if recordReq.RecordId != 0 {
-		db = db.Where("record_id = ?", recordReq.RecordId)
+		db.Where("record_id = ?", recordReq.RecordId)
 	}
 
 	if len(recordReq.StepRange) == 2 {
 		if recordReq.StepRange[0] != 0 {
-			db = db.Where("record_step >= ?", recordReq.StepRange[0])
+			db.Where("record_step >= ?", recordReq.StepRange[0])
 		}
 		if recordReq.StepRange[1] != 0 {
-			db = db.Where("record_step <= ?", recordReq.StepRange[1])
+			db.Where("record_step <= ?", recordReq.StepRange[1])
 		}
 	}
 
 	if len(recordReq.RankRange) == 2 {
 		if recordReq.RankRange[0] != 0 {
-			db = db.Where("ranked >= ?", recordReq.RankRange[0])
+			db.Where("ranked >= ?", recordReq.RankRange[0])
 		}
 		if recordReq.RankRange[01] != 0 {
-			db = db.Where("ranked <= ?", recordReq.RankRange[1])
+			db.Where("ranked <= ?", recordReq.RankRange[1])
 		}
 	}
 
 	if len(recordReq.BreakCountRange) == 2 {
 		if recordReq.BreakCountRange[0] != 0 {
-			db = db.Where("record_break_count >= ?", recordReq.BreakCountRange[0])
+			db.Where("record_break_count >= ?", recordReq.BreakCountRange[0])
 		}
 		if recordReq.BreakCountRange[1] != 0 {
-			db = db.Where("record_break_count <= ?", recordReq.BreakCountRange[1])
+			db.Where("record_break_count <= ?", recordReq.BreakCountRange[1])
 		}
 	}
 
 	if len(recordReq.DateRange) == 2 && !recordReq.DateRange[0].IsZero() && !recordReq.DateRange[1].IsZero() {
-		db = db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
+		db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
 	}
 
 	// 查询总数
@@ -158,7 +158,7 @@ func List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, e
 
 	// 分页
 	if (recordReq.Pagination.Page > 0) && (recordReq.Pagination.PageSize > 0) {
-		db = db.Scopes(utils.Paginate(&recordReq.Pagination))
+		db.Scopes(utils.Paginate(&recordReq.Pagination))
 	}
 
 	// 查询记录
@@ -224,23 +224,23 @@ func ListWithUserInfo(recordReq *models.RecordBestStepReq) (models.RecordBestSte
 	db := database.GetMySQL().Table("record_best_step").Order("record_step " + recordReq.Sorted)
 
 	if recordReq.UserId != 0 {
-		db = db.Where("user_id = ?", recordReq.UserId)
+		db.Where("user_id = ?", recordReq.UserId)
 	}
 
 	if recordReq.Dimension != 0 {
-		db = db.Where("dimension = ?", recordReq.Dimension)
+		db.Where("dimension = ?", recordReq.Dimension)
 	}
 
 	if recordReq.RecordId != 0 {
-		db = db.Where("record_id = ?", recordReq.RecordId)
+		db.Where("record_id = ?", recordReq.RecordId)
 	}
 
 	if len(recordReq.StepRange) == 2 {
-		db = db.Where("record_step >= ? AND record_step <= ?", recordReq.StepRange[0], recordReq.StepRange[1])
+		db.Where("record_step >= ? AND record_step <= ?", recordReq.StepRange[0], recordReq.StepRange[1])
 	}
 
 	if len(recordReq.DateRange) == 2 {
-		db = db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
+		db.Where("created_at >= ? AND created_at <= ?", recordReq.DateRange[0], recordReq.DateRange[1])
 	}
 
 	// 查询总数
@@ -251,7 +251,7 @@ func ListWithUserInfo(recordReq *models.RecordBestStepReq) (models.RecordBestSte
 
 	// 分页
 	if (recordReq.Pagination.Page > 0) && (recordReq.Pagination.PageSize > 0) {
-		db = db.Scopes(utils.Paginate(&recordReq.Pagination))
+		db.Scopes(utils.Paginate(&recordReq.Pagination))
 	}
 
 	// 查询记录
