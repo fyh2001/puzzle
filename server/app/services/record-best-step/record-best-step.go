@@ -161,33 +161,14 @@ func List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, e
 		db.Scopes(utils.Paginate(&recordReq.Pagination))
 	}
 
+	if recordReq.NeedUserInfo {
+		db.Preload("UserInfo")
+	}
+
 	// 查询记录
 	err = db.Find(&recordBestStepListResp.Records).Error
 	if err != nil {
 		return recordBestStepListResp, errors.New("查询失败")
-	}
-
-	if recordReq.NeedUserInfo {
-		// 查询用户信息
-		userIds := make([]int64, 0)
-		for _, record := range recordBestStepListResp.Records {
-			userId, _ := strconv.ParseInt(record.UserId, 10, 64)
-			userIds = append(userIds, userId)
-		}
-
-		userList, err := commonService.GetUserInfo(userIds)
-		if err != nil {
-			return recordBestStepListResp, errors.New("查询用户信息失败")
-		}
-
-		userMap := make(map[string]models.UserResp)
-		for _, user := range userList.Records {
-			userMap[user.Id] = user
-		}
-
-		for i, record := range recordBestStepListResp.Records {
-			recordBestStepListResp.Records[i].UserInfo = userMap[record.UserId]
-		}
 	}
 
 	if recordReq.NeedRecordDetail {

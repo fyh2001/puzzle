@@ -44,17 +44,17 @@ type RecordBestStepReq struct {
 
 // RecordBestStepResp 用户最佳步数记录响应模型
 type RecordBestStepResp struct {
-	Id               string         `json:"id" gorm:"primaryKey"`            // 主键ID
-	UserId           string         `json:"userId"`                          // 用户ID
-	Dimension        int            `json:"dimension"`                       // 阶数 3 | 4 | 5 | 6 | 7 | 8
-	RecordId         string         `json:"recordId"`                        // 记录ID
-	RecordStep       int            `json:"recordStep"`                      // 步数
-	RecordBreakCount int            `json:"recordBreakCount"`                // 破纪录次数
-	Ranked           int            `json:"ranked"`                          // 排名
-	CreatedAt        time.Time      `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
-	UpdatedAt        time.Time      `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
-	UserInfo         UserResp       `json:"userInfo" gorm:"-"`               // 用户信息
-	RecordDetail     RecordListResp `json:"recordDetail" gorm:"-"`           // 记录详情
+	Id               string         `json:"id" gorm:"primaryKey"`                            // 主键ID
+	UserId           string         `json:"userId"`                                          // 用户ID
+	Dimension        int            `json:"dimension"`                                       // 阶数 3 | 4 | 5 | 6 | 7 | 8
+	RecordId         string         `json:"recordId"`                                        // 记录ID
+	RecordStep       int            `json:"recordStep"`                                      // 步数
+	RecordBreakCount int            `json:"recordBreakCount"`                                // 破纪录次数
+	Ranked           int            `json:"ranked"`                                          // 排名
+	CreatedAt        time.Time      `json:"createdAt" gorm:"autoCreateTime"`                 // 创建时间
+	UpdatedAt        time.Time      `json:"updatedAt" gorm:"autoUpdateTime"`                 // 更新时间
+	UserInfo         UserResp       `json:"userInfo" gorm:"foreignKey:Id;references:UserId"` // 用户信息
+	RecordDetail     RecordListResp `json:"recordDetail" gorm:"-"`                           // 记录详情
 }
 
 // RecordBestStepListResp 用户最佳步数记录列表响应模型
