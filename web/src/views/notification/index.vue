@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { InfoRound } from "@vicons/material";
-import { Raw, markRaw } from "vue";
+import { Raw } from "vue";
+import { useUserStore } from "@/store/user";
 import { useNotificationStore } from "@/store/notification";
 import { notificationUserStatusRequest } from "api/notification";
 import { useMessage } from "naive-ui";
@@ -8,6 +9,7 @@ import type { NotificationResp } from "@/types/notification";
 
 const Message = useMessage();
 
+const userStore = useUserStore();
 const notificationStore = useNotificationStore();
 
 const NotificationIcon: Record<string, Raw<any>> = {
@@ -39,7 +41,7 @@ console.log(notificationStore.getNotificationList);
   <div>
     <top-bar pt-4 title="通知" />
 
-    <div class="p-4">
+    <div class="p-4" v-if="notificationStore.getNotificationTotal">
       <div
         v-for="(data, index) in notificationStore.getNotificationList"
         :key="index"
@@ -82,6 +84,22 @@ console.log(notificationStore.getNotificationList);
         </div>
       </div>
     </div>
+
+    <n-result
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-4/5"
+      status="418"
+      title="暂无通知"
+      description="等待我们的消息吧！"
+      v-if="notificationStore.getNotificationTotal === 0 && userStore.getToken"
+    />
+
+    <n-result
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-4/5"
+      status="403"
+      title="禁止访问"
+      description="这里只有登录用户才能访问噢!"
+      v-if="!userStore.getToken"
+    />
   </div>
 </template>
 
