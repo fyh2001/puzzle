@@ -272,7 +272,7 @@ func updateRecordBestSingle(record *models.Record) error {
 	}
 
 	// 若有最佳单次记录, 且当前记录的持续时间大于最佳单次记录, 则直接返回(没有打破记录)
-	if recordBestSingle.Total > 1 && record.Duration > recordBestSingle.Records[0].RecordDuration {
+	if recordBestSingle.Total > 0 && record.Duration > recordBestSingle.Records[0].RecordDuration {
 		return nil
 	}
 
@@ -301,6 +301,7 @@ func updateRecordBestSingle(record *models.Record) error {
 
 			err = recordBestSingleSerivce.Update(&models.RecordBestSingle{
 				Id:               id,
+				UserId:           record.UserId,
 				RecordId:         record.Id,
 				Dimension:        record.Dimension,
 				RecordDuration:   record.Duration,
@@ -315,7 +316,7 @@ func updateRecordBestSingle(record *models.Record) error {
 	}
 
 	// 发布通知
-	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳单次记录, 用时 %d 秒, 步数 %d, 排名可前往排行榜查看", record.Dimension, record.Duration/1000, record.Step))
+	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳单次记录, 用时 %.3f 秒, 步数 %d, 排名可前往排行榜查看", record.Dimension, float64(record.Duration)/1000, record.Step))
 	if err != nil {
 		return err
 	}
@@ -422,6 +423,7 @@ func updateRecordBestAverage5(record *models.Record) error {
 				Id:                    id,
 				RecordIds:             recordIdsStr,
 				Dimension:             record.Dimension,
+				UserId:                record.UserId,
 				Type:                  5,
 				RecordAverageDuration: averageDuration,
 				RecordBreakCount:      recordBestAverage.Records[0].RecordBreakCount + 1,
@@ -434,7 +436,7 @@ func updateRecordBestAverage5(record *models.Record) error {
 	}
 
 	// 发布通知
-	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳5次平均记录, 平均用时 %f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
+	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳5次平均记录, 平均用时 %.3f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
 	if err != nil {
 		return err
 	}
@@ -540,6 +542,7 @@ func updateRecordBestAverage12(record *models.Record) error {
 				Id:                    id,
 				RecordIds:             recordIdsStr,
 				Dimension:             record.Dimension,
+				UserId:                record.UserId,
 				Type:                  12,
 				RecordAverageDuration: averageDuration,
 				RecordBreakCount:      recordBestAverage.Records[0].RecordBreakCount + 1,
@@ -552,7 +555,7 @@ func updateRecordBestAverage12(record *models.Record) error {
 	}
 
 	// 发布通知
-	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳12次平均记录, 平均用时 %f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
+	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳12次平均记录, 平均用时 %.3f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
 	if err != nil {
 		return err
 	}
@@ -599,9 +602,7 @@ func updateRecordBestStep(record *models.Record) error {
 		if err != nil {
 			return errors.New("新增最佳步数记录失败")
 		}
-
 	} else {
-
 		id, _ := strconv.ParseInt(recordBestStep.Records[0].Id, 10, 64)
 
 		// 若有最佳步数记录, 则比较并更新
@@ -609,6 +610,7 @@ func updateRecordBestStep(record *models.Record) error {
 			err = recordBestStepSerivce.Update(&models.RecordBestStep{
 				Id:               id,
 				RecordId:         record.Id,
+				UserId:           record.UserId,
 				Dimension:        record.Dimension,
 				RecordStep:       record.Step,
 				RecordBreakCount: recordBestStep.Records[0].RecordBreakCount + 1,

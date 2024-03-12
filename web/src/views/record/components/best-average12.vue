@@ -157,6 +157,7 @@ watch(
   () => {
     // 重新获取记录
     getRecords();
+    getRecordPersion();
   }
 );
 

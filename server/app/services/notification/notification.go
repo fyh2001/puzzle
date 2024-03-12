@@ -134,7 +134,7 @@ func List(notificationReq *models.NotificationReq) (models.NotificationListResp,
 	db.Preload("NotificationTypeInfo")
 	db.Preload("NotificationUserStatusInfo", "notification_user_status.user_id = ?", notificationReq.UserId)
 
-	db.Joins("LEFT JOIN notification_user_status ON notification.id = notification_user_status.notification_id AND notification_user_status.user_id = ?", notificationReq.UserId).Order("notification_user_status.status").Order("notification.updated_at")
+	db.Joins("LEFT JOIN notification_user_status ON notification.id = notification_user_status.notification_id AND notification_user_status.user_id = ?", notificationReq.UserId).Order("notification_user_status.status asc").Order("notification.updated_at desc")
 
 	// 分页
 	if notificationReq.Pagination.Page > 0 && notificationReq.Pagination.PageSize > 0 {

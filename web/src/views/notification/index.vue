@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { InfoRound } from "@vicons/material";
-import { Raw } from "vue";
+import { Raw, onMounted, ref } from "vue";
 import { useUserStore } from "@/store/user";
 import { useNotificationStore } from "@/store/notification";
 import { notificationUserStatusRequest } from "api/notification";
 import { useMessage } from "naive-ui";
+import { useScrollTo } from "@/utils/useScrollTo";
 import type { NotificationResp } from "@/types/notification";
 
 const Message = useMessage();
@@ -15,6 +16,8 @@ const notificationStore = useNotificationStore();
 const NotificationIcon: Record<string, Raw<any>> = {
   InfoRound: InfoRound,
 };
+
+const currentPage = ref(1);
 
 const handleNotificationRead = async (data: NotificationResp) => {
   if (data.notificationUserStatusInfo.status === 1) return;
@@ -27,13 +30,38 @@ const handleNotificationRead = async (data: NotificationResp) => {
     Message.error(msg);
   }
 
-  notificationStore.fetchNotificationList({
-    pagination: {
-      page: 1,
-      pageSize: 10,
+  notificationStore.fetchNotifications(
+    {
+      pagination: {
+        page: 1,
+        pageSize: 10 * currentPage.value,
+      },
     },
-  });
+    "overwrite"
+  );
 };
+
+useScrollTo(200, () => {
+  fetchNotifications("append");
+});
+
+const fetchNotifications = async (type: string) => {
+  await notificationStore.fetchNotifications(
+    {
+      pagination: {
+        page: currentPage.value,
+        pageSize: 6,
+      },
+    },
+    type
+  );
+
+  currentPage.value++;
+};
+
+onMounted(() => {
+  fetchNotifications("overwrite");
+});
 </script>
 
 <template>

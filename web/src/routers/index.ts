@@ -14,8 +14,6 @@ import {
 } from "@vicons/material";
 import { markRaw } from "vue";
 import { useAdminStore } from "@/store/admin";
-import { useUserStore } from "@/store/user";
-import { useNotificationStore } from "@/store/notification";
 import Home from "@/views/home/index.vue";
 import Record from "@/views/record/index.vue";
 import User from "@/views/user/index.vue";

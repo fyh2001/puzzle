@@ -11,21 +11,20 @@ const polling = async () => {
 };
 
 const fetchNotifications = async () => {
-  await notificationStore.fetchNotificationList({
-    pagination: {
-      page: 1,
-      pageSize: 10,
-    },
-  });
+  await notificationStore.fetchNotificationsDefault();
 
   // 有未读消息
   if (notificationStore.getNotificationUnreadTotal > 0) {
     //首次加载
     if (!notificationStore.getNotifiedStatus) {
       notificationStore.setNotified();
-      return Message.info(
-        `您有 ${notificationStore.getNotificationUnreadTotal} 条未读消息`
-      );
+      if (notificationStore.getNotificationUnreadTotal <= 10) {
+        return Message.info(
+          `您有 ${notificationStore.getNotificationUnreadTotal} 条未读消息`
+        );
+      } else {
+        return Message.info("您有超过 10 条未读消息");
+      }
     }
 
     // 非首次加载
