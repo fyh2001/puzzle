@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { InfoRound } from "@vicons/material";
+import { Raw, markRaw } from "vue";
 import { useNotificationStore } from "@/store/notification";
 import { notificationUserStatusRequest } from "api/notification";
 import { useMessage } from "naive-ui";
@@ -7,6 +9,10 @@ import type { NotificationResp } from "@/types/notification";
 const Message = useMessage();
 
 const notificationStore = useNotificationStore();
+
+const NotificationIcon: Record<string, Raw<any>> = {
+  InfoRound: InfoRound,
+};
 
 const handleNotificationRead = async (data: NotificationResp) => {
   if (data.notificationUserStatusInfo.status === 1) return;
@@ -58,8 +64,11 @@ console.log(notificationStore.getNotificationList);
         >
           <!-- 标题与时间 -->
           <div class="flex justify-between items-center">
-            <div class="flex justify-between items-center">
-              <n-icon />
+            <div class="flex justify-between items-center gap-2">
+              <n-icon
+                :size="24"
+                :component="NotificationIcon[data.notificationTypeInfo.icon]"
+              />
               <div class="text-4.5 font-bold">
                 {{ data.notificationTypeInfo?.name }}
               </div>
@@ -69,7 +78,7 @@ console.log(notificationStore.getNotificationList);
             </div>
           </div>
           <!-- 内容 -->
-          <div class="mt-4 indent-4 text-4">{{ data.content }}</div>
+          <div class="mt-2 indent-4 text-4">{{ data.content }}</div>
         </div>
       </div>
     </div>

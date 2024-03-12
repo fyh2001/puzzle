@@ -6,6 +6,7 @@ import (
 	"puzzle/app/models"
 
 	commonService "puzzle/app/services"
+	notificationService "puzzle/app/services/notification"
 	recordBestAverageSerivce "puzzle/app/services/record-best-average"
 	recordBestSingleSerivce "puzzle/app/services/record-best-single"
 	recordBestStepSerivce "puzzle/app/services/record-best-step"
@@ -270,6 +271,11 @@ func updateRecordBestSingle(record *models.Record) error {
 		return errors.New("获取最佳单次记录失败")
 	}
 
+	// 若有最佳单次记录, 且当前记录的持续时间大于最佳单次记录, 则直接返回(没有打破记录)
+	if recordBestSingle.Total > 1 && record.Duration > recordBestSingle.Records[0].RecordDuration {
+		return nil
+	}
+
 	// 若无最佳单次记录, 则直接插入
 	if recordBestSingle.Total == 0 {
 		snowflake := utils.Snowflake{}
@@ -287,6 +293,7 @@ func updateRecordBestSingle(record *models.Record) error {
 		if err != nil {
 			return errors.New("新增最佳单次记录失败")
 		}
+
 	} else {
 		// 若有最佳单次记录, 则比较并更新
 		if record.Duration < recordBestSingle.Records[0].RecordDuration {
@@ -305,6 +312,12 @@ func updateRecordBestSingle(record *models.Record) error {
 				return errors.New("更新最佳单次记录失败")
 			}
 		}
+	}
+
+	// 发布通知
+	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳单次记录, 用时 %d 秒, 步数 %d, 排名可前往排行榜查看", record.Dimension, record.Duration/1000, record.Step))
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -377,6 +390,11 @@ func updateRecordBestAverage5(record *models.Record) error {
 
 	recordIdsStr := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(recordIds)), ","), "[]")
 
+	// 若有最佳平均记录, 且当前记录的平均持续时间大于最佳平均记录, 则直接返回(没有打破记录)
+	if recordBestAverage.Total > 0 && averageDuration > recordBestAverage.Records[0].RecordAverageDuration {
+		return nil
+	}
+
 	// 若无最佳平均记录, 则直接插入
 	if recordBestAverage.Total == 0 {
 		snowflake := utils.Snowflake{}
@@ -413,6 +431,12 @@ func updateRecordBestAverage5(record *models.Record) error {
 				return errors.New("更新最佳平均记录失败")
 			}
 		}
+	}
+
+	// 发布通知
+	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳5次平均记录, 平均用时 %f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -484,6 +508,11 @@ func updateRecordBestAverage12(record *models.Record) error {
 
 	recordIdsStr := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(recordIds)), ","), "[]")
 
+	// 若有最佳平均记录, 且当前记录的平均持续时间大于最佳平均记录, 则直接返回(没有打破记录)
+	if recordBestAverage.Total > 0 && averageDuration > recordBestAverage.Records[0].RecordAverageDuration {
+		return nil
+	}
+
 	// 若无最佳平均记录, 则直接插入
 	if recordBestAverage.Total == 0 {
 		snowflake := utils.Snowflake{}
@@ -521,6 +550,13 @@ func updateRecordBestAverage12(record *models.Record) error {
 			}
 		}
 	}
+
+	// 发布通知
+	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳12次平均记录, 平均用时 %f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -539,6 +575,11 @@ func updateRecordBestStep(record *models.Record) error {
 
 	if err != nil {
 		return errors.New("获取最佳步数记录失败")
+	}
+
+	// 若有最佳步数记录, 且当前记录的步数大于最佳步数记录, 则直接返回(没有打破记录)
+	if recordBestStep.Total > 0 && record.Step > recordBestStep.Records[0].RecordStep {
+		return nil
 	}
 
 	// 若无最佳步数记录, 则直接插入
@@ -578,5 +619,28 @@ func updateRecordBestStep(record *models.Record) error {
 			}
 		}
 	}
+
+	// 发布通知
+	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳步数记录, 步数 %d 步, 排名可前往排行榜查看", record.Dimension, record.Step))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// publishNotification 发布通知
+func publishNotification(userId int64, content string) error {
+
+	err := notificationService.Insert(&models.NotificationReq{
+		UserId:  userId,
+		TypeId:  1,
+		Content: content,
+	})
+
+	if err != nil {
+		return errors.New("发布通知失败")
+	}
+
 	return nil
 }
