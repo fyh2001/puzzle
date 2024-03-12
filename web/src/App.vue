@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import GlobalProvider from "@/components/global-provider.vue";
+import polling from "@/components/polling.vue";
 import { onMounted } from "vue";
 import { useThemeStore } from "@/store/theme";
 
@@ -10,6 +11,7 @@ onMounted(() => {});
 
 <template>
   <global-provider>
+    <polling />
     <router-view v-slot="{ Component }">
       <transition :name="'fade'" mode="out-in">
         <component

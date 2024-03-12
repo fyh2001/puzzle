@@ -7,13 +7,9 @@ import {
 } from "@vicons/material";
 import Tabbar from "@/components/tabbar.vue";
 import { useI18n } from "vue-i18n";
-import { useMessage } from "naive-ui";
-import { useUserStore } from "@/store/user";
-import { useNotificationStore } from "@/store/notification";
 import type { TabbarItem } from "@/components/tabbar.vue";
 
 const { t } = useI18n();
-const Message = useMessage();
 
 const tabsContent = computed<TabbarItem[]>(() => [
   {
@@ -32,26 +28,6 @@ const tabsContent = computed<TabbarItem[]>(() => [
     path: "/user",
   },
 ]);
-
-const userStore = useUserStore();
-const notificationStore = useNotificationStore();
-
-if (userStore.getToken) {
-  notificationStore
-    .fetchNotificationList({
-      pagination: {
-        page: 1,
-        pageSize: 10,
-      },
-      userId: userStore.getUser.id,
-    })
-    .then(() => {
-      if (notificationStore.getNotificationUnreadTotal > 0)
-        Message.info(
-          `您有 ${notificationStore.getNotificationUnreadTotal} 条未读消息`
-        );
-    });
-}
 </script>
 
 <template>

@@ -34,7 +34,6 @@ const handleNotificationRead = async (data: NotificationResp) => {
     },
   });
 };
-console.log(notificationStore.getNotificationList);
 </script>
 
 <template>

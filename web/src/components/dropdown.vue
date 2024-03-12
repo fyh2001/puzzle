@@ -48,6 +48,7 @@ const options = computed(() => [
           dot
           processing
           value={notificationStore.getNotificationUnreadTotal}
+          show={notificationStore.getNotificationUnreadTotal > 0}
           max={10}
         >
           <n-el class="flex items center" style="color: var(--primary-color)">

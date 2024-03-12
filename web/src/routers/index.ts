@@ -25,7 +25,6 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     name: "Index",
     component: () => import("@/views/index/index.vue"),
-    meta: { notification: true },
     children: [
       {
         path: "/",
@@ -56,7 +55,6 @@ const routes: RouteRecordRaw[] = [
     path: "/notification",
     name: "Notification",
     component: () => import("@/views/notification/index.vue"),
-    meta: { notification: true },
   },
   {
     path: "/record-detail",
@@ -197,19 +195,6 @@ router.afterEach((to, from) => {
 
     if (adminStore.getToken === "") {
       router.push({ name: "AdminAuth" });
-    }
-  }
-
-  // 判断是否请求通知
-  if (to.meta.notification) {
-    const userStore = useUserStore();
-    const notificationStore = useNotificationStore();
-    // 判断是否登录
-    if (userStore.getToken) {
-      notificationStore.fetchNotificationList({
-        userId: userStore.getUser.id,
-        pagination: { page: 1, pageSize: 10 },
-      });
     }
   }
 });

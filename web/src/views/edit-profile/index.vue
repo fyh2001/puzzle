@@ -20,6 +20,7 @@ const profileItemOptions = computed(() => [
   {
     label: t("editProfile.content.avatar"),
     avatar: userStore.getUser.avatar || defaultAvatar,
+    divider: true,
     dialog: AvatarDialog,
   },
   {
@@ -68,6 +69,7 @@ const commonUpdate = async (form: UserModel) => {
           :label="data.label"
           :content="data.content"
           :avatar="data.avatar"
+          :divider="data.divider"
           @update="commonUpdate"
         >
           <template #dialog v-if="data.dialog">
