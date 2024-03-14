@@ -3,17 +3,19 @@ package controllers
 import (
 	"puzzle/app/common/result"
 	"puzzle/app/models"
-	adminAuthorizationService "puzzle/app/services/admin-authorization"
+	"puzzle/app/services"
 
 	"github.com/gin-gonic/gin"
 )
 
-type AdminAuthorization struct {
+type AdminAuthorizationController struct{}
+
+type AdminAuthorizationResp struct {
 	Code string `json:"code"` // 验证码
 }
 
-func ResetOtp(c *gin.Context) {
-	url, err := adminAuthorizationService.GenerateSecretKey()
+func (AdminAuthorizationController) ResetOtp(c *gin.Context) {
+	url, err := services.AdminAuthorization.GenerateSecretKey()
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -26,8 +28,8 @@ func ResetOtp(c *gin.Context) {
 	c.JSON(200, result.Success(secretResp))
 }
 
-func Authorization(c *gin.Context) {
-	var adminAuthorization AdminAuthorization
+func (AdminAuthorizationController) Authorization(c *gin.Context) {
+	var adminAuthorization AdminAuthorizationResp
 
 	// 获取参数
 	if err := c.ShouldBindJSON(&adminAuthorization); err != nil {
@@ -36,7 +38,7 @@ func Authorization(c *gin.Context) {
 	}
 
 	// 校验验证码
-	adminAuthorizationResp, err := adminAuthorizationService.Authorization(adminAuthorization.Code)
+	adminAuthorizationResp, err := services.AdminAuthorization.Authorization(adminAuthorization.Code)
 
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
@@ -46,8 +48,8 @@ func Authorization(c *gin.Context) {
 	c.JSON(200, result.Success(adminAuthorizationResp))
 }
 
-func GetUrl(c *gin.Context) {
-	url, err := adminAuthorizationService.GetUrl()
+func (AdminAuthorizationController) GetUrl(c *gin.Context) {
+	url, err := services.AdminAuthorization.GetUrl()
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return

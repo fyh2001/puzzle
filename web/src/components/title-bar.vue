@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, defineProps } from "vue";
 import { useCommonStore } from "@/store/common";
 
 const commonStore = useCommonStore();

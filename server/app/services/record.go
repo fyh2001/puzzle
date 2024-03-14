@@ -1,16 +1,10 @@
-package record
+package services
 
 import (
 	"errors"
 	"fmt"
 	"puzzle/app/models"
 
-	commonService "puzzle/app/services"
-	notificationService "puzzle/app/services/notification"
-	recordBestAverageSerivce "puzzle/app/services/record-best-average"
-	recordBestSingleSerivce "puzzle/app/services/record-best-single"
-	recordBestStepSerivce "puzzle/app/services/record-best-step"
-	scrambledUserStatusService "puzzle/app/services/scrambled-user-status"
 	"puzzle/database"
 	"puzzle/utils"
 	"sort"
@@ -18,8 +12,23 @@ import (
 	"strings"
 )
 
+type RecordService interface {
+	check(record *models.Record) error
+	Insert(record *models.Record) error
+	List(recordReq *models.RecordReq) (models.RecordListResp, error)
+	GetRecordByIds(recordIds []int64) (models.RecordListResp, error)
+	Update(record *models.Record) error
+	updateRecordBestSingle(record *models.Record) error
+	updateRecordBestAverage5(record *models.Record) error
+	updateRecordBestAverage12(record *models.Record) error
+	updateRecordBestStep(record *models.Record) error
+	publishNotification(userId int64, content string) error
+}
+
+type RecordImpl struct{}
+
 // check 检查参数
-func check(record *models.Record) error {
+func (RecordImpl) check(record *models.Record) error {
 	if record.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -56,9 +65,9 @@ func check(record *models.Record) error {
 }
 
 // Insert 新增记录
-func Insert(record *models.Record) error {
+func (RecordImpl) Insert(record *models.Record) error {
 	// 检查参数
-	err := check(record)
+	err := Record.check(record)
 	if err != nil {
 		return err
 	}
@@ -77,7 +86,7 @@ func Insert(record *models.Record) error {
 	// 若记录为非练习记录, 则需要更新用户的记录
 	if record.Type != 1 {
 		// 更新用户的完成状态
-		scrambledUserStatus, err := scrambledUserStatusService.List(&models.ScrambledUserStatusReq{
+		scrambledUserStatus, err := ScrambledUserStatus.List(&models.ScrambledUserStatusReq{
 			UserId:    record.UserId,
 			Dimension: record.Dimension,
 			Pagination: utils.Pagination{
@@ -91,7 +100,7 @@ func Insert(record *models.Record) error {
 
 		id, _ := strconv.ParseInt(scrambledUserStatus.Records[0].Id, 10, 64)
 
-		err = scrambledUserStatusService.Update(&models.ScrambledUserStatus{
+		err = ScrambledUserStatus.Update(&models.ScrambledUserStatus{
 			Id:     id,
 			Status: 2,
 		})
@@ -101,25 +110,25 @@ func Insert(record *models.Record) error {
 		}
 
 		// 更新用户最佳单次记录
-		err = updateRecordBestSingle(record)
+		err = Record.updateRecordBestSingle(record)
 		if err != nil {
 			return err
 		}
 
 		// 更新用户最佳5次平均记录
-		err = updateRecordBestAverage5(record)
+		err = Record.updateRecordBestAverage5(record)
 		if err != nil {
 			return err
 		}
 
 		// 更新用户最佳12次平均记录
-		err = updateRecordBestAverage12(record)
+		err = Record.updateRecordBestAverage12(record)
 		if err != nil {
 			return err
 		}
 
 		// 更新用户最佳步数记录
-		err = updateRecordBestStep(record)
+		err = Record.updateRecordBestStep(record)
 		if err != nil {
 			return err
 		}
@@ -129,11 +138,11 @@ func Insert(record *models.Record) error {
 }
 
 // List 记录列表
-func List(recordReq *models.RecordReq) (models.RecordListResp, error) {
+func (RecordImpl) List(recordReq *models.RecordReq) (models.RecordListResp, error) {
 	var recordListResp models.RecordListResp
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
-		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
+		userInfo, err := User.GetUserByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
 		if err != nil {
 			return recordListResp, errors.New("查询用户信息失败")
 		}
@@ -244,8 +253,20 @@ func List(recordReq *models.RecordReq) (models.RecordListResp, error) {
 	return recordListResp, nil
 }
 
+// GetRecordDetail 获取记录详情
+func (RecordImpl) GetRecordByIds(recordIds []int64) (models.RecordListResp, error) {
+	var recordDetail models.RecordListResp
+
+	err := database.GetMySQL().Table("record").Where("id in ?", recordIds).Find(&recordDetail.Records).Error
+	if err != nil {
+		return recordDetail, err
+	}
+
+	return recordDetail, nil
+}
+
 // Update 更新记录
-func Update(record *models.Record) error {
+func (RecordImpl) Update(record *models.Record) error {
 	err := database.GetMySQL().Model(&record).Updates(&record).Error
 	if err != nil {
 		return errors.New("更新失败")
@@ -255,10 +276,10 @@ func Update(record *models.Record) error {
 }
 
 // updateRecordBestSingle 更新最佳单次记录
-func updateRecordBestSingle(record *models.Record) error {
+func (RecordImpl) updateRecordBestSingle(record *models.Record) error {
 
 	// 获取最佳单次记录
-	recordBestSingle, err := recordBestSingleSerivce.List(&models.RecordBestSingleReq{
+	recordBestSingle, err := RecordBestSingle.List(&models.RecordBestSingleReq{
 		UserId:    record.UserId,
 		Dimension: record.Dimension,
 
@@ -280,7 +301,7 @@ func updateRecordBestSingle(record *models.Record) error {
 	if recordBestSingle.Total == 0 {
 		snowflake := utils.Snowflake{}
 
-		err = recordBestSingleSerivce.Insert(&models.RecordBestSingle{
+		err = RecordBestSingle.Insert(&models.RecordBestSingle{
 			Id:               snowflake.NextVal(),
 			UserId:           record.UserId,
 			Dimension:        record.Dimension,
@@ -299,7 +320,7 @@ func updateRecordBestSingle(record *models.Record) error {
 		if record.Duration < recordBestSingle.Records[0].RecordDuration {
 			id, _ := strconv.ParseInt(recordBestSingle.Records[0].Id, 10, 64)
 
-			err = recordBestSingleSerivce.Update(&models.RecordBestSingle{
+			err = RecordBestSingle.Update(&models.RecordBestSingle{
 				Id:               id,
 				UserId:           record.UserId,
 				RecordId:         record.Id,
@@ -316,7 +337,7 @@ func updateRecordBestSingle(record *models.Record) error {
 	}
 
 	// 发布通知
-	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳单次记录, 用时 %.3f 秒, 步数 %d, 排名可前往排行榜查看", record.Dimension, float64(record.Duration)/1000, record.Step))
+	err = Record.publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳单次记录, 用时 %.3f 秒, 步数 %d, 排名可前往排行榜查看", record.Dimension, float64(record.Duration)/1000, record.Step))
 	if err != nil {
 		return err
 	}
@@ -325,10 +346,10 @@ func updateRecordBestSingle(record *models.Record) error {
 }
 
 // updateRecordBestAverag5e 更新最佳五次平均记录
-func updateRecordBestAverage5(record *models.Record) error {
+func (RecordImpl) updateRecordBestAverage5(record *models.Record) error {
 
 	// 获取用户最近5条记录
-	last5Records, err := List(&models.RecordReq{
+	last5Records, err := Record.List(&models.RecordReq{
 		UserId:    record.UserId,
 		Dimension: record.Dimension,
 		Type:      record.Type,
@@ -369,7 +390,7 @@ func updateRecordBestAverage5(record *models.Record) error {
 	averageDuration := totalDuration / (len(durations) - 2)
 
 	// 获取最佳平均记录
-	recordBestAverage, err := recordBestAverageSerivce.List(&models.RecordBestAverageReq{
+	recordBestAverage, err := RecordBestAverage.List(&models.RecordBestAverageReq{
 		UserId:    record.UserId,
 		Dimension: record.Dimension,
 		Type:      5,
@@ -400,7 +421,7 @@ func updateRecordBestAverage5(record *models.Record) error {
 	if recordBestAverage.Total == 0 {
 		snowflake := utils.Snowflake{}
 
-		err = recordBestAverageSerivce.Insert(&models.RecordBestAverage{
+		err = RecordBestAverage.Insert(&models.RecordBestAverage{
 			Id:                    snowflake.NextVal(),
 			UserId:                record.UserId,
 			Dimension:             record.Dimension,
@@ -419,7 +440,7 @@ func updateRecordBestAverage5(record *models.Record) error {
 
 		// 若有最佳平均记录, 则比较并更新
 		if averageDuration < recordBestAverage.Records[0].RecordAverageDuration {
-			err = recordBestAverageSerivce.Update(&models.RecordBestAverage{
+			err = RecordBestAverage.Update(&models.RecordBestAverage{
 				Id:                    id,
 				RecordIds:             recordIdsStr,
 				Dimension:             record.Dimension,
@@ -436,7 +457,7 @@ func updateRecordBestAverage5(record *models.Record) error {
 	}
 
 	// 发布通知
-	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳5次平均记录, 平均用时 %.3f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
+	err = Record.publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳5次平均记录, 平均用时 %.3f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
 	if err != nil {
 		return err
 	}
@@ -445,9 +466,9 @@ func updateRecordBestAverage5(record *models.Record) error {
 }
 
 // updateRecordBestAverage12 更新最佳12次平均记录
-func updateRecordBestAverage12(record *models.Record) error {
+func (RecordImpl) updateRecordBestAverage12(record *models.Record) error {
 	// 获取用户最近12条记录
-	last12Records, err := List(&models.RecordReq{
+	last12Records, err := Record.List(&models.RecordReq{
 		UserId:    record.UserId,
 		Dimension: record.Dimension,
 		Type:      record.Type,
@@ -488,7 +509,7 @@ func updateRecordBestAverage12(record *models.Record) error {
 	averageDuration := totalDuration / (len(durations) - 2)
 
 	// 获取最佳平均记录
-	recordBestAverage, err := recordBestAverageSerivce.List(&models.RecordBestAverageReq{
+	recordBestAverage, err := RecordBestAverage.List(&models.RecordBestAverageReq{
 		UserId:    record.UserId,
 		Dimension: record.Dimension,
 		Type:      12,
@@ -519,7 +540,7 @@ func updateRecordBestAverage12(record *models.Record) error {
 	if recordBestAverage.Total == 0 {
 		snowflake := utils.Snowflake{}
 
-		err = recordBestAverageSerivce.Insert(&models.RecordBestAverage{
+		err = RecordBestAverage.Insert(&models.RecordBestAverage{
 			Id:                    snowflake.NextVal(),
 			UserId:                record.UserId,
 			Dimension:             record.Dimension,
@@ -538,7 +559,7 @@ func updateRecordBestAverage12(record *models.Record) error {
 
 		// 若有最佳平均记录, 则比较并更新
 		if averageDuration < recordBestAverage.Records[0].RecordAverageDuration {
-			err = recordBestAverageSerivce.Update(&models.RecordBestAverage{
+			err = RecordBestAverage.Update(&models.RecordBestAverage{
 				Id:                    id,
 				RecordIds:             recordIdsStr,
 				Dimension:             record.Dimension,
@@ -555,7 +576,7 @@ func updateRecordBestAverage12(record *models.Record) error {
 	}
 
 	// 发布通知
-	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳12次平均记录, 平均用时 %.3f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
+	err = Record.publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳12次平均记录, 平均用时 %.3f 秒, 排名可前往排行榜查看", record.Dimension, float64(averageDuration)/1000))
 	if err != nil {
 		return err
 	}
@@ -564,10 +585,10 @@ func updateRecordBestAverage12(record *models.Record) error {
 }
 
 // updateRecordBestStep 更新最佳步数记录
-func updateRecordBestStep(record *models.Record) error {
+func (RecordImpl) updateRecordBestStep(record *models.Record) error {
 
 	// 获取用户最佳步数记录
-	recordBestStep, err := recordBestStepSerivce.List(&models.RecordBestStepReq{
+	recordBestStep, err := RecordBestStep.List(&models.RecordBestStepReq{
 		UserId:    record.UserId,
 		Dimension: record.Dimension,
 		Pagination: utils.Pagination{
@@ -590,7 +611,7 @@ func updateRecordBestStep(record *models.Record) error {
 
 		snowflake := utils.Snowflake{}
 
-		err = recordBestStepSerivce.Insert(&models.RecordBestStep{
+		err = RecordBestStep.Insert(&models.RecordBestStep{
 			Id:               snowflake.NextVal(),
 			UserId:           record.UserId,
 			Dimension:        record.Dimension,
@@ -607,7 +628,7 @@ func updateRecordBestStep(record *models.Record) error {
 
 		// 若有最佳步数记录, 则比较并更新
 		if record.Step < recordBestStep.Records[0].RecordStep {
-			err = recordBestStepSerivce.Update(&models.RecordBestStep{
+			err = RecordBestStep.Update(&models.RecordBestStep{
 				Id:               id,
 				RecordId:         record.Id,
 				UserId:           record.UserId,
@@ -623,7 +644,7 @@ func updateRecordBestStep(record *models.Record) error {
 	}
 
 	// 发布通知
-	err = publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳步数记录, 步数 %d 步, 排名可前往排行榜查看", record.Dimension, record.Step))
+	err = Record.publishNotification(record.UserId, fmt.Sprintf("恭喜您打破了 %d 阶最佳步数记录, 步数 %d 步, 排名可前往排行榜查看", record.Dimension, record.Step))
 	if err != nil {
 		return err
 	}
@@ -632,9 +653,9 @@ func updateRecordBestStep(record *models.Record) error {
 }
 
 // publishNotification 发布通知
-func publishNotification(userId int64, content string) error {
+func (RecordImpl) publishNotification(userId int64, content string) error {
 
-	err := notificationService.Insert(&models.NotificationReq{
+	err := Notification.Insert(&models.NotificationReq{
 		UserId:  userId,
 		TypeId:  1,
 		Content: content,

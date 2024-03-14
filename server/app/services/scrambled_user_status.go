@@ -1,4 +1,4 @@
-package scrambleduserstatus
+package services
 
 import (
 	"errors"
@@ -7,7 +7,16 @@ import (
 	"puzzle/utils"
 )
 
-func check(scrambledUserStatus *models.ScrambledUserStatus) error {
+type ScrambledUserStatusService interface {
+	check(scrambledUserStatus *models.ScrambledUserStatus) error
+	Insert(scrambledUserStatus *models.ScrambledUserStatus) error
+	List(scrambledUserStatusReq *models.ScrambledUserStatusReq) (models.ScrambledUserStatusListResp, error)
+	Update(scrambledUserStatus *models.ScrambledUserStatus) error
+}
+
+type ScrambledUserStatusImpl struct{}
+
+func (ScrambledUserStatusImpl) check(scrambledUserStatus *models.ScrambledUserStatus) error {
 	if scrambledUserStatus.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -23,8 +32,8 @@ func check(scrambledUserStatus *models.ScrambledUserStatus) error {
 	return nil
 }
 
-func Insert(scrambledUserStatus *models.ScrambledUserStatus) error {
-	if err := check(scrambledUserStatus); err != nil {
+func (ScrambledUserStatusImpl) Insert(scrambledUserStatus *models.ScrambledUserStatus) error {
+	if err := ScrambledUserStatus.check(scrambledUserStatus); err != nil {
 		return err
 	}
 
@@ -36,7 +45,7 @@ func Insert(scrambledUserStatus *models.ScrambledUserStatus) error {
 	return database.GetMySQL().Create(scrambledUserStatus).Error
 }
 
-func List(scrambledUserStatusReq *models.ScrambledUserStatusReq) (models.ScrambledUserStatusListResp, error) {
+func (ScrambledUserStatusImpl) List(scrambledUserStatusReq *models.ScrambledUserStatusReq) (models.ScrambledUserStatusListResp, error) {
 	var scrambledUserStatusListResp models.ScrambledUserStatusListResp
 	db := database.GetMySQL().Table("scrambled_user_status")
 
@@ -82,7 +91,7 @@ func List(scrambledUserStatusReq *models.ScrambledUserStatusReq) (models.Scrambl
 	return scrambledUserStatusListResp, nil
 }
 
-func Update(scrambledUserStatus *models.ScrambledUserStatus) error {
+func (ScrambledUserStatusImpl) Update(scrambledUserStatus *models.ScrambledUserStatus) error {
 	db := database.GetMySQL().Table("scrambled_user_status")
 
 	err := db.Updates(scrambledUserStatus).Error

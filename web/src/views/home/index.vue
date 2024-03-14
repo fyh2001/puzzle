@@ -502,7 +502,7 @@ watch(
             class="aspect-square flex items-center justify-center rounded-md text-center text-5 font-bold"
             :class="item === 0 ? 'invisible' : gameStore.getCellClass(item)"
             v-for="(item, colIndex) in row"
-            :key="colIndex"
+            :key="item"
             @click="handleTouch(rowIndex, colIndex)"
           >
             {{ item }}

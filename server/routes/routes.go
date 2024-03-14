@@ -22,41 +22,41 @@ func InitRouter() *gin.Engine {
 		// 用户
 		user := root.Group("/user")
 		{
-			user.POST("/register", controllers.Register)                     // 用户注册
-			user.POST("/login", controllers.Login)                           // 用户登录
-			user.POST("/list", controllers.ListUser)                         // 列表查询
-			user.POST("/get-user-info", jwt.JWT(), controllers.GetUserInfo)  // 获取用户信息
-			user.POST("/update-avatar", jwt.JWT(), controllers.UpdateAvatar) // 更新用户头像
-			user.POST("/update", jwt.JWT(), controllers.UpdateUser)          // 更新用户
+			user.POST("/register", controllers.User.Register)                     // 用户注册
+			user.POST("/login", controllers.User.Login)                           // 用户登录
+			user.POST("/list", controllers.User.List)                             // 列表查询
+			user.POST("/get-user-info", jwt.JWT(), controllers.User.GetUserInfo)  // 获取用户信息
+			user.POST("/update-avatar", jwt.JWT(), controllers.User.UpdateAvatar) // 更新用户头像
+			user.POST("/update", jwt.JWT(), controllers.User.Update)              // 更新用户
 		}
 
 		// 记录
 		record := root.Group("/record").Use(jwt.JWT())
 		{
-			record.POST("/insert", controllers.InsertRecord)                     // 新增记录
-			record.POST("/list-record", controllers.ListRecord)                  // 记录列表
-			record.POST("/list-best-single", controllers.ListRecordBestSingle)   // 最佳单次记录列表
-			record.POST("/list-best-average", controllers.ListRecordBestAverage) // 最佳平均记录列表
-			record.POST("/list-best-step", controllers.ListRecordBestStep)       // 最佳步数记录列表
-			record.POST("/update", controllers.UpdateRecord)                     // 更新记录
+			record.POST("/insert", controllers.Record.Insert)                     // 新增记录
+			record.POST("/list-record", controllers.Record.List)                  // 记录列表
+			record.POST("/list-best-single", controllers.RecordBestSingle.List)   // 最佳单次记录列表
+			record.POST("/list-best-average", controllers.RecordBestAverage.List) // 最佳平均记录列表
+			record.POST("/list-best-step", controllers.RecordBestStep.List)       // 最佳步数记录列表
+			record.POST("/update", controllers.Record.Update)                     // 更新记录
 		}
 
 		// 打乱
 		scramble := root.Group("/scramble").Use(jwt.JWT())
 		{
-			scramble.POST("/get-new-scramble", controllers.GetNewScamble)    // 获取新打乱
-			scramble.POST("/get-user-scramble", controllers.GetUserScramble) // 获取用户打乱
+			scramble.POST("/get-new-scramble", controllers.Scramble.GetNewScamble)    // 获取新打乱
+			scramble.POST("/get-user-scramble", controllers.Scramble.GetUserScramble) // 获取用户打乱
 		}
 
 		notification := root.Group("/notification")
 		{
-			notification.POST("/insert", controllers.InsertNotification)        // 发布通知
-			notification.POST("/list", jwt.JWT(), controllers.ListNotification) // 通知列表
+			notification.POST("/insert", controllers.Notification.Insert)        // 发布通知
+			notification.POST("/list", jwt.JWT(), controllers.Notification.List) // 通知列表
 		}
 
 		notificationUserStatus := root.Group("/notification-user-status").Use(jwt.JWT())
 		{
-			notificationUserStatus.POST("/insert", controllers.InsertNotificationUserStatus) // 插入通知用户状态
+			notificationUserStatus.POST("/insert", controllers.NotificationUserStatus.Insert) // 插入通知用户状态
 		}
 
 		// 管理员
@@ -65,41 +65,41 @@ func InitRouter() *gin.Engine {
 			// 鉴权
 			authorization := admin.Group("/authorization")
 			{
-				authorization.POST("/reset-otp", controllers.ResetOtp)          // 重置otp
-				authorization.POST("/authorization", controllers.Authorization) // 验证otp
-				authorization.POST("/get-url", controllers.GetUrl)              // 获取url
+				authorization.POST("/reset-otp", controllers.AdminAuthorization.ResetOtp)          // 重置otp
+				authorization.POST("/authorization", controllers.AdminAuthorization.Authorization) // 验证otp
+				authorization.POST("/get-url", controllers.AdminAuthorization.GetUrl)              // 获取url
 			}
 
 			// 用户
 			userManage := admin.Group("/user-manage").Use(jwt.AdminJWT())
 			{
-				userManage.POST("/list", controllers.ListUserData)     // 用户列表
-				userManage.POST("/update", controllers.UpdateUserData) // 更新用户
+				userManage.POST("/list", controllers.Admin.ListUserData)     // 用户列表
+				userManage.POST("/update", controllers.Admin.UpdateUserData) // 更新用户
 			}
 
 			// 记录
 			recordManage := admin.Group("/record-manage").Use(jwt.AdminJWT())
 			{
-				recordManage.POST("/list", controllers.ListRecordData)     // 记录列表
-				recordManage.POST("/update", controllers.UpdateRecordData) // 更新记录
+				recordManage.POST("/list", controllers.Admin.ListRecordData)     // 记录列表
+				recordManage.POST("/update", controllers.Admin.UpdateRecordData) // 更新记录
 			}
 
 			// 最佳单次记录
 			recordBestSingleManage := admin.Group("/record-best-single-manage").Use(jwt.AdminJWT())
 			{
-				recordBestSingleManage.POST("/list", controllers.ListRecordBestSingleData) // 最佳单次记录列表
+				recordBestSingleManage.POST("/list", controllers.Admin.ListRecordBestSingleData) // 最佳单次记录列表
 			}
 
 			// 最佳平均记录
 			recordBestAverageManage := admin.Group("/record-best-average-manage").Use(jwt.AdminJWT())
 			{
-				recordBestAverageManage.POST("/list", controllers.ListRecordBestAverageData) // 最佳平均记录列表
+				recordBestAverageManage.POST("/list", controllers.Admin.ListRecordBestAverageData) // 最佳平均记录列表
 			}
 
 			// 最佳步数记录
 			recordBestStepManage := admin.Group("/record-best-step-manage").Use(jwt.AdminJWT())
 			{
-				recordBestStepManage.POST("/list", controllers.ListRecordBestStepData) // 最佳步数记录列表
+				recordBestStepManage.POST("/list", controllers.Admin.ListRecordBestStepData) // 最佳步数记录列表
 			}
 		}
 	}

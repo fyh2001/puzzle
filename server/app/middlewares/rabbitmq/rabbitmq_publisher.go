@@ -3,9 +3,15 @@ package rabbitmq
 import (
 	"context"
 	"fmt"
+	"puzzle/app/middlewares/rabbitmq/handlers"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+type RabbitMQMessage struct {
+	Message    string
+	RankUpdate handlers.RankUpdate
+}
 
 // 简单模式Step 2:简单模式下生产代码
 func (r *RabbitMQ) Publish(message []byte) {

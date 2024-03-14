@@ -1,11 +1,12 @@
-package recordbestsingle
+package services
 
 import (
 	"encoding/json"
 	"errors"
 	"puzzle/app/middlewares/rabbitmq"
+	"puzzle/app/middlewares/rabbitmq/handlers"
 	"puzzle/app/models"
-	commonService "puzzle/app/services"
+
 	"puzzle/database"
 	"puzzle/utils"
 	"strconv"
@@ -13,8 +14,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type RecordBestSingleService interface {
+	check(record *models.RecordBestSingle) error
+	Insert(record *models.RecordBestSingle) error
+	List(recordReq *models.RecordBestSingleReq) (models.RecordBestSingleListResp, error)
+	Update(record *models.RecordBestSingle) error
+	publishMessage(rankUpdate handlers.RankUpdate)
+}
+
+type RecordBestSingleImpl struct{}
+
 // publishMessage 发送消息至消息队列
-func publishMessage(rankUpdate commonService.RankUpdate) {
+func (RecordBestSingleImpl) publishMessage(rankUpdate handlers.RankUpdate) {
 	mq := rabbitmq.NewRabbitMQ("best_single_rank_update_queue", "", "")
 	defer mq.Destory()
 
@@ -31,7 +42,7 @@ func publishMessage(rankUpdate commonService.RankUpdate) {
 	mq.Publish(messageByte)
 }
 
-func check(record *models.RecordBestSingle) error {
+func (RecordBestSingleImpl) check(record *models.RecordBestSingle) error {
 	if record.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -56,9 +67,9 @@ func check(record *models.RecordBestSingle) error {
 }
 
 // Insert 插入一条记录
-func Insert(record *models.RecordBestSingle) error {
+func (RecordBestSingleImpl) Insert(record *models.RecordBestSingle) error {
 	// 校验参数
-	err := check(record)
+	err := RecordBestSingle.check(record)
 	if err != nil {
 		return err
 	}
@@ -71,7 +82,7 @@ func Insert(record *models.RecordBestSingle) error {
 	}
 
 	// 发送消息至消息队列
-	publishMessage(commonService.RankUpdate{
+	RecordBestSingle.publishMessage(handlers.RankUpdate{
 		Dimension: record.Dimension,
 	})
 
@@ -79,11 +90,11 @@ func Insert(record *models.RecordBestSingle) error {
 }
 
 // List 查询记录列表
-func List(recordReq *models.RecordBestSingleReq) (models.RecordBestSingleListResp, error) {
+func (RecordBestSingleImpl) List(recordReq *models.RecordBestSingleReq) (models.RecordBestSingleListResp, error) {
 	var recordListResp models.RecordBestSingleListResp
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
-		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
+		userInfo, err := User.GetUserByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return recordListResp, errors.New("查询用户信息失败")
 		}
@@ -201,7 +212,7 @@ func List(recordReq *models.RecordBestSingleReq) (models.RecordBestSingleListRes
 }
 
 // Update 更新记录
-func Update(record *models.RecordBestSingle) error {
+func (RecordBestSingleImpl) Update(record *models.RecordBestSingle) error {
 	db := database.GetMySQL().Table("record_best_single")
 
 	err := db.Updates(record).Error
@@ -211,7 +222,7 @@ func Update(record *models.RecordBestSingle) error {
 	}
 
 	// 发送消息至消息队列
-	publishMessage(commonService.RankUpdate{
+	RecordBestSingle.publishMessage(handlers.RankUpdate{
 		Dimension: record.Dimension,
 	})
 

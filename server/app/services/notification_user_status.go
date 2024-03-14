@@ -1,4 +1,4 @@
-package notificationuserstatus
+package services
 
 import (
 	"errors"
@@ -8,7 +8,14 @@ import (
 	"strconv"
 )
 
-func check(notificationUserStatus *models.NotificationUserStatus) error {
+type NotificationUserStatusService interface {
+	check(notificationUserStatus *models.NotificationUserStatus) error
+	Insert(notificationUserStatusReq *models.NotificationUserStatusReq) error
+}
+
+type NotificationUserStatusImpl struct{}
+
+func (NotificationUserStatusImpl) check(notificationUserStatus *models.NotificationUserStatus) error {
 	if notificationUserStatus.NotificationId == 0 {
 		return errors.New("通知ID不能为空")
 	}
@@ -20,14 +27,14 @@ func check(notificationUserStatus *models.NotificationUserStatus) error {
 	return nil
 }
 
-func Insert(notificationUserStatusReq *models.NotificationUserStatusReq) error {
+func (NotificationUserStatusImpl) Insert(notificationUserStatusReq *models.NotificationUserStatusReq) error {
 	notificationId, _ := strconv.ParseInt(notificationUserStatusReq.NotificationIdStr, 10, 64)
 	notificationUserStatus := &models.NotificationUserStatus{
 		NotificationId: notificationId,
 		UserId:         notificationUserStatusReq.UserId,
 	}
 
-	err := check(notificationUserStatus)
+	err := NotificationUserStatus.check(notificationUserStatus)
 	if err != nil {
 		return err
 	}

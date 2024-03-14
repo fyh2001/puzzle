@@ -1,4 +1,4 @@
-package adminauthorization
+package services
 
 import (
 	"context"
@@ -11,13 +11,21 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
+type AdminAuthorizationService interface {
+	GenerateSecretKey() (string, error)
+	Authorization(code string) (models.AdminAuthorizationResp, error)
+	GetUrl() (string, error)
+}
+
+type AdminAuthorizationImpl struct{}
+
 var option = totp.GenerateOpts{
 	Issuer:      "puzzle",
 	AccountName: "defo1215.cn",
 }
 
 // GenerateSecretKey 生成一个新的密钥
-func GenerateSecretKey() (string, error) {
+func (AdminAuthorizationImpl) GenerateSecretKey() (string, error) {
 	key, err := totp.Generate(option)
 	if err != nil {
 		return "", errors.New("生成密钥失败")
@@ -43,7 +51,7 @@ func GenerateSecretKey() (string, error) {
 }
 
 // Authorization 验证验证码并获取token
-func Authorization(code string) (models.AdminAuthorizationResp, error) {
+func (AdminAuthorizationImpl) Authorization(code string) (models.AdminAuthorizationResp, error) {
 	var adminAuthorizationResp models.AdminAuthorizationResp
 
 	// 从redis获取secret
@@ -71,7 +79,7 @@ func Authorization(code string) (models.AdminAuthorizationResp, error) {
 }
 
 // GetUrl 获取url
-func GetUrl() (string, error) {
+func (AdminAuthorizationImpl) GetUrl() (string, error) {
 	url, err := database.GetRedis().Get(context.Background(), "admin:opt_url").Result()
 	if err != nil {
 		return "", errors.New("获取opt_url失败")

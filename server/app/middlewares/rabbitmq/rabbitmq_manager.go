@@ -1,8 +1,6 @@
 package rabbitmq
 
-import (
-	commonService "puzzle/app/services"
-)
+import "puzzle/app/middlewares/rabbitmq/handlers"
 
 type CallbackFunc[T any] func(T) error
 type CallbackFunc2 func(args ...interface{}) error
@@ -20,17 +18,17 @@ var recordRankUpdateQueue = []rabbitMQ[any]{
 	{
 		QueueName:    "best_single_rank_update_queue",
 		ExchangeName: "",
-		callback:     commonService.UpdateRecordBestSingleRank,
+		callback:     handlers.UpdateRecordBestSingleRank,
 	},
 	{
 		QueueName:    "best_average_rank_update_queue",
 		ExchangeName: "",
-		callback:     commonService.UpdateRecordBestAverageRank,
+		callback:     handlers.UpdateRecordBestAverageRank,
 	},
 	{
 		QueueName:    "best_step_rank_update_queue",
 		ExchangeName: "",
-		callback:     commonService.UpdateRecordBestStepRank,
+		callback:     handlers.UpdateRecordBestStepRank,
 	},
 }
 

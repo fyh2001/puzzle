@@ -48,7 +48,7 @@ onMounted(() => {
 
 <template>
   <n-el class="h-full">
-    <n-carousel :show-dots="false" :loop="false" :space-between="20">
+    <n-carousel :show-dots="true" :loop="false" :space-between="20">
       <!--   用户信息 和 记录信息-->
       <n-el class="flex flex-col items-center gap-4 w-full">
         <!-- 用户信息 -->

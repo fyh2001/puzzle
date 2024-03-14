@@ -3,16 +3,16 @@ package controllers
 import (
 	HttpResult "puzzle/app/common/result"
 	"puzzle/app/models"
-	recordService "puzzle/app/services/record"
-	recordBestAverageService "puzzle/app/services/record-best-average"
-	recordBestSingleService "puzzle/app/services/record-best-single"
-	recordBestStepSerivce "puzzle/app/services/record-best-step"
+	"puzzle/app/services"
+
 	"puzzle/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InsertRecord(c *gin.Context) {
+type RecordController struct{}
+
+func (RecordController) Insert(c *gin.Context) {
 	var record models.Record
 	err := c.ShouldBind(&record)
 	if err != nil {
@@ -37,7 +37,7 @@ func InsertRecord(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	record.UserId = userId.(int64)
 
-	err = recordService.Insert(&record)
+	err = services.Record.Insert(&record)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -46,7 +46,7 @@ func InsertRecord(c *gin.Context) {
 	c.JSON(200, HttpResult.Success("添加成功"))
 }
 
-func ListRecord(c *gin.Context) {
+func (RecordController) List(c *gin.Context) {
 	var recordReq models.RecordReq
 	err := c.ShouldBind(&recordReq)
 	if err != nil {
@@ -54,7 +54,7 @@ func ListRecord(c *gin.Context) {
 		return
 	}
 
-	recordList, err := recordService.List(&recordReq)
+	recordList, err := services.Record.List(&recordReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -63,7 +63,7 @@ func ListRecord(c *gin.Context) {
 	c.JSON(200, HttpResult.Success(recordList))
 }
 
-func UpdateRecord(c *gin.Context) {
+func (RecordController) Update(c *gin.Context) {
 	var record models.Record
 	err := c.ShouldBind(&record)
 	if err != nil {
@@ -71,62 +71,11 @@ func UpdateRecord(c *gin.Context) {
 		return
 	}
 
-	err = recordService.Update(&record)
+	err = services.Record.Update(&record)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
 	}
 
 	c.JSON(200, HttpResult.Success("修改成功"))
-}
-
-func ListRecordBestSingle(c *gin.Context) {
-	var recordReq models.RecordBestSingleReq
-	err := c.ShouldBind(&recordReq)
-	if err != nil {
-		c.JSON(200, HttpResult.Fail("参数错误"))
-		return
-	}
-
-	recordList, err := recordBestSingleService.List(&recordReq)
-	if err != nil {
-		c.JSON(200, HttpResult.Fail(err.Error()))
-		return
-	}
-
-	c.JSON(200, HttpResult.Success(recordList))
-}
-
-func ListRecordBestAverage(c *gin.Context) {
-	var recordReq models.RecordBestAverageReq
-	err := c.ShouldBind(&recordReq)
-	if err != nil {
-		c.JSON(200, HttpResult.Fail("参数错误"))
-		return
-	}
-
-	recordList, err := recordBestAverageService.List(&recordReq)
-	if err != nil {
-		c.JSON(200, HttpResult.Fail(err.Error()))
-		return
-	}
-
-	c.JSON(200, HttpResult.Success(recordList))
-}
-
-func ListRecordBestStep(c *gin.Context) {
-	var recordReq models.RecordBestStepReq
-	err := c.ShouldBind(&recordReq)
-	if err != nil {
-		c.JSON(200, HttpResult.Fail("参数错误"))
-		return
-	}
-
-	recordList, err := recordBestStepSerivce.List(&recordReq)
-	if err != nil {
-		c.JSON(200, HttpResult.Fail(err.Error()))
-		return
-	}
-
-	c.JSON(200, HttpResult.Success(recordList))
 }

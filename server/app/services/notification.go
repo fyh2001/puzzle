@@ -1,9 +1,8 @@
-package notification
+package services
 
 import (
 	"errors"
 	"puzzle/app/models"
-	commonService "puzzle/app/services"
 	"puzzle/database"
 	"puzzle/utils"
 	"strconv"
@@ -12,13 +11,23 @@ import (
 	"gorm.io/gorm"
 )
 
+type NotificationService interface {
+	check(notification *models.Notification) error
+	Insert(notificationReq *models.NotificationReq) error
+	List(notificationReq *models.NotificationReq) (models.NotificationListResp, error)
+}
+
+type NotificationImpl struct{}
+
+var currentTitle = "Notification"
+
 var tableName = "notification"
 
-func check(notification *models.Notification) error {
+func (NotificationImpl) check(notification *models.Notification) error {
 	return nil
 }
 
-func Insert(notificationReq *models.NotificationReq) error {
+func (NotificationImpl) Insert(notificationReq *models.NotificationReq) error {
 
 	if notificationReq.UserIdStr != "" {
 		notificationReq.UserId, _ = strconv.ParseInt(notificationReq.UserIdStr, 10, 64)
@@ -27,16 +36,14 @@ func Insert(notificationReq *models.NotificationReq) error {
 	snowflake := utils.Snowflake{}
 
 	notification := &models.Notification{
-		Id:        snowflake.NextVal(),
-		UserId:    notificationReq.UserId,
-		TypeId:    notificationReq.TypeId,
-		Content:   notificationReq.Content,
-		Status:    1,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		Id:      snowflake.NextVal(),
+		UserId:  notificationReq.UserId,
+		TypeId:  notificationReq.TypeId,
+		Content: notificationReq.Content,
+		Status:  1,
 	}
 
-	err := check(notification)
+	err := Notification.check(notification)
 	if err != nil {
 		return err
 	}
@@ -51,11 +58,11 @@ func Insert(notificationReq *models.NotificationReq) error {
 	return nil
 }
 
-func List(notificationReq *models.NotificationReq) (models.NotificationListResp, error) {
+func (NotificationImpl) List(notificationReq *models.NotificationReq) (models.NotificationListResp, error) {
 	var notificationListResp models.NotificationListResp
 
 	if notificationReq.Username != "" || notificationReq.Nickname != "" {
-		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(notificationReq.Username, notificationReq.Nickname)
+		userInfo, err := User.GetUserByUsernameOrNickname(notificationReq.Username, notificationReq.Nickname)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return notificationListResp, errors.New("查询用户信息失败")
 		}

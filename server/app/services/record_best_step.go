@@ -1,12 +1,11 @@
-package recordbeststep
+package services
 
 import (
 	"encoding/json"
 	"errors"
 	"puzzle/app/middlewares/rabbitmq"
+	"puzzle/app/middlewares/rabbitmq/handlers"
 	"puzzle/app/models"
-	commonService "puzzle/app/services"
-	userService "puzzle/app/services/user"
 	"puzzle/database"
 	"puzzle/utils"
 	"strconv"
@@ -14,26 +13,19 @@ import (
 	"gorm.io/gorm"
 )
 
-// publishMessage 发送消息至消息队列
-func publishMessage(rankUpdate commonService.RankUpdate) {
-	mq := rabbitmq.NewRabbitMQ("best_step_rank_update_queue", "", "")
-	defer mq.Destory()
-
-	message := rabbitmq.RabbitMQMessage{
-		RankUpdate: rankUpdate,
-		Message:    "rank update",
-	}
-
-	messageByte, err := json.Marshal(message)
-	if err != nil {
-		return
-	}
-
-	mq.Publish(messageByte)
+type RecordBestStepService interface {
+	check(record *models.RecordBestStep) error
+	Insert(record *models.RecordBestStep) error
+	List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, error)
+	ListWithUserInfo(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, error)
+	Update(record *models.RecordBestStep) error
+	publishMessage(rankUpdate handlers.RankUpdate)
 }
 
+type RecordBestStepImpl struct{}
+
 // check 检查参数
-func check(record *models.RecordBestStep) error {
+func (RecordBestStepImpl) check(record *models.RecordBestStep) error {
 	if record.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -54,8 +46,8 @@ func check(record *models.RecordBestStep) error {
 }
 
 // Insert 添加记录
-func Insert(record *models.RecordBestStep) error {
-	err := check(record)
+func (RecordBestStepImpl) Insert(record *models.RecordBestStep) error {
+	err := RecordBestStep.check(record)
 	if err != nil {
 		return err
 	}
@@ -66,7 +58,7 @@ func Insert(record *models.RecordBestStep) error {
 	}
 
 	// 发送消息至消息队列
-	publishMessage(commonService.RankUpdate{
+	RecordBestStep.publishMessage(handlers.RankUpdate{
 		Dimension: record.Dimension,
 	})
 
@@ -74,11 +66,11 @@ func Insert(record *models.RecordBestStep) error {
 }
 
 // List 查询记录
-func List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
+func (RecordBestStepImpl) List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
 	var recordBestStepListResp models.RecordBestStepListResp
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
-		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
+		userInfo, err := User.GetUserByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return recordBestStepListResp, errors.New("查询用户信息失败")
 		}
@@ -179,7 +171,7 @@ func List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, e
 			recordIds = append(recordIds, recordId)
 		}
 
-		recordList, err := commonService.GetRecordDetail(recordIds)
+		recordList, err := Record.GetRecordByIds(recordIds)
 		if err != nil {
 			return recordBestStepListResp, errors.New("查询记录详情失败")
 		}
@@ -200,7 +192,7 @@ func List(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, e
 }
 
 // ListWithUserInfo 查询记录并携带用户信息
-func ListWithUserInfo(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
+func (RecordBestStepImpl) ListWithUserInfo(recordReq *models.RecordBestStepReq) (models.RecordBestStepListResp, error) {
 	var recordBestStepListResp models.RecordBestStepListResp
 	db := database.GetMySQL().Table("record_best_step").Order("record_step " + recordReq.Sorted)
 
@@ -252,7 +244,7 @@ func ListWithUserInfo(recordReq *models.RecordBestStepReq) (models.RecordBestSte
 		Ids: userIds,
 	}
 
-	userList, err := userService.List(&userReq)
+	userList, err := User.List(&userReq)
 	if err != nil {
 		return recordBestStepListResp, errors.New("查询用户信息失败")
 	}
@@ -270,7 +262,7 @@ func ListWithUserInfo(recordReq *models.RecordBestStepReq) (models.RecordBestSte
 }
 
 // Update 更新记录
-func Update(record *models.RecordBestStep) error {
+func (RecordBestStepImpl) Update(record *models.RecordBestStep) error {
 	db := database.GetMySQL().Table("record_best_step").Where("user_id = ? AND dimension = ?", record.UserId, record.Dimension)
 
 	err := db.Updates(record).Error
@@ -280,9 +272,27 @@ func Update(record *models.RecordBestStep) error {
 	}
 
 	// 发送消息至消息队列
-	publishMessage(commonService.RankUpdate{
+	RecordBestStep.publishMessage(handlers.RankUpdate{
 		Dimension: record.Dimension,
 	})
 
 	return nil
+}
+
+// publishMessage 发送消息至消息队列
+func (RecordBestStepImpl) publishMessage(rankUpdate handlers.RankUpdate) {
+	mq := rabbitmq.NewRabbitMQ("best_step_rank_update_queue", "", "")
+	defer mq.Destory()
+
+	message := rabbitmq.RabbitMQMessage{
+		RankUpdate: rankUpdate,
+		Message:    "rank update",
+	}
+
+	messageByte, err := json.Marshal(message)
+	if err != nil {
+		return
+	}
+
+	mq.Publish(messageByte)
 }

@@ -77,6 +77,6 @@ type UserLoginResp struct {
 	User  UserResp `json:"user"`  // 用户信息
 }
 
-func (userResp UserResp) TableName() string {
+func (UserResp) TableName() string {
 	return "user"
 }

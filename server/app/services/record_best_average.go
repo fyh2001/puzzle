@@ -1,11 +1,12 @@
-package recordbestaverage
+package services
 
 import (
 	"encoding/json"
 	"errors"
 	"puzzle/app/middlewares/rabbitmq"
+	"puzzle/app/middlewares/rabbitmq/handlers"
 	"puzzle/app/models"
-	commonService "puzzle/app/services"
+
 	"puzzle/database"
 	"puzzle/utils"
 	"strconv"
@@ -15,8 +16,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type RecordBestAverageService interface {
+	check(record *models.RecordBestAverage) error
+	Insert(record *models.RecordBestAverage) error
+	List(recordReq *models.RecordBestAverageReq) (models.RecordBestAverageListResp, error)
+	Update(record *models.RecordBestAverage) error
+	publishMessage(rankUpdate handlers.RankUpdate)
+}
+
+type RecordBestAverageImpl struct{}
+
 // publishMessage 发送消息至消息队列
-func publishMessage(rankUpdate commonService.RankUpdate) {
+func (RecordBestAverageImpl) publishMessage(rankUpdate handlers.RankUpdate) {
 	mq := rabbitmq.NewRabbitMQ("best_average_rank_update_queue", "", "")
 	defer mq.Destory()
 
@@ -34,7 +45,7 @@ func publishMessage(rankUpdate commonService.RankUpdate) {
 }
 
 // check 校验参数
-func check(record *models.RecordBestAverage) error {
+func (RecordBestAverageImpl) check(record *models.RecordBestAverage) error {
 	if record.UserId == 0 {
 		return errors.New("用户ID不能为空")
 	}
@@ -59,9 +70,9 @@ func check(record *models.RecordBestAverage) error {
 }
 
 // Insert 插入一条记录
-func Insert(record *models.RecordBestAverage) error {
+func (RecordBestAverageImpl) Insert(record *models.RecordBestAverage) error {
 	// 校验参数
-	err := check(record)
+	err := RecordBestAverage.check(record)
 	if err != nil {
 		return err
 	}
@@ -72,7 +83,7 @@ func Insert(record *models.RecordBestAverage) error {
 	}
 
 	// 往消息队列中发送消息
-	publishMessage(commonService.RankUpdate{
+	RecordBestAverage.publishMessage(handlers.RankUpdate{
 		Dimension: record.Dimension,
 		Type:      record.Type,
 	})
@@ -81,11 +92,11 @@ func Insert(record *models.RecordBestAverage) error {
 }
 
 // List 记录列表
-func List(recordReq *models.RecordBestAverageReq) (models.RecordBestAverageListResp, error) {
+func (RecordBestAverageImpl) List(recordReq *models.RecordBestAverageReq) (models.RecordBestAverageListResp, error) {
 	var recordListResp models.RecordBestAverageListResp
 
 	if recordReq.Username != "" || recordReq.Nickname != "" {
-		userInfo, err := commonService.GetUserInfoByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
+		userInfo, err := User.GetUserByUsernameOrNickname(recordReq.Username, recordReq.Nickname)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return recordListResp, errors.New("查询用户信息失败")
 		}
@@ -188,7 +199,7 @@ func List(recordReq *models.RecordBestAverageReq) (models.RecordBestAverageListR
 			}
 		}
 
-		recordList, err := commonService.GetRecordDetail(recordIds)
+		recordList, err := Record.GetRecordByIds(recordIds)
 		if err != nil {
 			return recordListResp, errors.New("查询记录详情失败")
 		}
@@ -225,7 +236,7 @@ func List(recordReq *models.RecordBestAverageReq) (models.RecordBestAverageListR
 }
 
 // Update 更新记录
-func Update(record *models.RecordBestAverage) error {
+func (RecordBestAverageImpl) Update(record *models.RecordBestAverage) error {
 	db := database.GetMySQL().Table("record_best_average").Where("user_id = ? AND dimension = ? AND type = ?", record.UserId, record.Dimension, record.Type)
 
 	err := db.Updates(record).Error
@@ -234,7 +245,7 @@ func Update(record *models.RecordBestAverage) error {
 	}
 
 	// 往消息队列中发送消息
-	publishMessage(commonService.RankUpdate{
+	RecordBestAverage.publishMessage(handlers.RankUpdate{
 		Dimension: record.Dimension,
 		Type:      record.Type,
 	})

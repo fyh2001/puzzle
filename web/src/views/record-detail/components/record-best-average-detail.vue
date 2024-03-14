@@ -58,6 +58,17 @@ const getRecordDetail = async () => {
   }
 };
 
+// const carouselDotVisible = ref(false);
+// let carouselTimer: any = null;
+// const handleCarouselChange = () => {
+//   clearTimeout(carouselTimer);
+//   carouselDotVisible.value = true;
+
+//   carouselTimer = setTimeout(() => {
+//     carouselDotVisible.value = false;
+//   }, 1000);
+// };
+
 onMounted(() => {
   getUseInfo();
   getRecordDetail();
@@ -209,5 +220,15 @@ onMounted(() => {
 <style scoped>
 :deep(.n-descriptions.n-descriptions--bordered .n-descriptions-table-wrapper) {
   border-radius: 0.5rem;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

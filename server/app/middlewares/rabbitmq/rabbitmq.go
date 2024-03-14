@@ -3,7 +3,6 @@ package rabbitmq
 import (
 	"fmt"
 	"log"
-	"puzzle/app/services"
 	"puzzle/config"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -16,11 +15,6 @@ type RabbitMQ struct {
 	QueueName    string           // 队列名称
 	RouteKey     string           // 路由键
 	Mqurl        string           // 连接信息
-}
-
-type RabbitMQMessage struct {
-	RankUpdate services.RankUpdate
-	Message    string
 }
 
 // failOnErr 错误处理函数

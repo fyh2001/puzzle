@@ -3,12 +3,14 @@ package controllers
 import (
 	"puzzle/app/common/result"
 	"puzzle/app/models"
-	scrambleService "puzzle/app/services/scramble"
+	"puzzle/app/services"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetNewScamble(c *gin.Context) {
+type ScrambleController struct{}
+
+func (ScrambleController) GetNewScamble(c *gin.Context) {
 	var req models.GetNewScambleReq
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(200, result.Fail("参数错误"))
@@ -18,7 +20,7 @@ func GetNewScamble(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	req.UserId = userId.(int64)
 
-	scramble, err := scrambleService.GetNewScamble(&req)
+	scramble, err := services.Scramble.GetNewScamble(&req)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -27,7 +29,7 @@ func GetNewScamble(c *gin.Context) {
 	c.JSON(200, result.Success(scramble))
 }
 
-func GetUserScramble(c *gin.Context) {
+func (ScrambleController) GetUserScramble(c *gin.Context) {
 	var req models.GetNewScambleReq
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(200, result.Fail("参数错误"))
@@ -37,7 +39,7 @@ func GetUserScramble(c *gin.Context) {
 	userId, _ := c.Get("userId")
 	req.UserId = userId.(int64)
 
-	scramble, err := scrambleService.GetUserScramble(&req)
+	scramble, err := services.Scramble.GetUserScramble(&req)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return

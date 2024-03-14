@@ -4,18 +4,16 @@ import (
 	"fmt"
 	"puzzle/app/common/result"
 	"puzzle/app/models"
+	"puzzle/app/services"
 
-	recordService "puzzle/app/services/record"
-	recordBestAverageSerivce "puzzle/app/services/record-best-average"
-	recordBestSingleSerivce "puzzle/app/services/record-best-single"
-	recordBestStepSerivce "puzzle/app/services/record-best-step"
-	userService "puzzle/app/services/user"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func ListUserData(c *gin.Context) {
+type AdminController struct{}
+
+func (AdminController) ListUserData(c *gin.Context) {
 	var userReq models.UserReq
 
 	err := c.ShouldBindJSON(&userReq)
@@ -27,7 +25,7 @@ func ListUserData(c *gin.Context) {
 
 	userReq.Id, _ = strconv.ParseInt(userReq.IdStr, 10, 64)
 
-	userListResp, err := userService.List(&userReq)
+	userListResp, err := services.User.List(&userReq)
 
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
@@ -37,7 +35,7 @@ func ListUserData(c *gin.Context) {
 	c.JSON(200, result.Success(userListResp))
 }
 
-func UpdateUserData(c *gin.Context) {
+func (AdminController) UpdateUserData(c *gin.Context) {
 	var userReq models.UserReq
 	err := c.ShouldBindJSON(&userReq)
 	if err != nil {
@@ -57,7 +55,7 @@ func UpdateUserData(c *gin.Context) {
 		Status:   userReq.Status,
 	}
 
-	err = userService.Update(&user)
+	err = services.User.Update(&user)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -66,7 +64,7 @@ func UpdateUserData(c *gin.Context) {
 	c.JSON(200, result.Success("更新成功"))
 }
 
-func ListRecordData(c *gin.Context) {
+func (AdminController) ListRecordData(c *gin.Context) {
 	var recordReq models.RecordReq
 	err := c.ShouldBindJSON(&recordReq)
 	if err != nil {
@@ -74,7 +72,7 @@ func ListRecordData(c *gin.Context) {
 		return
 	}
 
-	recordListResp, err := recordService.List(&recordReq)
+	recordListResp, err := services.Record.List(&recordReq)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -83,7 +81,7 @@ func ListRecordData(c *gin.Context) {
 	c.JSON(200, result.Success(recordListResp))
 }
 
-func UpdateRecordData(c *gin.Context) {
+func (AdminController) UpdateRecordData(c *gin.Context) {
 	var recordReq models.RecordReq
 	err := c.ShouldBindJSON(&recordReq)
 	if err != nil {
@@ -109,7 +107,7 @@ func UpdateRecordData(c *gin.Context) {
 		Status:    recordReq.Status,
 	}
 
-	err = recordService.Update(&record)
+	err = services.Record.Update(&record)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -118,7 +116,7 @@ func UpdateRecordData(c *gin.Context) {
 	c.JSON(200, result.Success("更新成功"))
 }
 
-func ListRecordBestSingleData(c *gin.Context) {
+func (AdminController) ListRecordBestSingleData(c *gin.Context) {
 	var recordBestSingleReq models.RecordBestSingleReq
 	err := c.ShouldBindJSON(&recordBestSingleReq)
 	if err != nil {
@@ -127,7 +125,7 @@ func ListRecordBestSingleData(c *gin.Context) {
 		return
 	}
 
-	recordBestSingleListResp, err := recordBestSingleSerivce.List(&recordBestSingleReq)
+	recordBestSingleListResp, err := services.RecordBestSingle.List(&recordBestSingleReq)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -136,7 +134,7 @@ func ListRecordBestSingleData(c *gin.Context) {
 	c.JSON(200, result.Success(recordBestSingleListResp))
 }
 
-func ListRecordBestAverageData(c *gin.Context) {
+func (AdminController) ListRecordBestAverageData(c *gin.Context) {
 	var recordBestAverageReq models.RecordBestAverageReq
 	err := c.ShouldBindJSON(&recordBestAverageReq)
 	if err != nil {
@@ -145,7 +143,7 @@ func ListRecordBestAverageData(c *gin.Context) {
 		return
 	}
 
-	recordBestAverageListResp, err := recordBestAverageSerivce.List(&recordBestAverageReq)
+	recordBestAverageListResp, err := services.RecordBestAverage.List(&recordBestAverageReq)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return
@@ -154,7 +152,7 @@ func ListRecordBestAverageData(c *gin.Context) {
 	c.JSON(200, result.Success(recordBestAverageListResp))
 }
 
-func ListRecordBestStepData(c *gin.Context) {
+func (AdminController) ListRecordBestStepData(c *gin.Context) {
 	var recordBestStepReq models.RecordBestStepReq
 	err := c.ShouldBindJSON(&recordBestStepReq)
 	if err != nil {
@@ -163,7 +161,7 @@ func ListRecordBestStepData(c *gin.Context) {
 		return
 	}
 
-	recordBestStepListResp, err := recordBestStepSerivce.List(&recordBestStepReq)
+	recordBestStepListResp, err := services.RecordBestStep.List(&recordBestStepReq)
 	if err != nil {
 		c.JSON(200, result.Fail(err.Error()))
 		return

@@ -1,4 +1,4 @@
-package cos
+package services
 
 import (
 	"errors"
@@ -9,11 +9,18 @@ import (
 	"github.com/google/uuid"
 )
 
+type CosService interface {
+	UploadAvatar(file *multipart.FileHeader) (string, error)
+	DeleteAvatar(fullFilePath string) error
+}
+
+type CosImpl struct{}
+
 var baseUrl = map[string]string{
 	"avatar": "/avatar/",
 }
 
-func UploadAvatar(file *multipart.FileHeader) (string, error) {
+func (CosImpl) UploadAvatar(file *multipart.FileHeader) (string, error) {
 	var filePath string
 
 	if file.Size > 5*1024*1024 {
@@ -42,7 +49,7 @@ func UploadAvatar(file *multipart.FileHeader) (string, error) {
 	return fullFilePath, nil
 }
 
-func DeleteAvatar(fullFilePath string) error {
+func (CosImpl) DeleteAvatar(fullFilePath string) error {
 	filePath := strings.Split(fullFilePath, database.BaseURL)[1]
 
 	client := database.CosClient{

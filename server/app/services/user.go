@@ -1,18 +1,30 @@
-package user
+package services
 
 import (
 	"errors"
 	"mime/multipart"
 	"puzzle/app/models"
-	"puzzle/app/services/cos"
 	"puzzle/database"
 	"puzzle/utils"
 	jwt "puzzle/utils/jwt"
 	"strconv"
 )
 
-// UserRegister 用户注册
-func UserRegister(u *models.UserRegisterReq) error {
+type UserService interface {
+	Register(u *models.UserRegisterReq) error
+	Login(u *models.UserLoginReq) (models.UserLoginResp, error)
+	List(u *models.UserReq) (models.UserListResp, error)
+	GetUserById(userId int64) (models.UserResp, error)
+	GetUserByIdIds(userIds []int64) (models.UserListResp, error)
+	GetUserByUsernameOrNickname(username string, nickname string)
+	Update(u *models.User)
+	UpdateAvatar(u *models.User, file *multipart.FileHeader)
+}
+
+type UserImpl struct{}
+
+// Register 用户注册
+func (UserImpl) Register(u *models.UserRegisterReq) error {
 
 	// 判断用户名是否存在
 	var tempUser models.User
@@ -40,8 +52,8 @@ func UserRegister(u *models.UserRegisterReq) error {
 	return database.GetMySQL().Create(&user).Error
 }
 
-// UserLogin 用户登录
-func UserLogin(u *models.UserLoginReq) (models.UserLoginResp, error) {
+// Login 用户登录
+func (UserImpl) Login(u *models.UserLoginReq) (models.UserLoginResp, error) {
 	var loginResp models.UserLoginResp
 
 	// 根据用户名获取用户信息
@@ -87,7 +99,7 @@ func UserLogin(u *models.UserLoginReq) (models.UserLoginResp, error) {
 }
 
 // List 获取用户列表
-func List(u *models.UserReq) (models.UserListResp, error) {
+func (UserImpl) List(u *models.UserReq) (models.UserListResp, error) {
 	var userResp models.UserListResp
 
 	if u.IdStr != "" {
@@ -156,8 +168,8 @@ func List(u *models.UserReq) (models.UserListResp, error) {
 	return userResp, nil
 }
 
-// GetUserInfo 获取用户信息
-func GetUserInfo(userId int64) (models.UserResp, error) {
+// GetUserById 获取用户信息
+func (UserImpl) GetUserById(userId int64) (models.UserResp, error) {
 	var user models.UserResp
 	err := database.GetMySQL().Table("user").Where("id = ? AND status = ?", userId, 1).First(&user).Error
 	if err != nil {
@@ -167,8 +179,38 @@ func GetUserInfo(userId int64) (models.UserResp, error) {
 	return user, nil
 }
 
-// UpdateUser 更新用户
-func Update(u *models.User) error {
+// GetUserByIds 获取用户信息
+func (UserImpl) GetUserByIds(userIds []int64) (models.UserListResp, error) {
+	var userInfo models.UserListResp
+
+	err := database.GetMySQL().Table("user").Where("id in ?", userIds).Find(&userInfo.Records).Error
+	if err != nil {
+		return userInfo, err
+	}
+
+	return userInfo, nil
+}
+
+// GetUserByUsernameOrNickname 根据用户名或昵称获取用户信息
+func (UserImpl) GetUserByUsernameOrNickname(username string, nickname string) (models.UserResp, error) {
+	var user models.UserResp
+
+	db := database.GetMySQL().Table("user")
+
+	if username != "" {
+		db.Where("username Like ?", "%"+username+"%")
+	}
+
+	if nickname != "" {
+		db.Where("nickname Like ?", "%"+nickname+"%")
+	}
+
+	err := db.First(&user).Error
+	return user, err
+}
+
+// Update 更新用户
+func (UserImpl) Update(u *models.User) error {
 
 	if u.Password != "" {
 		u.Password = utils.MD5(u.Password)
@@ -195,9 +237,9 @@ func Update(u *models.User) error {
 }
 
 // UpdateAvatar 更新用户头像
-func UpdateAvatar(u *models.User, file *multipart.FileHeader) error {
+func (UserImpl) UpdateAvatar(u *models.User, file *multipart.FileHeader) error {
 	// 上传头像
-	filePath, err := cos.UploadAvatar(file)
+	filePath, err := Cos.UploadAvatar(file)
 	if err != nil {
 		return err
 	}
@@ -210,7 +252,7 @@ func UpdateAvatar(u *models.User, file *multipart.FileHeader) error {
 
 	// 删除旧头像
 	if user.Avatar != "" {
-		err = cos.DeleteAvatar(user.Avatar)
+		err = Cos.DeleteAvatar(user.Avatar)
 		if err != nil {
 			return err
 		}

@@ -3,13 +3,14 @@ package controllers
 import (
 	HttpResult "puzzle/app/common/result"
 	"puzzle/app/models"
-	notificationService "puzzle/app/services/notification"
-	notificationUserStatusService "puzzle/app/services/notification-user-status"
+	"puzzle/app/services"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InsertNotification(c *gin.Context) {
+type NotificationController struct{}
+
+func (NotificationController) Insert(c *gin.Context) {
 
 	var notification models.NotificationReq
 
@@ -19,7 +20,7 @@ func InsertNotification(c *gin.Context) {
 		return
 	}
 
-	err = notificationService.Insert(&notification)
+	err = services.Notification.Insert(&notification)
 
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
@@ -29,7 +30,7 @@ func InsertNotification(c *gin.Context) {
 	c.JSON(200, HttpResult.Success("发布成功"))
 }
 
-func ListNotification(c *gin.Context) {
+func (NotificationController) List(c *gin.Context) {
 
 	var notificationReq models.NotificationReq
 
@@ -39,7 +40,7 @@ func ListNotification(c *gin.Context) {
 		return
 	}
 
-	notificationListResp, err := notificationService.List(&notificationReq)
+	notificationListResp, err := services.Notification.List(&notificationReq)
 
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
@@ -47,27 +48,4 @@ func ListNotification(c *gin.Context) {
 	}
 
 	c.JSON(200, HttpResult.Success(notificationListResp))
-}
-
-func InsertNotificationUserStatus(c *gin.Context) {
-
-	var notificationUserStatus models.NotificationUserStatusReq
-
-	err := c.ShouldBind(&notificationUserStatus)
-	if err != nil {
-		c.JSON(200, HttpResult.Fail("参数错误"))
-		return
-	}
-
-	userId, _ := c.Get("userId")
-	notificationUserStatus.UserId = userId.(int64)
-
-	err = notificationUserStatusService.Insert(&notificationUserStatus)
-
-	if err != nil {
-		c.JSON(200, HttpResult.Fail(err.Error()))
-		return
-	}
-
-	c.JSON(200, HttpResult.Success("已读成功"))
 }

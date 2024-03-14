@@ -3,13 +3,15 @@ package controllers
 import (
 	HttpResult "puzzle/app/common/result"
 	"puzzle/app/models"
-	userService "puzzle/app/services/user"
+	"puzzle/app/services"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Register(c *gin.Context) {
+type UserController struct{}
+
+func (UserController) Register(c *gin.Context) {
 	var registerReq models.UserRegisterReq
 
 	err := c.ShouldBindJSON(&registerReq)
@@ -18,7 +20,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	err = userService.UserRegister(&registerReq)
+	err = services.User.Register(&registerReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -27,7 +29,7 @@ func Register(c *gin.Context) {
 	c.JSON(200, HttpResult.Success("注册成功"))
 }
 
-func Login(c *gin.Context) {
+func (UserController) Login(c *gin.Context) {
 	var loginReq models.UserLoginReq
 
 	// 参数校验
@@ -38,7 +40,7 @@ func Login(c *gin.Context) {
 	}
 
 	// 登录
-	userInfo, err := userService.UserLogin(&loginReq)
+	userInfo, err := services.User.Login(&loginReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -47,7 +49,7 @@ func Login(c *gin.Context) {
 	c.JSON(200, HttpResult.Success(userInfo))
 }
 
-func ListUser(c *gin.Context) {
+func (UserController) List(c *gin.Context) {
 	var userReq models.UserReq
 
 	// 参数校验
@@ -58,7 +60,7 @@ func ListUser(c *gin.Context) {
 	}
 
 	// 查询用户列表
-	userList, err := userService.List(&userReq)
+	userList, err := services.User.List(&userReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -67,10 +69,10 @@ func ListUser(c *gin.Context) {
 	c.JSON(200, HttpResult.Success(userList))
 }
 
-func GetUserInfo(c *gin.Context) {
+func (UserController) GetUserInfo(c *gin.Context) {
 	userId, _ := c.Get("userId")
 
-	userInfo, err := userService.GetUserInfo(userId.(int64))
+	userInfo, err := services.User.GetUserById(userId.(int64))
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -79,7 +81,7 @@ func GetUserInfo(c *gin.Context) {
 	c.JSON(200, HttpResult.Success(userInfo))
 }
 
-func UpdateAvatar(c *gin.Context) {
+func (UserController) UpdateAvatar(c *gin.Context) {
 	var user models.User
 
 	userId, _ := c.Get("userId")
@@ -93,7 +95,7 @@ func UpdateAvatar(c *gin.Context) {
 	user.Id = userId.(int64)
 
 	// 更新头像
-	err = userService.UpdateAvatar(&user, avatar)
+	err = services.User.UpdateAvatar(&user, avatar)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
@@ -102,7 +104,7 @@ func UpdateAvatar(c *gin.Context) {
 	c.JSON(200, HttpResult.Success("更新成功"))
 }
 
-func UpdateUser(c *gin.Context) {
+func (UserController) Update(c *gin.Context) {
 	var userReq models.UserReq
 
 	err := c.ShouldBind(&userReq)
@@ -125,7 +127,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// 更新用户
-	err = userService.Update(&user)
+	err = services.User.Update(&user)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
 		return
