@@ -177,6 +177,7 @@ CREATE TABLE IF NOT EXISTS `notification` (
   `user_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户ID 0:全体通知',
   `type_id` int UNSIGNED NOT NULL COMMENT '类型id',
   `content` TEXT NOT NULL COMMENT '通知内容',
+  `read_status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '已读状态 1:未读 2:已读',
   `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态 1:启用 2:冻结 3:删除',
   `created_at` DATETIME NOT NULL COMMENT '创建时间',
   `updated_at` DATETIME NOT NULL COMMENT '更新时间',
@@ -187,23 +188,7 @@ CREATE TABLE IF NOT EXISTS `notification` (
 ALTER TABLE `notification` ADD INDEX `idx_notification_user_id` (`user_id`);
 ALTER TABLE `notification` ADD INDEX `idx_notification_type_id` (`type_id`);
 ALTER TABLE `notification` ADD INDEX `idx_notification_status` (`status`);
-
-DROP TABLE IF EXISTS `notification_user_status`;
-CREATE TABLE IF NOT EXISTS `notification_user_status` (
-  `id` BIGINT(20) UNSIGNED NOT NULL COMMENT '主键ID',
-  `notification_id` BIGINT(20) UNSIGNED NOT NULL COMMENT '通知ID',
-  `user_id` BIGINT(20) UNSIGNED NOT NULL COMMENT '用户ID',
-  `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态 1:未读 2:已读',
-  `created_at` DATETIME NOT NULL COMMENT '创建时间',
-  `updated_at` DATETIME NOT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '通知用户状态表';
-
--- 为`notification_user_status`表添加索引，以提高按用户ID进行的查询效率
-ALTER TABLE `notification_user_status` ADD INDEX `idx_notification_user_status_notification_id` (`notification_id`);
-ALTER TABLE `notification_user_status` ADD INDEX `idx_notification_user_status_user_id` (`user_id`);
-ALTER TABLE `notification_user_status` ADD INDEX `idx_notification_user_status_status` (`status`);
-
+ALTER TABLE `notification` ADD INDEX `idx_notification_read` (`read_status`);
 
 DROP TABLE IF EXISTS `notification_type`;
 CREATE TABLE IF NOT EXISTS `notification_type` (

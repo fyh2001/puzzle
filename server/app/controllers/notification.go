@@ -49,3 +49,23 @@ func (NotificationController) List(c *gin.Context) {
 
 	c.JSON(200, HttpResult.Success(notificationListResp))
 }
+
+func (NotificationController) Update(c *gin.Context) {
+
+	var notification models.NotificationReq
+
+	err := c.ShouldBind(&notification)
+	if err != nil {
+		c.JSON(200, HttpResult.Fail("参数错误"))
+		return
+	}
+
+	err = services.Notification.Update(&notification)
+
+	if err != nil {
+		c.JSON(200, HttpResult.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, HttpResult.Success("修改成功"))
+}

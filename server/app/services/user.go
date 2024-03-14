@@ -168,6 +168,17 @@ func (UserImpl) List(u *models.UserReq) (models.UserListResp, error) {
 	return userResp, nil
 }
 
+// GetAllUserId 获取所有用户id
+func (UserImpl) GetAllUserId() ([]int64, error) {
+	var userIds []int64
+	err := database.GetMySQL().Table("user").Pluck("id", &userIds).Error
+	if err != nil {
+		return userIds, errors.New("查询失败")
+	}
+
+	return userIds, nil
+}
+
 // GetUserById 获取用户信息
 func (UserImpl) GetUserById(userId int64) (models.UserResp, error) {
 	var user models.UserResp

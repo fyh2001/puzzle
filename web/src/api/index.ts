@@ -4,9 +4,9 @@ import { useAdminStore } from "@/store/admin";
 import router from "@/routers";
 
 // const baseURL = "http://localhost:8081/api";
-// const baseURL = "http://192.168.31.141:8081/api";
+const baseURL = "http://192.168.31.141:8081/api";
 // const baseURL = "http://10.211.55.3:8081/api";
-const baseURL = "http://139.9.7.92:8081/api";
+// const baseURL = "http://139.9.7.92:8081/api";
 
 const request = axios.create({
   baseURL,

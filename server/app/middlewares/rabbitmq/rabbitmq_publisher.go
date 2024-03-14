@@ -9,8 +9,9 @@ import (
 )
 
 type RabbitMQMessage struct {
-	Message    string
-	RankUpdate handlers.RankUpdate
+	Message         string
+	RankUpdate      handlers.RankUpdate
+	NotificationMsg handlers.NotificationMsg
 }
 
 // 简单模式Step 2:简单模式下生产代码

@@ -60,6 +60,11 @@ func (r *RabbitMQ) Consume(callback CallbackFunc[any]) {
 				log.Println("记录排名更新成功")
 			}
 
+			if result.Message == "notification-all" {
+				callback(result.NotificationMsg) // 调用回调函数处理消息
+				log.Println("发送全体通知成功")
+			}
+
 			d.Ack(false) // 手动应答
 		}
 	}()

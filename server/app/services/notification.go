@@ -1,7 +1,11 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"puzzle/app/middlewares/rabbitmq"
+	"puzzle/app/middlewares/rabbitmq/handlers"
 	"puzzle/app/models"
 	"puzzle/database"
 	"puzzle/utils"
@@ -11,6 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var currentTitle = "notification"
+
 type NotificationService interface {
 	check(notification *models.Notification) error
 	Insert(notificationReq *models.NotificationReq) error
@@ -19,9 +25,23 @@ type NotificationService interface {
 
 type NotificationImpl struct{}
 
-var currentTitle = "Notification"
+// publishMessage 发送消息至消息队列
+func (NotificationImpl) publishMessage(notificationMsg handlers.NotificationMsg) {
+	mq := rabbitmq.NewRabbitMQ("notification_queue", "", "")
+	defer mq.Destory()
 
-var tableName = "notification"
+	message := rabbitmq.RabbitMQMessage{
+		NotificationMsg: notificationMsg,
+		Message:         "notification-all",
+	}
+
+	messageByte, err := json.Marshal(message)
+	if err != nil {
+		return
+	}
+
+	mq.Publish(messageByte)
+}
 
 func (NotificationImpl) check(notification *models.Notification) error {
 	return nil
@@ -34,6 +54,24 @@ func (NotificationImpl) Insert(notificationReq *models.NotificationReq) error {
 	}
 
 	snowflake := utils.Snowflake{}
+
+	// 如果是全体通知
+	if notificationReq.UserId == 0 {
+		userIds, err := User.GetAllUserId()
+		if err != nil {
+			return fmt.Errorf("[%s]获取用户id失败", currentTitle)
+		}
+
+		notificationMsg := handlers.NotificationMsg{
+			TypeId:  notificationReq.TypeId,
+			Content: notificationReq.Content,
+			UserIds: userIds,
+		}
+
+		Notification.publishMessage(notificationMsg)
+
+		return nil
+	}
 
 	notification := &models.Notification{
 		Id:      snowflake.NextVal(),
@@ -100,35 +138,39 @@ func (NotificationImpl) List(notificationReq *models.NotificationReq) (models.No
 	}
 
 	if notificationReq.Id != 0 {
-		db.Where(tableName+"."+"id = ?", notificationReq.Id)
+		db.Where("id = ?", notificationReq.Id)
 	}
 
 	if len(notificationReq.Ids) > 0 {
-		db.Where(tableName+"."+"id in ?", notificationReq.Ids)
+		db.Where("id in ?", notificationReq.Ids)
 	}
 
 	if notificationReq.UserId != 0 {
-		db.Where(tableName+"."+"user_id = 0").Or(tableName+"."+"user_id = ?", notificationReq.UserId)
+		db.Where("user_id = ?", notificationReq.UserId)
 	}
 
 	if notificationReq.TypeId != 0 {
-		db.Where(tableName+"."+"type_id = ?", notificationReq.TypeId)
+		db.Where("type_id = ?", notificationReq.TypeId)
 	}
 
 	if notificationReq.Content != "" {
-		db.Where(tableName+"."+"content Like ?", "%"+notificationReq.Content+"%")
+		db.Where("content Like ?", "%"+notificationReq.Content+"%")
+	}
+
+	if notificationReq.ReadStatus != 0 {
+		db.Where("read_status = ?", notificationReq.ReadStatus)
 	}
 
 	if notificationReq.Status != 0 {
-		db.Where(tableName+"."+"status = ?", notificationReq.Status)
+		db.Where("status = ?", notificationReq.Status)
 	}
 
 	if len(notificationReq.DateRange) == 2 {
 		if notificationReq.DateRange[0] != (time.Time{}) {
-			db.Where(tableName+"."+"created_at >= ?", notificationReq.DateRange[0])
+			db.Where("created_at >= ?", notificationReq.DateRange[0])
 		}
 		if notificationReq.DateRange[1] != (time.Time{}) {
-			db.Where(tableName+"."+"created_at <= ?", notificationReq.DateRange[1])
+			db.Where("created_at <= ?", notificationReq.DateRange[1])
 		}
 	}
 
@@ -138,10 +180,11 @@ func (NotificationImpl) List(notificationReq *models.NotificationReq) (models.No
 		return notificationListResp, errors.New("查询通知总数失败")
 	}
 
-	db.Preload("NotificationTypeInfo")
-	db.Preload("NotificationUserStatusInfo", "notification_user_status.user_id = ?", notificationReq.UserId)
+	if notificationReq.OnlyTotal {
+		return notificationListResp, nil
+	}
 
-	db.Joins("LEFT JOIN notification_user_status ON notification.id = notification_user_status.notification_id AND notification_user_status.user_id = ?", notificationReq.UserId).Order("notification_user_status.status asc").Order("notification.updated_at desc")
+	db.Preload("NotificationTypeInfo")
 
 	// 分页
 	if notificationReq.Pagination.Page > 0 && notificationReq.Pagination.PageSize > 0 {
@@ -155,4 +198,43 @@ func (NotificationImpl) List(notificationReq *models.NotificationReq) (models.No
 	}
 
 	return notificationListResp, nil
+}
+
+func (NotificationImpl) Update(notificationReq *models.NotificationReq) error {
+
+	if notificationReq.IdStr != "" {
+		notificationReq.Id, _ = strconv.ParseInt(notificationReq.IdStr, 10, 64)
+	}
+
+	if notificationReq.UserIdStr != "" {
+		notificationReq.UserId, _ = strconv.ParseInt(notificationReq.UserIdStr, 10, 64)
+	}
+
+	if len(notificationReq.IdsStr) > 0 {
+		notificationReq.Ids = make([]int64, len(notificationReq.IdsStr))
+		for i, v := range notificationReq.IdsStr {
+			notificationReq.Ids[i], _ = strconv.ParseInt(v, 10, 64)
+		}
+	}
+
+	notification := &models.Notification{
+		Id:         notificationReq.Id,
+		UserId:     notificationReq.UserId,
+		TypeId:     notificationReq.TypeId,
+		Content:    notificationReq.Content,
+		ReadStatus: notificationReq.ReadStatus,
+		Status:     notificationReq.Status,
+	}
+
+	err := Notification.check(notification)
+	if err != nil {
+		return err
+	}
+
+	err = database.GetMySQL().Model(&models.Notification{}).Where("id = ?", notificationReq.Id).Updates(notification).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -14,7 +14,7 @@ type rabbitMQ[T any] struct {
 var Queues []*RabbitMQ
 
 // 队列和更新操作的映射关系配置
-var recordRankUpdateQueue = []rabbitMQ[any]{
+var QueueList = []rabbitMQ[any]{
 	{
 		QueueName:    "best_single_rank_update_queue",
 		ExchangeName: "",
@@ -30,12 +30,17 @@ var recordRankUpdateQueue = []rabbitMQ[any]{
 		ExchangeName: "",
 		callback:     handlers.UpdateRecordBestStepRank,
 	},
+	{
+		QueueName:    "notification_queue",
+		ExchangeName: "",
+		callback:     handlers.SendNotification,
+	},
 }
 
 // 初始化队列和更新操作
 func InitQueuesAndConsumers() {
 
-	for _, q := range recordRankUpdateQueue {
+	for _, q := range QueueList {
 		mq := NewRabbitMQ(q.QueueName, q.ExchangeName, "")
 		go mq.Consume(q.callback)
 

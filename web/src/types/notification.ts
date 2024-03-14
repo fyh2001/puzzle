@@ -6,6 +6,7 @@ export interface Notification {
   userId: string;
   type: number;
   content: string;
+  readStatus: number;
   status: number;
   createdAt: string;
   updatedAt: string;
@@ -19,11 +20,13 @@ export interface NotificationReq {
   nickname?: string;
   type?: number | null;
   content?: string;
+  readStatus?: number | null;
   status?: number | null;
   dateRange?: [string, string] | [Date, Date];
   pagination?: Pagination;
   sorted?: string;
   orderBy?: string;
+  onlyTotal?: boolean;
 }
 
 export interface NotificationResp {
@@ -31,9 +34,9 @@ export interface NotificationResp {
   userId: string;
   type: number;
   content: string;
+  readStatus: number;
   status: number;
   notificationTypeInfo: NotificationTypeResp;
-  notificationUserStatusInfo: NotificationUserStatusResp;
   createdAt: string;
   updatedAt: string;
 }
@@ -77,42 +80,4 @@ export interface NotificationTypeResp {
 export interface NotificationTypeListResp {
   total: number;
   records: NotificationTypeResp[];
-}
-
-// 用户通知状态
-export interface NotificationUserStatus {
-  id: string;
-  userId: string;
-  notificationId: string;
-  status: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface NotificationUserStatusReq {
-  id?: string;
-  ids?: string[];
-  userId?: string;
-  username?: string;
-  nickname?: string;
-  notificationId?: string;
-  status?: number | null;
-  dateRange?: [string, string] | [Date, Date];
-  pagination?: Pagination;
-  sorted?: string;
-  orderBy?: string;
-}
-
-export interface NotificationUserStatusResp {
-  id: string;
-  userId: string;
-  notificationId: string;
-  status: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface NotificationUserStatusListResp {
-  total: number;
-  records: NotificationUserStatusResp[];
 }
