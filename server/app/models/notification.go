@@ -23,7 +23,7 @@ type NotificationReq struct {
 	TypeId     int              `json:"typeId"`                      // 类型ID
 	Content    string           `json:"content"`                     // 内容
 	ReadStatus int              `json:"readStatus" gorm:"default 1"` // 状态 1:未读 2: 已读
-	Status     int              `json:"status"`                      // 状态 1:启用 2:冻结 3:删除
+	Status     int              `json:"status" gorm:"default 1"`     // 状态 1:启用 2:冻结 3:删除
 	IdStr      string           `json:"id"`                          // 主键ID
 	IdsStr     []string         `json:"ids"`                         // 主键ID集合
 	UserIdStr  string           `json:"userId"`                      // 用户ID

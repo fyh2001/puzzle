@@ -10,4 +10,5 @@ var (
 	Notification       = new(NotificationController)
 	AdminAuthorization = new(AdminAuthorizationController)
 	Admin              = new(AdminController)
+	WebSocket          = new(WebSocketController)
 )

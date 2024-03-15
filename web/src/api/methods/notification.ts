@@ -2,7 +2,6 @@ import { request } from "@/api/index";
 import type {
   NotificationListResp,
   NotificationReq,
-  NotificationUserStatusReq,
 } from "@/types/notification";
 import type { HttpBaseResp } from "@/types/http";
 
@@ -15,12 +14,17 @@ export const notificationRequest = {
       method: "post",
       data,
     }),
-};
 
-export const notificationUserStatusRequest = {
-  insert: (data: NotificationUserStatusReq): Promise<HttpBaseResp<string>> =>
+  update: (data: NotificationReq): Promise<HttpBaseResp<string>> =>
     request({
-      url: `notification-user-status/insert`,
+      url: `${baseURL}/update`,
+      method: "post",
+      data,
+    }),
+
+  readAll: (data: NotificationReq): Promise<HttpBaseResp<string>> =>
+    request({
+      url: `${baseURL}/read-all`,
       method: "post",
       data,
     }),

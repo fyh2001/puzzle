@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import TopBar from "@/components/top-bar.vue";
 import { InfoRound } from "@vicons/material";
 import { Raw, onMounted, ref } from "vue";
 import { useUserStore } from "@/store/user";
 import { useNotificationStore } from "@/store/notification";
-import { notificationUserStatusRequest } from "api/notification";
+import { notificationRequest } from "api/notification";
 import { useMessage } from "naive-ui";
 import { useScrollTo } from "@/utils/useScrollTo";
 import type { NotificationResp } from "@/types/notification";
@@ -19,12 +20,13 @@ const NotificationIcon: Record<string, Raw<any>> = {
 
 const currentPage = ref(1);
 
+// 处理通知已读
 const handleNotificationRead = async (data: NotificationResp) => {
-  if (data.notificationUserStatusInfo.status === 1) return;
+  if (data.readStatus === 2) return;
 
   const {
     data: { msg, code },
-  } = await notificationUserStatusRequest.insert({ notificationId: data.id });
+  } = await notificationRequest.update({ id: data.id, readStatus: 2 });
 
   if (code !== 200) {
     Message.error(msg);
@@ -39,18 +41,46 @@ const handleNotificationRead = async (data: NotificationResp) => {
     },
     "overwrite"
   );
+
+  notificationStore.fetchUnreadCount();
 };
 
-useScrollTo(200, () => {
-  fetchNotifications("append");
-});
+// 处理全部已读
+const handleReadAll = async () => {
+  const {
+    data: { msg, code, data: readAllResp },
+  } = await notificationRequest.readAll({
+    userId: userStore.getUser.id,
+  });
 
+  if (code === 200) {
+    Message.success(readAllResp);
+  } else {
+    Message.error(msg);
+  }
+
+  notificationStore.fetchNotifications(
+    {
+      pagination: {
+        page: 1,
+        pageSize: 10 * currentPage.value,
+      },
+    },
+    "overwrite"
+  );
+
+  notificationStore.fetchUnreadCount();
+
+  currentPage.value = 1;
+};
+
+// 获取通知
 const fetchNotifications = async (type: string) => {
   await notificationStore.fetchNotifications(
     {
       pagination: {
         page: currentPage.value,
-        pageSize: 6,
+        pageSize: 10,
       },
     },
     type
@@ -59,6 +89,13 @@ const fetchNotifications = async (type: string) => {
   currentPage.value++;
 };
 
+useScrollTo(200, () => {
+  if (notificationStore.getNotificationTotal < 10 * (currentPage.value - 1)) {
+    return;
+  }
+
+  fetchNotifications("append");
+});
 onMounted(() => {
   fetchNotifications("overwrite");
 });
@@ -66,7 +103,20 @@ onMounted(() => {
 
 <template>
   <div>
-    <top-bar pt-4 title="通知" />
+    <top-bar pt-4 title="通知">
+      <template #right>
+        <n-button
+          class="mr-4"
+          type="primary"
+          secondary
+          strong
+          @click="handleReadAll"
+          v-if="notificationStore.getNotificationTotal"
+        >
+          全部已读
+        </n-button>
+      </template>
+    </top-bar>
 
     <div class="p-4" v-if="notificationStore.getNotificationTotal">
       <div
@@ -81,14 +131,14 @@ onMounted(() => {
             dot
             processing
             :offset="[3.5, 4]"
-            :show="data.notificationUserStatusInfo.status === 0"
+            :show="data.readStatus === 1"
           />
         </div>
         <!-- 通知内容 -->
         <div
           class="p-4 w-full bg-white shadow-sm rounded-xl mb-2 transition-all duration-300"
           :class="{
-            'text-gray': data.notificationUserStatusInfo.status === 1,
+            'text-gray': data.readStatus === 2,
           }"
         >
           <!-- 标题与时间 -->

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"puzzle/app/middlewares/rabbitmq"
 	"puzzle/app/middlewares/rabbitmq/handlers"
+	"puzzle/app/middlewares/websocket"
 	"puzzle/app/models"
 	"puzzle/database"
 	"puzzle/utils"
@@ -21,6 +22,8 @@ type NotificationService interface {
 	check(notification *models.Notification) error
 	Insert(notificationReq *models.NotificationReq) error
 	List(notificationReq *models.NotificationReq) (models.NotificationListResp, error)
+	Update(notificationReq *models.NotificationReq) error
+	ReadAll(notificationReq *models.NotificationReq) error
 }
 
 type NotificationImpl struct{}
@@ -43,6 +46,33 @@ func (NotificationImpl) publishMessage(notificationMsg handlers.NotificationMsg)
 	mq.Publish(messageByte)
 }
 
+// sendWebsocketMessage 发送消息至websocket
+func (NotificationImpl) sendWebsocketMessage(userId int64, content string) {
+
+	// 编辑消息
+	message, _ := json.Marshal(websocket.Message{
+		Type:    "notification",
+		Content: content,
+	})
+
+	// 全体消息
+	if userId == 0 {
+		websocket.ClientManagerInstance.Broadcast <- message
+	} else { // 单体消息
+		websocketUser, ok := websocket.GatewayUser.Load(strconv.FormatInt(userId, 10))
+		if ok {
+			userBase := websocketUser.(*websocket.WebSocketUser)
+			for _, v := range userBase.ClientID {
+				client, ok := websocket.ClientManagerInstance.Clients.Load(v)
+				if ok {
+					clientInfo := client.(*websocket.Client)
+					clientInfo.Send <- message
+				}
+			}
+		}
+	}
+}
+
 func (NotificationImpl) check(notification *models.Notification) error {
 	return nil
 }
@@ -54,6 +84,9 @@ func (NotificationImpl) Insert(notificationReq *models.NotificationReq) error {
 	}
 
 	snowflake := utils.Snowflake{}
+
+	// 发送消息
+	Notification.sendWebsocketMessage(notificationReq.UserId, notificationReq.Content)
 
 	// 如果是全体通知
 	if notificationReq.UserId == 0 {
@@ -74,19 +107,18 @@ func (NotificationImpl) Insert(notificationReq *models.NotificationReq) error {
 	}
 
 	notification := &models.Notification{
-		Id:      snowflake.NextVal(),
-		UserId:  notificationReq.UserId,
-		TypeId:  notificationReq.TypeId,
-		Content: notificationReq.Content,
-		Status:  1,
+		Id:         snowflake.NextVal(),
+		UserId:     notificationReq.UserId,
+		TypeId:     notificationReq.TypeId,
+		Content:    notificationReq.Content,
+		ReadStatus: 1,
+		Status:     1,
 	}
 
 	err := Notification.check(notification)
 	if err != nil {
 		return err
 	}
-
-	notification.Status = 1
 
 	err = database.GetMySQL().Create(notification).Error
 	if err != nil {
@@ -131,7 +163,7 @@ func (NotificationImpl) List(notificationReq *models.NotificationReq) (models.No
 		notificationReq.OrderBy = "updated_at"
 	}
 
-	db := database.GetMySQL().Table("notification")
+	db := database.GetMySQL().Table("notification").Order("read_status asc, created_at desc")
 
 	if notificationReq.Sorted != "" {
 		db.Order(notificationReq.OrderBy + " " + notificationReq.Sorted)
@@ -234,6 +266,25 @@ func (NotificationImpl) Update(notificationReq *models.NotificationReq) error {
 	err = database.GetMySQL().Model(&models.Notification{}).Where("id = ?", notificationReq.Id).Updates(notification).Error
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// 一键已读
+func (NotificationImpl) ReadAll(notificationReq *models.NotificationReq) error {
+	if notificationReq.UserIdStr != "" {
+		notificationReq.UserId, _ = strconv.ParseInt(notificationReq.UserIdStr, 10, 64)
+	}
+
+	notification := &models.Notification{
+		UserId:     notificationReq.UserId,
+		ReadStatus: 2,
+	}
+
+	err := database.GetMySQL().Model(&models.Notification{}).Where("user_id = ?", notificationReq.UserId).Updates(notification).Error
+	if err != nil {
+		return fmt.Errorf("[%s]一键已读失败", currentTitle)
 	}
 
 	return nil

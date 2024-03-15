@@ -4,7 +4,7 @@ import * as _ from "lodash";
 export function useScrollTo(
   threshold: number,
   callback: Function,
-  delay: number = 2000,
+  delay: number = 100,
   target?: string | Element
 ) {
   const targetElement = ref<Element | null>(null);

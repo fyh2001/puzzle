@@ -228,7 +228,7 @@ const handleSelect = (key: string) => {
     <n-badge
       processing
       :value="notificationStore.getNotificationUnreadTotal"
-      :max="10"
+      :max="9"
     >
       <n-dropdown
         placement="bottom-end"

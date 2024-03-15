@@ -43,7 +43,7 @@ func (RecordController) Insert(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, HttpResult.Success("添加成功"))
+	c.JSON(200, HttpResult.Success("数据上传成功"))
 }
 
 func (RecordController) List(c *gin.Context) {

@@ -64,6 +64,7 @@ export const useNotificationStore = defineStore("notification", {
             ...notificationResp.records,
           ];
         }
+        this.notifications.total = notificationResp.total;
       }
     },
 

@@ -1,19 +1,14 @@
 <script lang="ts" setup>
 import GlobalProvider from "@/components/global-provider.vue";
-import { onMounted } from "vue";
+import GlobalInit from "@/components/global-init.vue";
 import { useThemeStore } from "@/store/theme";
-import { useNotificationStore } from "./store/notification";
 
 const themeStore = useThemeStore();
-const notificationStore = useNotificationStore();
-
-onMounted(() => {
-  notificationStore.fetchUnreadCount();
-});
 </script>
 
 <template>
   <global-provider>
+    <global-init />
     <router-view v-slot="{ Component }">
       <transition :name="'fade'" mode="out-in">
         <component

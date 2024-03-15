@@ -2,6 +2,7 @@ package main
 
 import (
 	"puzzle/app/middlewares/rabbitmq"
+	"puzzle/app/middlewares/websocket"
 	"puzzle/config"
 	"puzzle/database"
 	"puzzle/routes"
@@ -12,6 +13,8 @@ func main() {
 
 	database.InitMySQL() // 初始化MySQL数据库连接
 	database.InitRedis() // 初始化Redis数据库连接
+
+	go websocket.ClientManagerInstance.Start() // 初始化WebSocket服务端
 
 	// 初始化队列和消费者
 	go rabbitmq.InitQueuesAndConsumers()

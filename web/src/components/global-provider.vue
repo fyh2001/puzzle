@@ -16,6 +16,7 @@ import { computed } from "vue";
 import { darkTheme, lightTheme } from "naive-ui";
 import { useThemeStore } from "@/store/theme";
 import { themeProvider } from "@/theme";
+
 const themeStore = useThemeStore();
 
 themeStore.fetchLoadedThemes();

@@ -69,3 +69,23 @@ func (NotificationController) Update(c *gin.Context) {
 
 	c.JSON(200, HttpResult.Success("修改成功"))
 }
+
+func (NotificationController) ReadAll(c *gin.Context) {
+
+	var notificationReq models.NotificationReq
+
+	err := c.ShouldBind(&notificationReq)
+	if err != nil {
+		c.JSON(200, HttpResult.Fail("参数错误"))
+		return
+	}
+
+	err = services.Notification.ReadAll(&notificationReq)
+
+	if err != nil {
+		c.JSON(200, HttpResult.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, HttpResult.Success("一键已读成功"))
+}

@@ -48,10 +48,19 @@ func InitRouter() *gin.Engine {
 			scramble.POST("/get-user-scramble", controllers.Scramble.GetUserScramble) // 获取用户打乱
 		}
 
+		// 通知
 		notification := root.Group("/notification")
 		{
-			notification.POST("/insert", controllers.Notification.Insert)        // 发布通知
-			notification.POST("/list", jwt.JWT(), controllers.Notification.List) // 通知列表
+			notification.POST("/insert", controllers.Notification.Insert)              // 发布通知
+			notification.POST("/list", jwt.JWT(), controllers.Notification.List)       // 通知列表
+			notification.POST("/update", jwt.JWT(), controllers.Notification.Update)   // 更新通知
+			notification.POST("read-all", jwt.JWT(), controllers.Notification.ReadAll) // 全部已读
+		}
+
+		// WebSocket
+		ws := root.Group("/ws")
+		{
+			ws.GET("/connect", controllers.WebSocket.Connect) // 连接
 		}
 
 		// 管理员
