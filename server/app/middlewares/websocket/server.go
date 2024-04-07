@@ -121,6 +121,15 @@ func (c *Client) Reader(manager *ClientManager) {
 
 		switch c.Message.Type {
 		case "ping": // 心跳消息
+			if c.BindUserId == "" { // 未认证
+				message, _ := json.Marshal(&Message{
+					Type:    "auth",
+					Content: "未认证用户",
+				})
+				c.Send <- message // 回复认证消息
+				manager.Unregister <- c
+				return
+			}
 			message, _ := json.Marshal(&Message{
 				Type:    "pong",
 				Content: "pong",

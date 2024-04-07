@@ -1,5 +1,6 @@
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import TopBar from "@/components/top-bar.vue";
+import { DataArrayRound } from "@vicons/material";
 import { InfoRound } from "@vicons/material";
 import { Raw, onMounted, ref } from "vue";
 import { useUserStore } from "@/store/user";
@@ -53,8 +54,16 @@ const handleReadAll = async () => {
     userId: userStore.getUser.id,
   });
 
+  console.log(readAllResp);
+
   if (code === 200) {
-    Message.success(readAllResp);
+    readAllResp === "一键已读成功" && Message.success(readAllResp);
+    readAllResp === "暂无未读信息" &&
+      Message.info(readAllResp, {
+        icon: () => {
+          return <n-icon component={DataArrayRound} />;
+        },
+      });
   } else {
     Message.error(msg);
   }

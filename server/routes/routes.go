@@ -63,6 +63,13 @@ func InitRouter() *gin.Engine {
 			ws.GET("/connect", controllers.WebSocket.Connect) // 连接
 		}
 
+		// 更新日志
+		updateLog := root.Group("/update-log")
+		{
+			updateLog.POST("/insert", controllers.UpdateLog.Insert) // 新增更新日志
+			updateLog.POST("/list", controllers.UpdateLog.List)     // 更新日志列表
+		}
+
 		// 管理员
 		admin := root.Group("/admin")
 		{

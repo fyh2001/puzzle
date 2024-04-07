@@ -208,3 +208,21 @@ ALTER TABLE `notification_type` ADD INDEX `idx_notification_type_status` (`statu
 BEGIN;
 INSERT INTO `notification_type` (`id`, `name`, `icon`, `status`, `created_at`, `updated_at`) VALUES (1, '系统通知', '', 1, '2024-02-04 23:11:32', '2024-02-04 23:11:32');
 COMMIT;
+
+DROP TABLE IF EXISTS `update_log`;
+CREATE TABLE IF NOT EXISTS `update_log` (
+  `id` BIGINT(20) UNSIGNED NOT NULL COMMENT '主键ID',
+  `version` VARCHAR(20) NOT NULL COMMENT '版本号',
+  `type` TINYINT(1) NOT NULL COMMENT '类型 1:日常更新 2:重大更新',
+  `content` TEXT NOT NULL COMMENT '更新内容',
+  `description` TEXT COMMENT '更新描述',
+  `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态 1:启用 2:冻结 3:删除',
+  `created_at` DATETIME NOT NULL COMMENT '创建时间',
+  `updated_at` DATETIME NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '更新日志表';
+
+-- 为`update_log`表添加唯一索引，以提高版本号的唯一性查询效率
+ALTER TABLE `update_log` ADD UNIQUE INDEX `idx_update_log_version` (`version`);
+ALTER TABLE `update_log` ADD INDEX `idx_update_log_type` (`type`);
+ALTER TABLE `update_log` ADD INDEX `idx_update_log_status` (`status`);

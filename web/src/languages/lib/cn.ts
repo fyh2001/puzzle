@@ -153,7 +153,7 @@ export default {
       duration: "耗时",
       step: "步数",
       recordBreakCount: {
-        label: "记录破纪录次数",
+        label: "打破纪录次数",
         content: "{recordBreakCount} 次",
       },
       status: {

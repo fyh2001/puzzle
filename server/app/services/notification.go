@@ -20,6 +20,8 @@ var currentTitle = "notification"
 
 type NotificationService interface {
 	check(notification *models.Notification) error
+	publishMessage(notificationMsg handlers.NotificationMsg)
+	sendWebsocketMessage(userId int64, content string)
 	Insert(notificationReq *models.NotificationReq) error
 	List(notificationReq *models.NotificationReq) (models.NotificationListResp, error)
 	Update(notificationReq *models.NotificationReq) error
@@ -102,27 +104,25 @@ func (NotificationImpl) Insert(notificationReq *models.NotificationReq) error {
 		}
 
 		Notification.publishMessage(notificationMsg)
+	} else {
+		// 如果是单体通知
+		notification := &models.Notification{
+			Id:         snowflake.NextVal(),
+			UserId:     notificationReq.UserId,
+			TypeId:     notificationReq.TypeId,
+			Content:    notificationReq.Content,
+			ReadStatus: 1,
+			Status:     1,
+		}
+		err := Notification.check(notification)
+		if err != nil {
+			return err
+		}
 
-		return nil
-	}
-
-	notification := &models.Notification{
-		Id:         snowflake.NextVal(),
-		UserId:     notificationReq.UserId,
-		TypeId:     notificationReq.TypeId,
-		Content:    notificationReq.Content,
-		ReadStatus: 1,
-		Status:     1,
-	}
-
-	err := Notification.check(notification)
-	if err != nil {
-		return err
-	}
-
-	err = database.GetMySQL().Create(notification).Error
-	if err != nil {
-		return err
+		err = database.GetMySQL().Create(notification).Error
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -272,7 +272,7 @@ func (NotificationImpl) Update(notificationReq *models.NotificationReq) error {
 }
 
 // 一键已读
-func (NotificationImpl) ReadAll(notificationReq *models.NotificationReq) error {
+func (NotificationImpl) ReadAll(notificationReq *models.NotificationReq) (int64, error) {
 	if notificationReq.UserIdStr != "" {
 		notificationReq.UserId, _ = strconv.ParseInt(notificationReq.UserIdStr, 10, 64)
 	}
@@ -282,10 +282,11 @@ func (NotificationImpl) ReadAll(notificationReq *models.NotificationReq) error {
 		ReadStatus: 2,
 	}
 
-	err := database.GetMySQL().Model(&models.Notification{}).Where("user_id = ?", notificationReq.UserId).Updates(notification).Error
-	if err != nil {
-		return fmt.Errorf("[%s]一键已读失败", currentTitle)
+	result := database.GetMySQL().Model(&models.Notification{}).Where("user_id = ? AND read_status = ?", notificationReq.UserId, 1).Updates(notification)
+
+	if result.Error != nil {
+		return result.RowsAffected, fmt.Errorf("[%s]一键已读失败", currentTitle)
 	}
 
-	return nil
+	return result.RowsAffected, nil
 }

@@ -80,10 +80,14 @@ func (NotificationController) ReadAll(c *gin.Context) {
 		return
 	}
 
-	err = services.Notification.ReadAll(&notificationReq)
-
+	rowsAffected, err := services.Notification.ReadAll(&notificationReq)
 	if err != nil {
 		c.JSON(200, HttpResult.Fail(err.Error()))
+		return
+	}
+
+	if rowsAffected == 0 {
+		c.JSON(200, HttpResult.Success("暂无未读信息"))
 		return
 	}
 

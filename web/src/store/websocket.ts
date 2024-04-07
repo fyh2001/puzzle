@@ -91,6 +91,11 @@ export const useWebsocketStore = defineStore("websocket", () => {
       Message.info("您有 1 条新的通知");
     }
 
+    if (message.type === "update") {
+      notificationStore.fetchUnreadCount();
+      Message.info(message.content, { duration: 15 * 1000 });
+    }
+
     if (message.type === "auth") {
       Message.info(message.content);
     }

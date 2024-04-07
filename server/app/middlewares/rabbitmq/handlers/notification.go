@@ -35,7 +35,6 @@ func SendNotification(notification any) error {
 	}
 
 	// 插入通知
-
 	db := database.GetMySQL()
 
 	tx := db.Begin()

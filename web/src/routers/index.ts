@@ -65,11 +65,15 @@ const routes: RouteRecordRaw[] = [
     name: "Register",
     component: () => import("@/views/register/index.vue"),
   },
-
   {
     path: "/login",
     name: "Login",
     component: () => import("@/views/login/index.vue"),
+  },
+  {
+    path: "/update-log",
+    name: "UpdateLog",
+    component: () => import("@/views/update-log/index.vue"),
   },
   {
     path: "/test",

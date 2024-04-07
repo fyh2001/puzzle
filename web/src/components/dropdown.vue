@@ -33,11 +33,13 @@ const props = defineProps<{
 
 const options = computed(() => [
   ...props.options,
+  // 分割线
   {
     key: "divider",
     show: props.options.length > 0 && props.showDivider,
     type: "divider",
   },
+  // 通知
   {
     label: t("dropdown.notification.label"),
     key: "notification",
@@ -58,6 +60,7 @@ const options = computed(() => [
       );
     },
   },
+  // 深色模式
   {
     label: t("dropdown.darkMode.label"),
     key: "dark",
@@ -104,6 +107,7 @@ const options = computed(() => [
       },
     ],
   },
+  // 主题切换
   {
     label: t("dropdown.theme.label"),
     key: "themeColor",
@@ -128,6 +132,7 @@ const options = computed(() => [
       ),
     })),
   },
+  // 语言切换
   {
     label: t("dropdown.language.label"),
     key: "language",
@@ -156,6 +161,7 @@ const options = computed(() => [
       },
     ],
   },
+  // 设置
   {
     label: t("dropdown.setting.label"),
     key: "setting",
@@ -168,10 +174,11 @@ const options = computed(() => [
       );
     },
   },
+  // 更新日志
   {
     label: t("dropdown.updateLog.label"),
     key: "updateLog",
-    disabled: true,
+    disabled: false,
     icon: () => {
       return (
         <n-el class="flex items-center" style="color: var(--primary-color)">
@@ -180,6 +187,7 @@ const options = computed(() => [
       );
     },
   },
+  // 反馈
   {
     label: t("dropdown.feedback.label"),
     key: "feedback",

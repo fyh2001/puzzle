@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Application Application `mapstructure:"application"`
+	Application Application `mapstructure:"app"`
 	Mysql       Mysql       `mapstructure:"mysql"`
 	Redis       Redis       `mapstructure:"redis"`
 	RabbitMQ    RabbitMQ    `mapstructure:"rabbitmq"`

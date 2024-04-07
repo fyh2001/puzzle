@@ -11,4 +11,5 @@ var (
 	Notification        = new(NotificationImpl)
 	Cos                 = new(CosImpl)
 	AdminAuthorization  = new(AdminAuthorizationImpl)
+	UpdateLog           = new(UpdateLogImpl)
 )

@@ -54,6 +54,7 @@ const tableColumns = computed(() => [
     title: t("record.table.column.user"),
     dataIndex: "nickname",
     key: "nickname",
+    width: "110",
   },
   {
     title: t("record.table.column.duration"),

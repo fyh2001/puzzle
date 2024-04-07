@@ -26,5 +26,5 @@ func main() {
 
 	router := routes.InitRouter() // 初始化路由
 
-	_ = router.Run(":8081")
+	_ = router.Run(":" + config.Settings.Application.Port) // 启动服务端
 }

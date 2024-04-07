@@ -11,4 +11,5 @@ var (
 	AdminAuthorization = new(AdminAuthorizationController)
 	Admin              = new(AdminController)
 	WebSocket          = new(WebSocketController)
+	UpdateLog          = new(UpdateLogController)
 )
