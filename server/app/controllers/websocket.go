@@ -32,7 +32,7 @@ var (
 	}
 )
 
-// WsServer WebSocket 服务端
+// Connect 连接服务端
 func (WebSocketController) Connect(c *gin.Context) {
 	// 捕获异常
 	defer func() {
@@ -48,19 +48,54 @@ func (WebSocketController) Connect(c *gin.Context) {
 		return
 	}
 
-	// 获取用户ID
-	// userId, _ := c.Get("userId")
-	// userIdStr := strconv.FormatInt(userId.(int64), 10)
-
 	// 初始化客户端
-	client := ws.InitClient(conn)
+	client := ws.ClientManagerInstance.InitClient(conn)
 
 	// 发送客户端唯一标识 ID
 	if client.ID == "" {
 		return
 	}
 
-	go ws.ClientHeartbeatCheck(client.ID)       // 心跳检测
-	go client.Reader(&ws.ClientManagerInstance) // 读取消息
-	go client.Writer()                          // 发送消息
+	go ws.ClientManagerInstance.ClientHeartbeatCheck(client.ID) // 心跳检测
+	go client.Reader(&ws.ClientManagerInstance)                 // 读取消息
+	go client.Writer()                                          // 发送消息
+}
+
+// WsServer WebSocket 根据ID连接服务端
+func (WebSocketController) ConnectById(c *gin.Context) {
+	// 捕获异常
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("WsServer panic: %v\n", err)
+		}
+	}()
+
+	// 将 HTTP 连接升级为 WebSocket 连接
+	conn, err := socketSet.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		c.JSON(200, result.Fail("升级协议失败"))
+		return
+	}
+
+	id := c.Query("id")
+
+	clientManager, ok := ws.Managers.Load(id)
+	if !ok {
+		clientManager = ws.InitClientManager(id)
+		go clientManager.(*ws.ClientManager).Start() //开启监听
+		go ws.ClientManagerHearBeatCheck(id)         // 心跳检测
+	}
+
+	client := clientManager.(*ws.ClientManager).InitClient(conn)
+
+	fmt.Println(client)
+
+	// 发送客户端唯一标识 ID
+	if client.ID == "" {
+		return
+	}
+
+	go clientManager.(*ws.ClientManager).ClientHeartbeatCheck(client.ID) // 心跳检测
+	go client.Reader(clientManager.(*ws.ClientManager))                  // 读取消息
+	go client.Writer()                                                   // 发送消息
 }

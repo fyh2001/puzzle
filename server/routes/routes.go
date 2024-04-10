@@ -60,7 +60,8 @@ func InitRouter() *gin.Engine {
 		// WebSocket
 		ws := root.Group("/ws")
 		{
-			ws.GET("/connect", controllers.WebSocket.Connect) // 连接
+			ws.GET("/connect", controllers.WebSocket.Connect)         // 连接
+			ws.GET("/connectById", controllers.WebSocket.ConnectById) // 根据Id连接
 		}
 
 		// 更新日志

@@ -8,12 +8,38 @@ import (
 // 设置心跳检测间隔时长（秒）
 var HeartbeatTime = 180 * time.Second
 
+// ClientManagerHearBeatCheck 服务端心跳检测
+func ClientManagerHearBeatCheck(managerId string) {
+	for {
+		time.Sleep(5 * time.Minute)
+
+		managerInterface, ok := Managers.Load(managerId)
+		if !ok {
+			break
+		}
+
+		manager, _ := managerInterface.(*ClientManager)
+
+		len := 0
+		if manager.Clients.Range(func(key, value interface{}) bool {
+			len++
+			return true
+		}); len == 0 {
+			fmt.Println("房间无人,自动关闭")
+			Managers.Delete(managerId)
+			break
+		} else {
+			fmt.Println(len)
+		}
+	}
+}
+
 // ClientHeartbeatCheck 客户端心跳检测
-func ClientHeartbeatCheck(clientID string) {
+func (manager *ClientManager) ClientHeartbeatCheck(clientID string) {
 	for {
 		time.Sleep(5 * time.Second)
 
-		clientInterface, ok := ClientManagerInstance.Clients.Load(clientID)
+		clientInterface, ok := manager.Clients.Load(clientID)
 		if !ok {
 			break
 		}
@@ -24,7 +50,7 @@ func ClientHeartbeatCheck(clientID string) {
 			fmt.Printf("Client %s heartbeat timeout", clientID)
 
 			// 注销客户端
-			ClientManagerInstance.Unregister <- client
+			manager.Unregister <- client
 			break
 		}
 	}

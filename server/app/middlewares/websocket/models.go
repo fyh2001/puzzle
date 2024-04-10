@@ -20,6 +20,7 @@ type Client struct {
 
 // ClientManager 客户端管理
 type ClientManager struct {
+	ID         string       // 客户端ID
 	Clients    sync.Map     // 客户端列表
 	Broadcast  chan []byte  // 广播消息
 	Register   chan *Client // 新增客户端
@@ -44,7 +45,7 @@ type Message struct {
 	Content string `json:"content"` // 消息
 }
 
-var GatewayUser, GatewayGroup sync.Map
+var GatewayUser, GatewayGroup, Managers sync.Map
 
 var ClientManagerInstance = ClientManager{
 	Clients:    sync.Map{},

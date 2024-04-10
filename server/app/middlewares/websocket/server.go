@@ -2,22 +2,19 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	jwt "puzzle/utils/jwt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
-// InitWsServer 初始化WebSocket服务端
-func InitWsServer() {
-	go ClientManagerInstance.Start()
-}
-
 // InitClient 初始化客户端
-func InitClient(conn *websocket.Conn) *Client {
+func (manager *ClientManager) InitClient(conn *websocket.Conn) *Client {
 
 	// clientID也可以用其他方式生成，只要能保证在所有服务端中都能保证唯一即可
 	clientID := uuid.New().String()
@@ -33,14 +30,25 @@ func InitClient(conn *websocket.Conn) *Client {
 	}
 
 	// 注册客户端
-	ClientManagerInstance.Register <- client
-
-	// if err := conn.WriteMessage(websocket.TextMessage, []byte(clientID)); err != nil {
-	// 	ClientManagerInstance.Unregister <- client
-	// 	return nil
-	// }
+	manager.Register <- client
 
 	return client
+}
+
+// InitClientManager 初始化服务端
+func InitClientManager(id string) *ClientManager {
+	manage := &ClientManager{
+		ID:         id,
+		Clients:    sync.Map{},
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+		Broadcast:  make(chan []byte),
+		Timer:      time.NewTimer(5 * time.Second),
+	}
+
+	Managers.Store(id, manage)
+
+	return manage
 }
 
 // Start 启动客户端管理
@@ -60,18 +68,19 @@ func (manager *ClientManager) Start() {
 		case conn := <-manager.Register:
 			manager.Clients.Store(conn.ID, conn)
 		case conn := <-manager.Unregister:
-			if _, ok := manager.Clients.Load(conn); ok {
-				conn.CloseClient()
-			}
+			fmt.Println("开始注销")
 
+			if _, ok := manager.Clients.Load(conn.ID); ok {
+				fmt.Println("注销成功")
+				manager.CloseClient(conn)
+			}
 		case message := <-manager.Broadcast:
-			log.Println("广播消息")
 			manager.Clients.Range(func(key, value interface{}) bool {
 				client := value.(*Client)
 				select {
 				case client.Send <- message:
 				default:
-					client.CloseClient()
+					manager.CloseClient(client)
 				}
 				return true
 			})
@@ -80,8 +89,8 @@ func (manager *ClientManager) Start() {
 }
 
 // closeClient 关闭客户端
-func (c *Client) CloseClient() {
-	if value, ok := ClientManagerInstance.Clients.Load(c.ID); ok {
+func (manager *ClientManager) CloseClient(c *Client) {
+	if value, ok := manager.Clients.Load(c.ID); ok {
 		client := value.(*Client)
 		if client.BindUserId != "" {
 			clientUnBindUid(c.ID, client.BindUserId)
@@ -91,7 +100,7 @@ func (c *Client) CloseClient() {
 			clientLeaveGroup(c.ID)
 		}
 
-		ClientManagerInstance.Clients.Delete(c.ID)
+		manager.Clients.Delete(c.ID)
 	}
 
 	close(c.Send)  // 关闭发送消息通道
@@ -118,6 +127,8 @@ func (c *Client) Reader(manager *ClientManager) {
 		}
 
 		json.Unmarshal(message, c.Message)
+
+		fmt.Println(c.Message)
 
 		switch c.Message.Type {
 		case "ping": // 心跳消息
