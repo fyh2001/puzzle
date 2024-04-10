@@ -88,8 +88,6 @@ func (WebSocketController) ConnectById(c *gin.Context) {
 
 	client := clientManager.(*ws.ClientManager).InitClient(conn)
 
-	fmt.Println(client)
-
 	// 发送客户端唯一标识 ID
 	if client.ID == "" {
 		return
