@@ -68,10 +68,8 @@ func (manager *ClientManager) Start() {
 		case conn := <-manager.Register:
 			manager.Clients.Store(conn.ID, conn)
 		case conn := <-manager.Unregister:
-			fmt.Println("开始注销")
 
 			if _, ok := manager.Clients.Load(conn.ID); ok {
-				fmt.Println("注销成功")
 				manager.CloseClient(conn)
 			}
 		case message := <-manager.Broadcast:
