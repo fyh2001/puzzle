@@ -68,7 +68,6 @@ func (manager *ClientManager) Start() {
 		case conn := <-manager.Register:
 			manager.Clients.Store(conn.ID, conn)
 		case conn := <-manager.Unregister:
-
 			if _, ok := manager.Clients.Load(conn.ID); ok {
 				manager.CloseClient(conn)
 			}
@@ -135,7 +134,10 @@ func (c *Client) Reader(manager *ClientManager) {
 					Type:    "auth",
 					Content: "未认证用户",
 				})
+
 				c.Send <- message // 回复认证消息
+
+				time.Sleep(1 * time.Second)
 				manager.Unregister <- c
 				return
 			}

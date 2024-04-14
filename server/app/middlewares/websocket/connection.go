@@ -28,8 +28,6 @@ func ClientManagerHearBeatCheck(managerId string) {
 			fmt.Println("房间无人,自动关闭")
 			Managers.Delete(managerId)
 			break
-		} else {
-			fmt.Println(len)
 		}
 	}
 }
