@@ -1,0 +1,6 @@
+{
+  "github-enterprise.uri": "https://enterprise.mstp.online",
+  "github.copilot.advanced": {
+    "authProvider": "github-enterprise"
+  }
+}
