@@ -20,7 +20,7 @@ type User struct {
 }
 
 type UserReq struct {
-	ID         int64            `json:"id" gorm:"primaryKey"`        // 主键ID
+	ID         int64            `json:"-"`                           // 主键ID
 	Username   string           `json:"username"`                    // 用户名
 	Password   string           `json:"password"`                    // 密码
 	Nickname   string           `json:"nickname"`                    // 昵称
@@ -31,6 +31,7 @@ type UserReq struct {
 	Status     int8             `json:"status" gorm:"default 1"`     // 状态 1:启用 2:冻结 3:删除
 	Pagination utils.Pagination `gorm:"embedded"`                    // 分页
 	DateRange  []time.Time      `json:"dateRange"`                   // 时间范围
+	IDStr      string           `json:"idStr"`                       // ID字符串
 	IDs        []int64          `json:"ids"`                         // 主键ID集合
 	Sorted     string           `json:"sorted"`                      // 排序
 	OrderBy    string           `json:"orderBy"`                     // 排序字段

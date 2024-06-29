@@ -1,75 +1,101 @@
 package controllers
 
 import (
-	"errors"
+	"puzzle/app/common"
 	"puzzle/app/models"
-	"puzzle/database"
-	"puzzle/utils"
+	"puzzle/app/services"
+	"strconv"
 
-	"gorm.io/gorm"
+	"github.com/gin-gonic/gin"
 )
 
-type UserService interface {
-	Register(u *models.UserRegisterReq) error
+type UserController struct{}
+
+func (UserController) Register(c *gin.Context) {
+
+	var registerReq models.UserRegisterReq
+
+	if err := c.ShouldBindJSON(&registerReq); err != nil {
+		c.JSON(200, common.HttpResult.Fail("参数错误"))
+		return
+	}
+
+	if err := services.User.Register(&registerReq); err != nil {
+		c.JSON(200, common.HttpResult.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, common.HttpResult.Success("注册成功"))
 }
 
-type UserServiceImpl struct{}
+func (UserController) Login(c *gin.Context) {
 
-const (
-	StatusNormal int8 = 1 + iota
-	StatusFrozen
-	StatusDeleted
-)
+	var loginReq models.UserLoginReq
 
-func (UserServiceImpl) Register(u *models.UserRegisterReq) error {
-
-	var tempUser models.User
-
-	// 检查用户名重复
-	row := database.GetMySQL().Model(&models.User{}).Where("username = ? AND status != ?", u.Username, StatusDeleted).First(&tempUser).RowsAffected
-	if row > 0 {
-		return errors.New("用户名已存在")
+	// 参数校验
+	if err := c.ShouldBindJSON(&loginReq); err != nil {
+		c.JSON(200, common.HttpResult.Fail("参数错误"))
+		return
 	}
 
-	// 检查昵称重复
-	row = database.GetMySQL().Model(&models.User{}).Where("nickname = ? AND status != ?", u.Nickname, StatusDeleted).First(&tempUser).RowsAffected
-	if row > 0 {
-		return errors.New("昵称已存在")
+	// 登录
+	userInfo, err := services.User.Login(&loginReq)
+	if err != nil {
+		c.JSON(200, common.HttpResult.Fail(err.Error()))
+		return
 	}
+
+	c.JSON(200, common.HttpResult.Success(userInfo))
+}
+
+func (UserController) List(c *gin.Context) {
+
+	var userReq models.UserReq
+
+	// 参数校验
+	if err := c.ShouldBind(&userReq); err != nil {
+		c.JSON(200, common.HttpResult.Fail("参数错误"))
+		return
+	}
+
+	// 查询用户列表
+	userList, err := services.User.List(&userReq)
+	if err != nil {
+		c.JSON(200, common.HttpResult.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(200, common.HttpResult.Success(userList))
+}
+
+func (UserController) Update(c *gin.Context) {
+	var userReq models.UserReq
+
+	err := c.ShouldBind(&userReq)
+	if err != nil {
+		c.JSON(200, common.HttpResult.Fail("参数错误"))
+		return
+	}
+
+	id, _ := strconv.ParseInt(userReq.IDStr, 10, 64)
 
 	user := &models.User{
-		ID:       (&utils.Snowflake{}).NextVal(),
-		Username: u.Username,
-		Password: utils.MD5(u.Password),
-		Nickname: u.Nickname,
-		Status:   StatusNormal,
+		ID:         id,
+		Username:   userReq.Username,
+		Nickname:   userReq.Nickname,
+		AccoladeId: userReq.AccoladeId,
+		Email:      userReq.Email,
+		Phone:      userReq.Phone,
+		Password:   userReq.Password,
+		Status:     userReq.Status,
 	}
 
-	return database.GetMySQL().Create(user).Error
-}
-
-func (UserServiceImpl) Login(u *models.UserLoginReq) (models.UserLoginResp, error) {
-
-	var loginResp models.UserLoginResp
-
-	var userInfo models.User
-	err := database.GetMySQL().Model(&models.User{}).Where("username = ?", u.Username).First(&userInfo).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return loginResp, errors.New("用户不存在")
+	// 更新用户
+	err = services.User.Update(user)
+	if err != nil {
+		c.JSON(200, common.HttpResult.Fail(err.Error()))
+		return
 	}
 
-	if userInfo.Password != utils.MD5(u.Password) {
-		return loginResp, errors.New("用户名或密码错误")
-	}
-
-	if userInfo.Status == StatusFrozen {
-		return loginResp, errors.New("用户已冻结")
-	}
-
-	if userInfo.Status == StatusDeleted {
-		return loginResp, errors.New("用户已注销")
-	}
-
-	return loginResp, nil
+	c.JSON(200, common.HttpResult.Success("更新成功"))
 }
