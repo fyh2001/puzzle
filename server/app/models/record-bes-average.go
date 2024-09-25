@@ -1,20 +1,22 @@
 package models
 
 import (
+	"gorm.io/gorm"
 	"puzzle/utils"
 	"time"
 )
 
 // RecordBestAverage 最佳平均记录模型
 type RecordBestAverage struct {
-	ID                    int64     `json:"id" gorm:"primaryKey"`            // 主键ID
-	UserID                int64     `json:"userId"`                          // 用户ID
-	Dimension             int       `json:"dimension"`                       // 阶数 3 | 4 | 5 | 6 | 7 | 8
-	Type                  int       `json:"type"`                            // 类型 5:5次平均 12:12次平均
-	RecordIDs             string    `json:"recordIds"`                       // 记录ID
-	RecordAverageDuration int       `json:"recordAverageDuration"`           // 平均耗时
-	RecordBreakCount      int       `json:"recordBreakCount"`                // 破纪录次数
-	Ranked                int       `json:"ranked"`                          // 排名
+	ID                    int64  `json:"id" gorm:"primaryKey"`  // 主键ID
+	UserID                int64  `json:"userId"`                // 用户ID
+	Dimension             int    `json:"dimension"`             // 阶数 3 | 4 | 5 | 6 | 7 | 8
+	Type                  int    `json:"type"`                  // 类型 5:5次平均 12:12次平均
+	RecordIDs             string `json:"recordIds"`             // 记录ID
+	RecordAverageDuration int    `json:"recordAverageDuration"` // 平均耗时
+	RecordBreakCount      int    `json:"recordBreakCount"`      // 破纪录次数
+	Ranked                int    `json:"ranked"`                // 排名
+	DeletedAt             gorm.DeletedAt
 	CreatedAt             time.Time `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt             time.Time `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 }

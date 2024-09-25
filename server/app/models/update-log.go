@@ -1,17 +1,19 @@
 package models
 
 import (
+	"gorm.io/gorm"
 	"puzzle/utils"
 	"time"
 )
 
 type UpdateLog struct {
-	ID          int64     `json:"id" gorm:"primary_key"`           // 主键ID
-	Version     string    `json:"version"`                         // 版本号
-	Type        int       `json:"type"`                            // 类型 1:日常更新 2:重大更新
-	Content     string    `json:"content"`                         // 更新内容
-	Description string    `json:"description"`                     // 描述
-	Status      int       `json:"status"`                          // 状态 0:启用 2:冻结 3:删除
+	ID          int64  `json:"id" gorm:"primary_key"` // 主键ID
+	Version     string `json:"version"`               // 版本号
+	Type        int    `json:"type"`                  // 类型 1:日常更新 2:重大更新
+	Content     string `json:"content"`               // 更新内容
+	Description string `json:"description"`           // 描述
+	Status      int    `json:"status"`                // 状态 0:启用 2:冻结 3:删除
+	DeletedAt   gorm.DeletedAt
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt   time.Time `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 }

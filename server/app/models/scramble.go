@@ -1,16 +1,18 @@
 package models
 
 import (
+	"gorm.io/gorm"
 	"puzzle/utils"
 	"time"
 )
 
 type Scramble struct {
-	ID        int64     `json:"id" gorm:"primaryKey"`            // 主键ID
-	Dimension int       `json:"dimension"`                       // 阶数 3 | 4 | 5 | 6
-	IDx       int64     `json:"idx"`                             // 随机数索引
-	Scramble  string    `json:"scramble"`                        // 打乱公式
-	Status    int8      `json:"status" gorm:"default 1"`         // 状态 1:启用 2:冻结 3:删除
+	ID        int64  `json:"id" gorm:"primaryKey"`    // 主键ID
+	Dimension int    `json:"dimension"`               // 阶数 3 | 4 | 5 | 6
+	IDx       int64  `json:"idx"`                     // 随机数索引
+	Scramble  string `json:"scramble"`                // 打乱公式
+	Status    int8   `json:"status" gorm:"default 1"` // 状态 1:启用 2:冻结 3:删除
+	DeletedAt gorm.DeletedAt
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 }

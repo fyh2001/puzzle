@@ -1,15 +1,17 @@
 package models
 
 import (
+	"gorm.io/gorm"
 	"puzzle/utils"
 	"time"
 )
 
 type NotificationType struct {
-	ID        int       `json:"id" gorm:"primary_key"`           // 主键ID
-	Name      string    `json:"name"`                            // 名称
-	Icon      string    `json:"icon"`                            // 图标
-	Status    int       `json:"status"`                          // 状态 1:启用 2:冻结 3:删除
+	ID        int    `json:"id" gorm:"primary_key"` // 主键ID
+	Name      string `json:"name"`                  // 名称
+	Icon      string `json:"icon"`                  // 图标
+	Status    int    `json:"status"`                // 状态 1:启用 2:冻结 3:删除
+	DeletedAt gorm.DeletedAt
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 }

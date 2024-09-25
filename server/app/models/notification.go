@@ -1,17 +1,19 @@
 package models
 
 import (
+	"gorm.io/gorm"
 	"puzzle/utils"
 	"time"
 )
 
 type Notification struct {
-	ID         int64     `json:"id" gorm:"primary_key"`           // 主键ID
-	UserID     int64     `json:"userId" gorm:"default 0"`         // 用户ID 0:全体通知
-	TypeID     int       `json:"typeId"`                          // 类型ID
-	Content    string    `json:"content"`                         // 内容
-	ReadStatus int       `json:"readStatus" gorm:"default 1"`     // 状态 1:未读 2: 已读
-	Status     int       `json:"status" gorm:"default 1"`         // 状态 1:启用 2:冻结 3:删除
+	ID         int64  `json:"id" gorm:"primary_key"`       // 主键ID
+	UserID     int64  `json:"userId" gorm:"default 0"`     // 用户ID 0:全体通知
+	TypeID     int    `json:"typeId"`                      // 类型ID
+	Content    string `json:"content"`                     // 内容
+	ReadStatus int    `json:"readStatus" gorm:"default 1"` // 状态 1:未读 2: 已读
+	Status     int    `json:"status" gorm:"default 1"`     // 状态 1:启用 2:冻结 3:删除
+	DeletedAt  gorm.DeletedAt
 	CreatedAt  time.Time `json:"createdAt" gorm:"autoCreateTime"` // 创建时间
 	UpdatedAt  time.Time `json:"updatedAt" gorm:"autoUpdateTime"` // 更新时间
 }

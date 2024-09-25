@@ -8,7 +8,7 @@ import (
 
 func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// TODO
+
 		var code int
 		var data interface{}
 
@@ -22,7 +22,7 @@ func JWT() gin.HandlerFunc {
 			if err != nil {
 				code = 40002 // token不合法
 			} else {
-				c.Set("userId", claims.Id)
+				c.Set("userID", claims.Id)
 				c.Set("username", claims.Username)
 			}
 			//else if time.Now().Unix() > claims.ExpiresAt {
