@@ -26,5 +26,5 @@ func main() {
 
 	router := routes.InitRouter() // 初始化路由
 
-	_ = router.Run(":" + config.Settings.Application.Port) // 启动服务端
+	router.RunTLS(":"+config.Settings.Application.Port, "path/to/your/cert.pem", "path/to/your/key.key")
 }

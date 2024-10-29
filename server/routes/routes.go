@@ -4,7 +4,7 @@ import (
 	"puzzle/app/controllers"
 	"puzzle/app/middlewares/cors"
 	"puzzle/app/middlewares/jwt"
-
+	"net/http"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,7 +12,7 @@ func InitRouter() *gin.Engine {
 	r := gin.Default()
 
 	// 静态文件服务
-	r.Static("/static", "./static")
+	r.StaticFS("/static", http.Dir("./static"))
 
 	//启用跨域中间件
 	r.Use(cors.Cors())
